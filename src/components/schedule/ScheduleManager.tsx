@@ -33,7 +33,6 @@ const DAY_MAP: Record<string, number> = {
 
 export function ScheduleManager() {
   const {
-    allSchedules,
     activeSchedule,
     setActiveSchedule,
     clearActiveSchedule,
@@ -311,24 +310,18 @@ export function ScheduleManager() {
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                 <label htmlFor="sm-start-date" style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '0.1rem', paddingLeft: '2px' }}>Start Week (Mon)</label>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                  {activeSchedule && allSchedules.length > 1 && (
-                    <button
-                      className="sm-btn-ghost"
-                      style={{ padding: '0.2rem', marginRight: '0.25rem' }}
-                      onClick={() => {
-                        const sorted = [...allSchedules].sort((a,b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
-                        const idx = sorted.findIndex(s => s.id === activeSchedule.id)
-                        if (idx > 0) setActiveSchedule(sorted[idx - 1])
-                      }}
-                      disabled={(() => {
-                        const sorted = [...allSchedules].sort((a,b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
-                        return sorted.findIndex(s => s.id === activeSchedule.id) <= 0
-                      })()}
-                      title="View previous schedule"
-                    >
-                      <ChevronLeft size={16} />
-                    </button>
-                  )}
+                  <button
+                    className="sm-btn-ghost"
+                    style={{ padding: '0.2rem', marginRight: '0.25rem' }}
+                    onClick={() => {
+                      const d = new Date(`${targetStartDate}T00:00:00`)
+                      d.setDate(d.getDate() - 7)
+                      setTargetStartDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)
+                    }}
+                    title="Previous Week"
+                  >
+                    <ChevronLeft size={16} />
+                  </button>
                   <input 
                     id="sm-start-date"
                     type="date"
@@ -355,25 +348,18 @@ export function ScheduleManager() {
                       fontSize: '0.85rem'
                     }}
                   />
-                  {activeSchedule && allSchedules.length > 1 && (
-                    <button
-                      className="sm-btn-ghost"
-                      style={{ padding: '0.2rem', marginLeft: '0.25rem' }}
-                      onClick={() => {
-                        const sorted = [...allSchedules].sort((a,b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
-                        const idx = sorted.findIndex(s => s.id === activeSchedule.id)
-                        if (idx !== -1 && idx < sorted.length - 1) setActiveSchedule(sorted[idx + 1])
-                      }}
-                      disabled={(() => {
-                        const sorted = [...allSchedules].sort((a,b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
-                        const idx = sorted.findIndex(s => s.id === activeSchedule.id)
-                        return idx === -1 || idx >= sorted.length - 1
-                      })()}
-                      title="View next schedule"
-                    >
-                      <ChevronRight size={16} />
-                    </button>
-                  )}
+                  <button
+                    className="sm-btn-ghost"
+                    style={{ padding: '0.2rem', marginLeft: '0.25rem' }}
+                    onClick={() => {
+                      const d = new Date(`${targetStartDate}T00:00:00`)
+                      d.setDate(d.getDate() + 7)
+                      setTargetStartDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)
+                    }}
+                    title="Next Week"
+                  >
+                    <ChevronRight size={16} />
+                  </button>
                 </div>
             </div>
             
