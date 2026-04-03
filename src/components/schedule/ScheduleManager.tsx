@@ -6,6 +6,7 @@ import { useCoverageStore } from '../../stores/coverageStore'
 import { generateScheduleAsync } from '../../engine/worker/client'
 import { createSchedule, createShift } from '../../types/factories'
 import type { Shift, ShiftAssignment } from '../../types/index'
+import { useTemplateStore } from '../../stores/templateStore'
 import { WeeklyGrid } from './WeeklyGrid'
 import { TimelineGrid } from './TimelineGrid'
 import { CoverageHeatmap } from './CoverageHeatmap'
@@ -38,6 +39,7 @@ export function ScheduleManager() {
   } = useScheduleStore()
   const { employees } = useEmployeeStore()
   const { requirements } = useCoverageStore()
+  const { templates } = useTemplateStore()
 
   const [viewMode, setViewMode] = useState<ViewMode>('matrix')
 
@@ -46,25 +48,55 @@ export function ScheduleManager() {
   const [errorStatus, setErrorStatus] = useState<string | null>(null)
 
   const handleGenerate = async () => {
-    if (employees.length === 0 || requirements.length === 0) {
+    const pendingTemplateId = useScheduleStore.getState().pendingTemplateId
+    const template = pendingTemplateId ? templates.find((t) => t.id === pendingTemplateId) : null
+
+    if (employees.length === 0 || (!template && requirements.length === 0)) {
       alert('You must configure at least 1 employee and 1 coverage requirement first.')
       return
     }
+
+    // Clear pending template flag once we begin
+    useScheduleStore.getState().setPendingTemplateId(null)
 
     setIsGenerating(true)
     setProgress(0)
     setErrorStatus(null)
 
-    // Convert Requirements to concrete shifts for the timeframe
-    // For Epic 4 scope, we map 1 Requirement -> 1 Shift
-    const generatedShifts: Shift[] = requirements.map((r) =>
-      createShift({
-        day: r.day,
-        startTime: r.startTime,
-        endTime: r.endTime,
-        requiredStaff: r.requiredStaff,
-      }),
-    )
+    let generatedShifts: Shift[] = []
+    let totalWeeks = 1
+
+    if (template) {
+      // Epic 5: Multi-week schedule expansion
+      if (template.pattern.kind === 'biweekly') totalWeeks = 2
+      else if (template.pattern.kind === 'rotation')
+        totalWeeks = template.pattern.cycleLength || 4 // default 4 if empty
+      else if (template.pattern.kind === 'monthly') totalWeeks = 4
+
+      for (let w = 0; w < totalWeeks; w++) {
+        const weeklyOffsetShifts = template.coverageRequirements.map((r) =>
+          createShift({
+            day: r.day,
+            startTime: r.startTime,
+            endTime: r.endTime,
+            requiredStaff: r.requiredStaff,
+            weekNumber: w, // assign the explicit week instance
+          }),
+        )
+        generatedShifts.push(...weeklyOffsetShifts)
+      }
+    } else {
+      // Epic 4 fallback (1 week from manual baseline requirements)
+      generatedShifts = requirements.map((r) =>
+        createShift({
+          day: r.day,
+          startTime: r.startTime,
+          endTime: r.endTime,
+          requiredStaff: r.requiredStaff,
+          weekNumber: 0,
+        }),
+      )
+    }
 
     // MAP TO ENGINE DTOs
     const engineEmployees: EngineEmployee[] = employees.map((e) => ({
@@ -120,9 +152,11 @@ export function ScheduleManager() {
         }))
 
       const newSchedule = createSchedule({
-        name: `Auto Generated - Week of ${new Date().toLocaleDateString()}`,
+        name: template
+          ? `Generated from ${template.name}`
+          : `Auto Generated - Week of ${new Date().toLocaleDateString()}`,
         startDate: new Date().toISOString(),
-        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        endDate: new Date(Date.now() + totalWeeks * 7 * 24 * 60 * 60 * 1000).toISOString(),
         shifts: generatedShifts,
         assignments: finalAssignments,
         qualityScore: result.success ? 100 : 0,
@@ -295,7 +329,36 @@ export function ScheduleManager() {
               </div>
             )}
 
-            {viewMode === 'matrix' ? <WeeklyGrid /> : <TimelineGrid />}
+            {viewMode === 'matrix' ? (
+              <div
+                className="scroll-matrix-wrapper"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '3rem',
+                  padding: '1rem',
+                  overflowY: 'auto',
+                }}
+              >
+                {Array.from({
+                  length:
+                    Math.ceil(
+                      (new Date(activeSchedule.endDate).getTime() -
+                        new Date(activeSchedule.startDate).getTime()) /
+                        (7 * 24 * 60 * 60 * 1000),
+                    ) || 1,
+                }).map((_, i) => (
+                  <div key={i} className="weekly-block">
+                    <h4 style={{ margin: '0 0 1rem 0', color: 'var(--text-muted)' }}>
+                      Week {i + 1}
+                    </h4>
+                    <WeeklyGrid weekNumber={i} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <TimelineGrid />
+            )}
 
             <div
               className="schedule-analytics"

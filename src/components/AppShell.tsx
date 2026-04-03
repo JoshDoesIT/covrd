@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { ScheduleManager } from './schedule/ScheduleManager'
 import { CommandPalette } from './tooling/CommandPalette'
+import { TemplatesView } from './templates/TemplatesView'
 import './AppShell.css'
 
 /** Navigation items for the sidebar. */
@@ -44,6 +45,8 @@ export function AppShell() {
     switch (activeNav) {
       case 'schedule':
         return <ScheduleManager />
+      case 'templates':
+        return <TemplatesView onNavigate={setActiveNav} />
       default:
         return (
           <div className="shell__placeholder">

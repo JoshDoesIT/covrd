@@ -18,6 +18,8 @@ interface ScheduleState {
   commitSandbox: () => void
   discardSandbox: () => void
   reset: () => void
+  pendingTemplateId: string | null
+  setPendingTemplateId: (id: string | null) => void
 }
 
 /**
@@ -29,6 +31,9 @@ export const useScheduleStore = create<ScheduleState>((set) => ({
   scheduleHistory: [],
   isSandboxMode: false,
   baselineSchedule: null,
+  pendingTemplateId: null,
+
+  setPendingTemplateId: (id) => set({ pendingTemplateId: id }),
 
   setActiveSchedule: (schedule) => {
     set({ activeSchedule: schedule })

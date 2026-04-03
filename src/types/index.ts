@@ -105,6 +105,8 @@ export interface Shift {
   endTime: string
   /** Number of employees needed for this shift. */
   requiredStaff: number
+  /** Week offset from the start date (0 = first week). Required for multi-week. */
+  weekNumber?: number
 }
 
 /**
