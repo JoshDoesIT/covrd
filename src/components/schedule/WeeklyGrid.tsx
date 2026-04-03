@@ -183,47 +183,52 @@ export function WeeklyGrid({
     <DndContext collisionDetection={pointerWithin} onDragEnd={handleDragEnd}>
       <div className="wg-wrapper">
         <div className="wg-grid">
-          {/* Top-Left Empty Corner */}
-          <div className="wg-header-cell wg-corner">Roster</div>
+          {/* Header Row Wrapper */}
+          <div className="wg-print-row-group">
+            {/* Top-Left Empty Corner */}
+            <div className="wg-header-cell wg-corner">Roster</div>
 
-          {/* Column Headers (Days) */}
-          {DAYS_OF_WEEK.map((day) => (
-            <div key={day} className="wg-header-cell">
-              {startDate ? formatDayHeader(startDate, weekNumber, day) : day}
-            </div>
-          ))}
-
-          {/* Unassigned Pool Row */}
-          <div className="wg-row-label wg-unassigned-pool">
-            <span className="wg-emp-name">Unassigned / Need Staff</span>
-            <span className="wg-emp-target">Pending fulfilling</span>
+            {/* Column Headers (Days) */}
+            {DAYS_OF_WEEK.map((day) => (
+              <div key={day} className="wg-header-cell">
+                {startDate ? formatDayHeader(startDate, weekNumber, day) : day}
+              </div>
+            ))}
           </div>
 
-          {DAYS_OF_WEEK.map((day) => {
-            const dayShifts = shiftsByDay.get(day) ?? []
-            // render shifts that still need staff
-            const neededShifts: Shift[] = []
+          {/* Unassigned Pool Wrapper */}
+          <div className="wg-print-row-group">
+            <div className="wg-row-label wg-unassigned-pool">
+              <span className="wg-emp-name">Unassigned / Need Staff</span>
+              <span className="wg-emp-target">Pending fulfilling</span>
+            </div>
 
-            dayShifts.forEach((shift) => {
-              const assignedCount = assignmentsByShift.get(shift.id)?.length ?? 0
-              if (assignedCount < shift.requiredStaff) {
-                // If it needs 3 staff but has 1, render 2 draggable tiles!
-                // Wait, if it has a unique shift ID from the expanded generator,
-                // each shift only has requiredStaff=1 inherently, so we just check if it has 0 assignments.
-                if (assignedCount === 0) {
-                  neededShifts.push(shift)
+            {DAYS_OF_WEEK.map((day) => {
+              const dayShifts = shiftsByDay.get(day) ?? []
+              // render shifts that still need staff
+              const neededShifts: Shift[] = []
+
+              dayShifts.forEach((shift) => {
+                const assignedCount = assignmentsByShift.get(shift.id)?.length ?? 0
+                if (assignedCount < shift.requiredStaff) {
+                  // If it needs 3 staff but has 1, render 2 draggable tiles!
+                  // Wait, if it has a unique shift ID from the expanded generator,
+                  // each shift only has requiredStaff=1 inherently, so we just check if it has 0 assignments.
+                  if (assignedCount === 0) {
+                    neededShifts.push(shift)
+                  }
                 }
-              }
-            })
+              })
 
-            return (
-              <DroppableCell key={`unassigned-${day}`} id={`unassigned-${day}`} day={day}>
-                {neededShifts.map((s) => (
-                  <DraggableShift key={`pool-${s.id}`} shift={s} isAssigned={false} />
-                ))}
-              </DroppableCell>
-            )
-          })}
+              return (
+                <DroppableCell key={`unassigned-${day}`} id={`unassigned-${day}`} day={day}>
+                  {neededShifts.map((s) => (
+                    <DraggableShift key={`pool-${s.id}`} shift={s} isAssigned={false} />
+                  ))}
+                </DroppableCell>
+              )
+            })}
+          </div>
 
           {/* Employee Rows */}
           {employees.map((emp) => {
@@ -245,7 +250,7 @@ export function WeeklyGrid({
             })
 
             return (
-              <React.Fragment key={emp.id}>
+              <div className="wg-print-row-group" key={emp.id}>
                 <div className="wg-row-label">
                   <span className="wg-emp-name">{emp.name}</span>
                   <span
@@ -272,7 +277,7 @@ export function WeeklyGrid({
                     </DroppableCell>
                   )
                 })}
-              </React.Fragment>
+              </div>
             )
           })}
         </div>
