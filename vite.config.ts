@@ -7,10 +7,13 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          state: ['zustand', 'dexie'],
-          ui: ['lucide-react', 'cmdk'],
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react')) return 'vendor'
+            if (id.includes('zustand') || id.includes('dexie')) return 'state'
+            if (id.includes('lucide') || id.includes('cmdk')) return 'ui'
+            return 'vendor-scripts'
+          }
         },
       },
     },
