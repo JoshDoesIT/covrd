@@ -329,10 +329,10 @@ a:hover {
     box-shadow: none !important;
   }
 
-  /* Force CSS Grid strictly to fit on paper width */
-  /* Disable grid to allow flex row wrapping for pagination */
+  /* Convert grid entirely to an HTML Table structure strictly for Print logic */
+  /* This enables the OS to natively repeat headers on new pages */
   .wg-grid {
-    display: block !important;
+    display: table !important;
     min-width: 0 !important;
     width: 100% !important;
     border-top: 1px solid #000 !important;
@@ -340,24 +340,34 @@ a:hover {
     border-right: 1px solid #000 !important;
   }
 
+  .wg-print-thead {
+    display: table-header-group !important;
+  }
+
+  .wg-print-tbody {
+    display: table-row-group !important;
+  }
+
   .wg-print-row-group {
-    display: flex !important;
+    display: table-row !important;
     width: 100% !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
-    border-bottom: 1px solid #000 !important;
   }
 
-  /* Flatten Sticky elements and apply sharp borders */
+  /* Flatten Sticky elements and apply sharp table borders */
   .wg-header-cell,
   .wg-row-label,
   .wg-cell {
     position: static !important;
+    display: table-cell !important;
     background: #fff !important;
     color: #000 !important;
     border: none !important;
     border-right: 1px solid #000 !important;
+    border-bottom: 1px solid #000 !important;
     padding: 6px !important;
+    vertical-align: top !important;
   }
 
   /* Remove double border on last item */
@@ -368,11 +378,10 @@ a:hover {
 
   .wg-row-label, .wg-header-cell.wg-corner {
     width: 180px !important;
-    flex-shrink: 0 !important;
   }
 
   .wg-header-cell:not(.wg-corner), .wg-cell {
-    flex: 1 1 0 !important;
+    width: auto !important;
   }
 
   .wg-header-cell {
@@ -407,6 +416,8 @@ a:hover {
 }
 
 /* Ensure React wrappers do not break native CSS Grid on web */
-.wg-print-row-group {
+.wg-print-row-group,
+.wg-print-thead,
+.wg-print-tbody {
   display: contents;
 }
