@@ -64,18 +64,22 @@ export function LandingPage({ onLaunch, onShowPrivacy, onShowAccessibility }: La
               milliseconds. It learns your coverage requirements and instantly builds perfect shifts.
             </p>
             <div className="landing__mock-scheduler">
-              {Array.from({ length: 21 }).map((_, i) => {
-                // Randomly assign some blocks to be pre-filled vs animated
-                const isFixed = Math.random() > 0.7;
-                const delay = (i % 7) * 0.15 + Math.random() * 0.5;
-                return (
-                  <div 
-                    key={i} 
-                    className={`landing__mock-cell ${isFixed ? 'fixed' : ''}`} 
-                    style={!isFixed ? { animationDelay: `${delay}s` } : {}}
-                  />
-                );
-              })}
+              <div className="landing__mock-calendar-header">
+                <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+              </div>
+              <div className="landing__mock-calendar-grid">
+                {Array.from({ length: 21 }).map((_, i) => {
+                  const isFixed = Math.random() > 0.7;
+                  const delay = (i % 7) * 0.15 + Math.random() * 0.5;
+                  return (
+                    <div 
+                      key={i} 
+                      className={`landing__mock-cell ${isFixed ? 'fixed' : ''}`} 
+                      style={!isFixed ? { animationDelay: `${delay}s` } : {}}
+                    />
+                  );
+                })}
+              </div>
             </div>
           </div>
 
@@ -111,14 +115,14 @@ export function LandingPage({ onLaunch, onShowPrivacy, onShowAccessibility }: La
               Covrd operates entirely within your browser's local sandbox. There is absolutely no server telemetry, no user accounts, and no backend database holding your employee data.
             </p>
             <div className="landing__mock-security">
-              <div className="landing__security-node landing__security-node--cloud">
-                <ServerOff size={24} />
-                <span>Blocked</span>
-              </div>
-              <div className="landing__security-flow" />
               <div className="landing__security-node landing__security-node--browser">
                 <MonitorSmartphone size={24} />
                 <span>Local Sandbox</span>
+              </div>
+              <div className="landing__security-flow" />
+              <div className="landing__security-node landing__security-node--cloud">
+                <ServerOff size={24} />
+                <span>Blocked</span>
               </div>
             </div>
           </div>
