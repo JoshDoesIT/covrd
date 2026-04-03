@@ -303,6 +303,8 @@
   color: var(--color-text-primary);
   outline: none;
   transition: border-color 0.2s ease;
+  box-sizing: border-box;
+  height: 42px;
 }
 
 .form-input:focus {
