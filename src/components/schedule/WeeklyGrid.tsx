@@ -221,11 +221,11 @@ export function WeeklyGrid({ weekNumber = 0, startDate }: { weekNumber?: number;
 
           {/* Employee Rows */}
           {employees.map((emp) => {
-            // Calculate assigned hours this week for display
+            // Calculate assigned hours EXACTLY for this week for display
             const assignedShifts = activeSchedule.assignments
               .filter((a) => a.employeeId === emp.id)
               .map((a) => activeSchedule.shifts.find((s) => s.id === a.shiftId))
-              .filter(Boolean) as Shift[]
+              .filter((s) => s && (s.weekNumber || 0) === weekNumber) as Shift[]
 
             let totalHours = 0
             assignedShifts.forEach((s) => {
@@ -247,10 +247,7 @@ export function WeeklyGrid({ weekNumber = 0, startDate }: { weekNumber?: number;
                 </div>
 
                 {DAYS_OF_WEEK.map((day) => {
-                  const empDayShifts = activeSchedule.assignments
-                    .filter((a) => a.employeeId === emp.id)
-                    .map((a) => activeSchedule.shifts.find((s) => s.id === a.shiftId))
-                    .filter((s) => s?.day === day) as Shift[]
+                  const empDayShifts = assignedShifts.filter((s) => s.day === day)
 
                   return (
                     <DroppableCell key={`${emp.id}-${day}`} id={`${emp.id}-${day}`} day={day}>

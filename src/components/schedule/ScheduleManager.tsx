@@ -62,8 +62,6 @@ export function ScheduleManager() {
     // Avoid UTC timezone shifting when formatting as string
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
   })
-  
-  const [manualWeeks, setManualWeeks] = useState(1)
 
   const handleGenerate = async () => {
     const pendingTemplateId = useScheduleStore.getState().pendingTemplateId
@@ -112,8 +110,8 @@ export function ScheduleManager() {
         generatedShifts.push(...weeklyOffsetShifts)
       }
     } else {
-      // Epic 4 fallback (manual baseline requirements scaled to manualWeeks)
-      totalWeeks = manualWeeks
+      // Automatic Baseline Generation extends 4 weeks into the future
+      totalWeeks = 4
       for (let w = 0; w < totalWeeks; w++) {
         const weeklyOffsetShifts = requirements.map((r) =>
           createShift({
@@ -375,28 +373,6 @@ export function ScheduleManager() {
                     </button>
                   )}
                 </div>
-            </div>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <label htmlFor="sm-weeks" style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '0.1rem', paddingLeft: '2px' }}>Weeks</label>
-              <select
-                id="sm-weeks"
-                value={manualWeeks}
-                onChange={(e) => setManualWeeks(Number(e.target.value))}
-                style={{ 
-                  background: 'var(--color-bg-elevated)',
-                  color: 'var(--color-text-primary)',
-                  border: '1px solid var(--color-border)',
-                  padding: '0.4rem 0.5rem',
-                  borderRadius: 'var(--radius-lg)',
-                  fontSize: '0.85rem'
-                }}
-              >
-                <option value={1}>1 Week</option>
-                <option value={2}>2 Weeks</option>
-                <option value={3}>3 Weeks</option>
-                <option value={4}>4 Weeks</option>
-              </select>
             </div>
             
             <button className="sm-btn-generate" onClick={handleGenerate} disabled={isGenerating}>
