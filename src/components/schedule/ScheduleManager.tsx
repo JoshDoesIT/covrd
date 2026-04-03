@@ -232,6 +232,14 @@ export function ScheduleManager() {
     }
   }
 
+  const totalWeeksInSchedule = activeSchedule
+    ? Math.ceil(
+        (new Date(activeSchedule.endDate).getTime() -
+          new Date(activeSchedule.startDate).getTime()) /
+          (7 * 24 * 60 * 60 * 1000),
+      ) || 1
+    : 1
+
   return (
     <div className="schedule-manager">
       <header className="sm-header">
@@ -514,15 +522,7 @@ export function ScheduleManager() {
           </div>
         )}
 
-        {activeSchedule ? (() => {
-          const totalWeeksInSchedule =
-            Math.ceil(
-              (new Date(activeSchedule.endDate).getTime() -
-                new Date(activeSchedule.startDate).getTime()) /
-                (7 * 24 * 60 * 60 * 1000),
-            ) || 1
-
-          return (
+        {activeSchedule ? (
           <div className="sm-grid-container" style={{ display: 'flex', flexDirection: 'column' }}>
             <div
               style={{
@@ -654,8 +654,6 @@ export function ScheduleManager() {
               <FairnessChart activeWeekNumber={activeWeekNumber} />
             </div>
           </div>
-          )
-        })()
         ) : (
           !isGenerating &&
           !errorStatus && (
