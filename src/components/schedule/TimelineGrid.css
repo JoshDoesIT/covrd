@@ -138,3 +138,13 @@
 .timeline-block-time {
   text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
+
+.timeline-block.dragging {
+  opacity: 0.8 !important;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+  cursor: grabbing;
+}
+
+.timeline-cell.wg-cell-is-over {
+  background-color: rgba(255, 255, 255, 0.05);
+}

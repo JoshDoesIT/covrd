@@ -87,7 +87,7 @@ function computeFairnessData(
  * Green (on target) → Yellow (under) → Red (over).
  */
 function getUtilizationColor(utilization: number): string {
-  if (utilization >= 80 && utilization <= 110) return '#22c55e' // On target
+  if (utilization >= 80 && utilization <= 110) return 'var(--color-accent)' // On target
   if (utilization >= 60 && utilization < 80) return '#f59e0b' // Slightly under
   if (utilization > 110 && utilization <= 130) return '#f59e0b' // Slightly over
   if (utilization < 60) return '#ef4444' // Very under-scheduled
@@ -95,7 +95,7 @@ function getUtilizationColor(utilization: number): string {
 }
 
 function getFairnessColor(score: number): string {
-  if (score >= 80) return '#22c55e'
+  if (score >= 80) return 'var(--color-accent)'
   if (score >= 60) return '#f59e0b'
   return '#ef4444'
 }
@@ -202,7 +202,7 @@ export function FairnessChart({ activeWeekNumber }: { activeWeekNumber: number }
 
       <div className="fairness-legend">
         <span className="legend-item">
-          <span className="legend-dot" style={{ background: '#22c55e' }} /> On target (80-110%)
+          <span className="legend-dot" style={{ background: 'var(--color-accent)' }} /> On target (80-110%)
         </span>
         <span className="legend-item">
           <span className="legend-dot" style={{ background: '#f59e0b' }} /> Slightly off

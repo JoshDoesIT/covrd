@@ -1,17 +1,98 @@
-import { useMemo } from 'react'
+import React, { useMemo } from 'react'
+import {
+  DndContext,
+  useDraggable,
+  useDroppable,
+  pointerWithin,
+} from '@dnd-kit/core'
+import type { DragEndEvent } from '@dnd-kit/core'
 import { useScheduleStore } from '../../stores/scheduleStore'
 import { useEmployeeStore } from '../../stores/employeeStore'
 import { useSettingsStore } from '../../stores/settingsStore'
 import { DAYS_OF_WEEK } from '../../types/index'
-import type { DayOfWeek, Shift } from '../../types/index'
+import type { DayOfWeek, Shift, Employee } from '../../types/index'
 import { formatDayHeader } from '../../utils/scheduleDates'
 import { formatTime } from '../../utils/formatTime'
 import './TimelineGrid.css'
 
+export const TimelineDraggableBlock = React.memo(function TimelineDraggableBlock({
+  shift,
+  employee,
+  left,
+  width,
+}: {
+  shift: Shift
+  employee: Employee
+  left: number
+  width: number
+}) {
+  const { timeFormat } = useSettingsStore()
+  const assignmentId = `${shift.id}__${employee.id}`
+
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: assignmentId,
+    data: { shift, employee, isAssigned: true },
+  })
+
+  // We layer transform x/y on top of our absolutely positioned left/width
+  const style: React.CSSProperties = {
+    left: `${left}%`,
+    width: `${width}%`,
+    backgroundColor: `${employee.color}30`,
+    borderColor: employee.color,
+    ...(transform
+      ? {
+          transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+          zIndex: 50,
+          opacity: 0.8,
+        }
+      : {}),
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...listeners}
+      {...attributes}
+      className={`timeline-block ${isDragging ? 'dragging' : ''}`}
+      title={`${formatTime(shift.startTime, timeFormat)} - ${formatTime(shift.endTime, timeFormat)}`}
+    >
+      <span className="timeline-block-time">
+        {formatTime(shift.startTime, timeFormat)}
+      </span>
+    </div>
+  )
+})
+
+export const TimelineDroppableCell = React.memo(function TimelineDroppableCell({
+  id,
+  day,
+  children,
+}: {
+  id: string
+  day: string
+  children: React.ReactNode
+}) {
+  const { isOver, setNodeRef } = useDroppable({
+    id,
+    data: { day },
+  })
+
+  return (
+    <td
+      ref={setNodeRef}
+      className={`timeline-cell ${isOver ? 'wg-cell-is-over' : ''}`} // Reuse the subtle background glow if needed
+      style={isOver ? { backgroundColor: 'rgba(255, 255, 255, 0.05)' } : {}}
+    >
+      {children}
+    </td>
+  )
+})
+
 export function TimelineGrid({ weekNumber = 0, startDate }: { weekNumber?: number; startDate?: string }) {
   const { activeSchedule } = useScheduleStore()
   const { employees } = useEmployeeStore()
-  const { timeFormat } = useSettingsStore()
 
   // Pre-compute shift assignments by employee and day
   const timelineData = useMemo(() => {
@@ -49,6 +130,60 @@ export function TimelineGrid({ weekNumber = 0, startDate }: { weekNumber?: numbe
     return data
   }, [activeSchedule, employees, weekNumber])
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    if (!activeSchedule) return
+
+    const { active, over } = event
+    if (!over) return
+
+    // active.id is the dragged assignment (shift.id__employee.id)
+    const draggedData = active.data.current as {
+      shift: Shift
+      employee: Employee
+      isAssigned: boolean
+    }
+
+    if (!draggedData) return
+
+    const shiftId = draggedData.shift.id
+    const oldEmployeeId = draggedData.employee.id
+
+    // over.id is the target cell e.g. "empId-day"
+    const overId = String(over.id)
+    const lastDash = overId.lastIndexOf('-')
+    const targetEmployeeId = overId.substring(0, lastDash)
+    
+    // We don't drop to unassigned in timeline view right now, but we can reassign
+    if (targetEmployeeId === oldEmployeeId) return // No change
+
+    let newAssignments = [...activeSchedule.assignments]
+
+    // Remove old
+    newAssignments = newAssignments.filter(
+      (a) => !(a.shiftId === shiftId && a.employeeId === oldEmployeeId),
+    )
+
+    // Ensure they don't already have this exact shift
+    const alreadyAssigned = newAssignments.some(
+      (a) => a.shiftId === shiftId && a.employeeId === targetEmployeeId,
+    )
+    
+    if (!alreadyAssigned) {
+      newAssignments.push({
+        id: crypto.randomUUID(),
+        shiftId: shiftId,
+        employeeId: targetEmployeeId,
+        isManual: true,
+      })
+    }
+
+    useScheduleStore.getState().setActiveSchedule({
+      ...activeSchedule,
+      assignments: newAssignments,
+      updatedAt: new Date().toISOString(),
+    })
+  }
+
   if (!activeSchedule || !timelineData) {
     return (
       <div className="timeline-grid empty-state">
@@ -66,9 +201,10 @@ export function TimelineGrid({ weekNumber = 0, startDate }: { weekNumber?: numbe
   }
 
   return (
-    <div className="timeline-grid">
-      <div className="timeline-header">
-        <h3 className="sr-only">Timeline Gantt View</h3>
+    <DndContext collisionDetection={pointerWithin} onDragEnd={handleDragEnd}>
+      <div className="timeline-grid">
+        <div className="timeline-header">
+          <h3 className="sr-only">Timeline Gantt View</h3>
       </div>
 
       <div className="timeline-wrapper">
@@ -92,47 +228,39 @@ export function TimelineGrid({ weekNumber = 0, startDate }: { weekNumber?: numbe
           <tbody>
             {employees.map((emp) => (
               <tr key={emp.id}>
-                <td className="timeline-emp-name">
-                  <div className="emp-color-dot" style={{ backgroundColor: emp.color }} />
-                  {emp.name}
-                </td>
-                {DAYS_OF_WEEK.map((day) => {
-                  const shifts = timelineData[emp.id][day]
-                  return (
-                    <td key={day} className="timeline-cell">
-                      {shifts.map((shift) => {
-                        const left = timeToPercentage(shift.startTime)
-                        const right = timeToPercentage(shift.endTime)
-                        let width = right - left
-                        // Handle overnight wrap (simple display constraint)
-                        if (width < 0) width = 100 - left
+                  <td className="timeline-emp-name">
+                    <div className="emp-color-dot" style={{ backgroundColor: emp.color }} />
+                    {emp.name}
+                  </td>
+                  {DAYS_OF_WEEK.map((day) => {
+                    const shifts = timelineData[emp.id][day]
+                    return (
+                      <TimelineDroppableCell key={`${emp.id}-${day}`} id={`${emp.id}-${day}`} day={day}>
+                        {shifts.map((shift) => {
+                          const left = timeToPercentage(shift.startTime)
+                          const right = timeToPercentage(shift.endTime)
+                          let width = right - left
+                          if (width < 0) width = 100 - left
 
-                        return (
-                          <div
-                            key={shift.id}
-                            className="timeline-block"
-                            style={{
-                              left: `${left}%`,
-                              width: `${Math.max(1, width)}%`,
-                              backgroundColor: `${emp.color}30`,
-                              borderColor: emp.color
-                            }}
-                            title={`${formatTime(shift.startTime, timeFormat)} - ${formatTime(shift.endTime, timeFormat)}`}
-                          >
-                            <span className="timeline-block-time">
-                              {formatTime(shift.startTime, timeFormat)}
-                            </span>
-                          </div>
-                        )
-                      })}
-                    </td>
-                  )
-                })}
-              </tr>
+                          return (
+                            <TimelineDraggableBlock
+                              key={shift.id}
+                              shift={shift}
+                              employee={emp}
+                              left={left}
+                              width={Math.max(1, width)}
+                            />
+                          )
+                        })}
+                      </TimelineDroppableCell>
+                    )
+                  })}
+                </tr>
             ))}
           </tbody>
         </table>
       </div>
     </div>
+    </DndContext>
   )
 }
