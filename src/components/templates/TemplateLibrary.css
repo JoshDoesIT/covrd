@@ -85,6 +85,16 @@
   color: var(--color-text-muted);
 }
 
+.template-card-details strong {
+  color: var(--color-text-secondary);
+}
+
+.template-card-meta {
+  font-size: 0.7rem !important;
+  opacity: 0.6;
+  margin-top: 0.25rem !important;
+}
+
 .template-card-actions {
   display: flex;
   gap: 0.5rem;

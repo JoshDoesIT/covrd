@@ -48,8 +48,25 @@ export function TemplateLibrary({ onEdit, onApply }: TemplateLibraryProps) {
             </div>
 
             <div className="template-card-details">
-              <p>{t.coverageRequirements.length} specific requirements</p>
-              <p>Last modified: {new Date(t.updatedAt).toLocaleDateString()}</p>
+              {t.coverageRequirements.length > 0 ? (
+                <p>
+                  <strong>Shifts:</strong>{' '}
+                  {t.coverageRequirements
+                    .slice(0, 3)
+                    .map((r) => r.name || `${r.day} ${r.startTime}–${r.endTime}`)
+                    .join(', ')}
+                  {t.coverageRequirements.length > 3 &&
+                    ` +${t.coverageRequirements.length - 3} more`}
+                </p>
+              ) : (
+                <p>No coverage requirements defined yet.</p>
+              )}
+              {t.constraints.length > 0 && (
+                <p>{t.constraints.length} constraint{t.constraints.length !== 1 ? 's' : ''}</p>
+              )}
+              <p className="template-card-meta">
+                Last modified: {new Date(t.updatedAt).toLocaleDateString()}
+              </p>
             </div>
 
             <div className="template-card-actions">

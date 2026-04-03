@@ -19,13 +19,13 @@ export function CoverageHeatmap() {
 
   // Build basic mock data for now
   const data = [
-    { name: 'Monday', coverage: 4 },
-    { name: 'Tuesday', coverage: 3 },
-    { name: 'Wednesday', coverage: 5 },
-    { name: 'Thursday', coverage: 2 },
-    { name: 'Friday', coverage: 6 },
-    { name: 'Saturday', coverage: 6 },
-    { name: 'Sunday', coverage: 4 },
+    { name: 'Mon', coverage: 4 },
+    { name: 'Tue', coverage: 3 },
+    { name: 'Wed', coverage: 5 },
+    { name: 'Thu', coverage: 2 },
+    { name: 'Fri', coverage: 6 },
+    { name: 'Sat', coverage: 6 },
+    { name: 'Sun', coverage: 4 },
   ]
 
   if (!activeSchedule) {
