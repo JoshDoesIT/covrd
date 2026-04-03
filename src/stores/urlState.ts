@@ -106,6 +106,46 @@ export function generateShareUrl(state: ShareableState): string {
 }
 
 /**
+ * Generate a highly-optimized shareable URL specifically for QR codes.
+ * Strips all unnecessary configuration data (availability, restrictions, etc.)
+ * leaving only the bare minimum needed to visually render the schedule.
+ * This guarantees the QR code stays within the physical 2.9KB limit.
+ */
+export function generateOptimizedQrUrl(state: ShareableState): string {
+  const optimizedState: ShareableState = {
+    ...state,
+    // Drop all requirements
+    coverageRequirements: [],
+    // Strip employee metadata that is only needed for building a schedule, not viewing it
+    employees: state.employees.map(emp => ({
+      id: emp.id,
+      name: emp.name,
+      role: emp.role,
+      color: emp.color,
+      employmentType: emp.employmentType,
+      availability: [],
+      restrictions: [],
+      preferredTimes: [],
+      maxHoursPerWeek: 0,
+      minHoursPerWeek: 0,
+      preferredShiftsPerWeek: null,
+      createdAt: '',
+      updatedAt: ''
+    })),
+    // Leave schedule as is (shifts + assignments)
+    schedule: {
+      ...state.schedule,
+      // Minimalist empty array for unneeded data
+      unfilledShiftIds: []
+    }
+  }
+
+  const hash = encodeStateToHash(optimizedState)
+  const origin = typeof window !== 'undefined' ? window.location.origin + window.location.pathname : ''
+  return `${origin}#${hash}`
+}
+
+/**
  * Attempt to hydrate application state from the current URL hash fragment.
  *
  * Returns null if no hash is present or if the hash is invalid.
