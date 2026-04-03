@@ -146,13 +146,13 @@ export function CoverageHeatmap({ activeWeekNumber }: { activeWeekNumber: number
 
       <div className="coverage-legend" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#00b894' }} /> Fully covered (100%+)
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#00b894' }} /> Fully covered
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b' }} /> Mostly covered (75-99%)
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b' }} /> Mostly covered
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }} /> Under-covered (&lt;75%)
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }} /> Under-covered
         </span>
       </div>
     </div>

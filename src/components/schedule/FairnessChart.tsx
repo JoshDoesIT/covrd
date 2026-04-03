@@ -202,13 +202,13 @@ export function FairnessChart({ activeWeekNumber }: { activeWeekNumber: number }
 
       <div className="fairness-legend" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
         <span className="legend-item" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          <span className="legend-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: '#00b894' }} /> On target (80-110%)
+          <span className="legend-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: '#00b894' }} /> On target
         </span>
         <span className="legend-item" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          <span className="legend-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b' }} /> Slightly off (60-79%, 111-130%)
+          <span className="legend-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b' }} /> Slightly off
         </span>
         <span className="legend-item" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          <span className="legend-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }} /> Needs attention (&lt;60%, &gt;130%)
+          <span className="legend-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }} /> Needs attention
         </span>
       </div>
     </div>
