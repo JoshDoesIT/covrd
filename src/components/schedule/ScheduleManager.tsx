@@ -51,6 +51,7 @@ export function ScheduleManager() {
   const { templates } = useTemplateStore()
 
   const [viewMode, setViewMode] = useState<ViewMode>('matrix')
+  const [activeWeekNumber, setActiveWeekNumber] = useState(0)
 
   const [isGenerating, setIsGenerating] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -199,6 +200,7 @@ export function ScheduleManager() {
       })
 
       setActiveSchedule(newSchedule)
+      setActiveWeekNumber(0)
     } catch (err: unknown) {
       setErrorStatus(err instanceof Error ? err.message : 'Solver Engine Failed')
     } finally {
@@ -472,36 +474,57 @@ export function ScheduleManager() {
               </div>
             )}
 
-            <div
-              className="scroll-matrix-wrapper"
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '3rem',
-                padding: '1rem',
-                overflowY: 'auto',
-              }}
-            >
-              {Array.from({
-                length:
-                  Math.ceil(
+            {(() => {
+              const totalWeeksInSchedule = Math.ceil(
                     (new Date(activeSchedule.endDate).getTime() -
                       new Date(activeSchedule.startDate).getTime()) /
-                      (7 * 24 * 60 * 60 * 1000),
-                  ) || 1,
-              }).map((_, i) => (
-                <div key={i} className="weekly-block">
-                  <h4 style={{ margin: '0 0 1rem 0', color: 'var(--color-text-muted)' }}>
-                    Week {i + 1} <span style={{ opacity: 0.6, fontSize: '0.9em', marginLeft: '0.5rem' }}>({formatWeekRange(activeSchedule.startDate, i)})</span>
-                  </h4>
-                  {viewMode === 'matrix' ? (
-                    <WeeklyGrid weekNumber={i} startDate={activeSchedule.startDate} />
-                  ) : (
-                    <TimelineGrid weekNumber={i} startDate={activeSchedule.startDate} />
-                  )}
+                      (7 * 24 * 60 * 60 * 1000)
+              ) || 1
+              
+              return (
+                <div className="schedule-week-container" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--color-bg-elevated)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }}>
+                    <h4 style={{ margin: 0, color: 'var(--color-primary)' }}>
+                      Week {activeWeekNumber + 1} <span style={{ opacity: 0.6, fontSize: '0.9em', marginLeft: '0.5rem', color: 'var(--color-text-muted)' }}>({formatWeekRange(activeSchedule.startDate, activeWeekNumber)})</span>
+                    </h4>
+                    
+                    {totalWeeksInSchedule > 1 && (
+                      <div style={{ display: 'flex', gap: '0.25rem' }}>
+                        <button 
+                          className="sm-btn-ghost"
+                          onClick={() => setActiveWeekNumber(Math.max(0, activeWeekNumber - 1))}
+                          disabled={activeWeekNumber <= 0}
+                          title="Previous Week"
+                        >
+                          <ChevronLeft size={20} />
+                        </button>
+                        <span style={{ display: 'flex', alignItems: 'center', fontSize: '0.85rem', color: 'var(--color-text-muted)', padding: '0 0.5rem' }}>
+                          {activeWeekNumber + 1} of {totalWeeksInSchedule}
+                        </span>
+                        <button 
+                          className="sm-btn-ghost"
+                          onClick={() => setActiveWeekNumber(Math.min(totalWeeksInSchedule - 1, activeWeekNumber + 1))}
+                          disabled={activeWeekNumber >= totalWeeksInSchedule - 1}
+                          title="Next Week"
+                        >
+                          <ChevronRight size={20} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="scroll-matrix-wrapper" style={{ overflowY: 'auto' }}>
+                    <div className="weekly-block">
+                      {viewMode === 'matrix' ? (
+                        <WeeklyGrid weekNumber={activeWeekNumber} startDate={activeSchedule.startDate} />
+                      ) : (
+                        <TimelineGrid weekNumber={activeWeekNumber} startDate={activeSchedule.startDate} />
+                      )}
+                    </div>
+                  </div>
                 </div>
-              ))}
-            </div>
+              )
+            })()}
 
             <div
               className="schedule-analytics"
