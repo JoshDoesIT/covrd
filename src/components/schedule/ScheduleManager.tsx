@@ -62,6 +62,8 @@ export function ScheduleManager() {
     // Avoid UTC timezone shifting when formatting as string
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
   })
+  
+  const [manualWeeks, setManualWeeks] = useState(1)
 
   const handleGenerate = async () => {
     const pendingTemplateId = useScheduleStore.getState().pendingTemplateId
@@ -110,16 +112,20 @@ export function ScheduleManager() {
         generatedShifts.push(...weeklyOffsetShifts)
       }
     } else {
-      // Epic 4 fallback (1 week from manual baseline requirements)
-      generatedShifts = requirements.map((r) =>
-        createShift({
-          day: r.day,
-          startTime: r.startTime,
-          endTime: r.endTime,
-          requiredStaff: r.requiredStaff,
-          weekNumber: 0,
-        }),
-      )
+      // Epic 4 fallback (manual baseline requirements scaled to manualWeeks)
+      totalWeeks = manualWeeks
+      for (let w = 0; w < totalWeeks; w++) {
+        const weeklyOffsetShifts = requirements.map((r) =>
+          createShift({
+            day: r.day,
+            startTime: r.startTime,
+            endTime: r.endTime,
+            requiredStaff: r.requiredStaff,
+            weekNumber: w,
+          }),
+        )
+        generatedShifts.push(...weeklyOffsetShifts)
+      }
     }
 
     // MAP TO ENGINE DTOs
@@ -151,6 +157,7 @@ export function ScheduleManager() {
         engineShifts.push({
           id: `${s.id}-${i}`,
           dayOfWeek: DAY_MAP[s.day] ?? 0,
+          weekNumber: s.weekNumber ?? 0,
           start: s.startTime,
           end: s.endTime,
           role: 'any',
@@ -213,42 +220,7 @@ export function ScheduleManager() {
             <p className="sm-subtitle">Interactive visualization and solver dispatch.</p>
           </div>
 
-          {/* Pagination Controls */}
-          {activeSchedule && allSchedules.length > 1 && (
-            <div style={{ display: 'flex', gap: '0.25rem', paddingLeft: '1rem', borderLeft: '1px solid var(--color-border)' }}>
-              <button
-                className="sm-btn-ghost"
-                onClick={() => {
-                  const sorted = [...allSchedules].sort((a,b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
-                  const idx = sorted.findIndex(s => s.id === activeSchedule.id)
-                  if (idx > 0) setActiveSchedule(sorted[idx - 1])
-                }}
-                disabled={(() => {
-                  const sorted = [...allSchedules].sort((a,b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
-                  return sorted.findIndex(s => s.id === activeSchedule.id) <= 0
-                })()}
-                title="View previous schedule"
-              >
-                <ChevronLeft size={20} />
-              </button>
-              <button
-                className="sm-btn-ghost"
-                onClick={() => {
-                  const sorted = [...allSchedules].sort((a,b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
-                  const idx = sorted.findIndex(s => s.id === activeSchedule.id)
-                  if (idx !== -1 && idx < sorted.length - 1) setActiveSchedule(sorted[idx + 1])
-                }}
-                disabled={(() => {
-                  const sorted = [...allSchedules].sort((a,b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
-                  const idx = sorted.findIndex(s => s.id === activeSchedule.id)
-                  return idx === -1 || idx >= sorted.length - 1
-                })()}
-                title="View next schedule"
-              >
-                <ChevronRight size={20} />
-              </button>
-            </div>
-          )}
+          {/* Pagination moved to input zone */}
         </div>
         <div className="sm-actions">
           {activeSchedule && (
@@ -337,35 +309,94 @@ export function ScheduleManager() {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-               <label htmlFor="sm-start-date" style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '0.1rem', paddingLeft: '2px' }}>Start Week (Mon)</label>
-               <input 
-                 id="sm-start-date"
-                 type="date"
-                 value={targetStartDate}
-                 onChange={(e) => {
-                   const val = e.target.value
-                   if (!val) return
-                   // Enforce Monday selection visually if they typed it manually
-                   const d = new Date(`${val}T00:00:00`)
-                   if (d.getDay() !== 1) {
-                     // Snap to the Monday
-                     const nextMon = getNextMonday(d)
-                     setTargetStartDate(`${nextMon.getFullYear()}-${String(nextMon.getMonth() + 1).padStart(2, '0')}-${String(nextMon.getDate()).padStart(2, '0')}`)
-                   } else {
-                     setTargetStartDate(val)
-                   }
-                 }}
-                 // Optional HTML5 validation trick: step by 7 days starting from a known Monday
-                 // step="7" 
-                 style={{ 
-                   background: 'var(--color-bg-elevated)',
-                   color: 'var(--color-text-primary)',
-                   border: '1px solid var(--color-border)',
-                   padding: '0.4rem 0.5rem',
-                   borderRadius: 'var(--radius-lg)',
-                   fontSize: '0.85rem'
-                 }}
-               />
+                <label htmlFor="sm-start-date" style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '0.1rem', paddingLeft: '2px' }}>Start Week (Mon)</label>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  {activeSchedule && allSchedules.length > 1 && (
+                    <button
+                      className="sm-btn-ghost"
+                      style={{ padding: '0.2rem', marginRight: '0.25rem' }}
+                      onClick={() => {
+                        const sorted = [...allSchedules].sort((a,b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+                        const idx = sorted.findIndex(s => s.id === activeSchedule.id)
+                        if (idx > 0) setActiveSchedule(sorted[idx - 1])
+                      }}
+                      disabled={(() => {
+                        const sorted = [...allSchedules].sort((a,b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+                        return sorted.findIndex(s => s.id === activeSchedule.id) <= 0
+                      })()}
+                      title="View previous schedule"
+                    >
+                      <ChevronLeft size={16} />
+                    </button>
+                  )}
+                  <input 
+                    id="sm-start-date"
+                    type="date"
+                    value={targetStartDate}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      if (!val) return
+                      // Enforce Monday selection visually if they typed it manually
+                      const d = new Date(`${val}T00:00:00`)
+                      if (d.getDay() !== 1) {
+                        // Snap to the Monday
+                        const nextMon = getNextMonday(d)
+                        setTargetStartDate(`${nextMon.getFullYear()}-${String(nextMon.getMonth() + 1).padStart(2, '0')}-${String(nextMon.getDate()).padStart(2, '0')}`)
+                      } else {
+                        setTargetStartDate(val)
+                      }
+                    }}
+                    style={{ 
+                      background: 'var(--color-bg-elevated)',
+                      color: 'var(--color-text-primary)',
+                      border: '1px solid var(--color-border)',
+                      padding: '0.4rem 0.5rem',
+                      borderRadius: 'var(--radius-lg)',
+                      fontSize: '0.85rem'
+                    }}
+                  />
+                  {activeSchedule && allSchedules.length > 1 && (
+                    <button
+                      className="sm-btn-ghost"
+                      style={{ padding: '0.2rem', marginLeft: '0.25rem' }}
+                      onClick={() => {
+                        const sorted = [...allSchedules].sort((a,b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+                        const idx = sorted.findIndex(s => s.id === activeSchedule.id)
+                        if (idx !== -1 && idx < sorted.length - 1) setActiveSchedule(sorted[idx + 1])
+                      }}
+                      disabled={(() => {
+                        const sorted = [...allSchedules].sort((a,b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+                        const idx = sorted.findIndex(s => s.id === activeSchedule.id)
+                        return idx === -1 || idx >= sorted.length - 1
+                      })()}
+                      title="View next schedule"
+                    >
+                      <ChevronRight size={16} />
+                    </button>
+                  )}
+                </div>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <label htmlFor="sm-weeks" style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '0.1rem', paddingLeft: '2px' }}>Weeks</label>
+              <select
+                id="sm-weeks"
+                value={manualWeeks}
+                onChange={(e) => setManualWeeks(Number(e.target.value))}
+                style={{ 
+                  background: 'var(--color-bg-elevated)',
+                  color: 'var(--color-text-primary)',
+                  border: '1px solid var(--color-border)',
+                  padding: '0.4rem 0.5rem',
+                  borderRadius: 'var(--radius-lg)',
+                  fontSize: '0.85rem'
+                }}
+              >
+                <option value={1}>1 Week</option>
+                <option value={2}>2 Weeks</option>
+                <option value={3}>3 Weeks</option>
+                <option value={4}>4 Weeks</option>
+              </select>
             </div>
             
             <button className="sm-btn-generate" onClick={handleGenerate} disabled={isGenerating}>

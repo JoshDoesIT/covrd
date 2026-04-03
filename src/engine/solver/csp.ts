@@ -16,7 +16,7 @@ export function solveSchedule(employees: Employee[], targetShifts: Shift[]): Sol
   // Deep clone to avoid mutating application state until success
   const shifts = targetShifts.map((s) => ({ ...s }))
   const existingAssignments = new Map<string, Shift[]>()
-  const currentHourTotals = new Map<string, number>()
+  const currentHourTotals = new Map<string, Map<number, number>>()
 
   const unassignedShifts = shifts.filter((s) => !s.isAssigned)
 
@@ -52,7 +52,7 @@ function backtrack(
   unassignedShifts: Shift[],
   employees: Employee[],
   assignments: Map<string, Shift[]>,
-  hourTotals: Map<string, number>,
+  hourTotals: Map<string, Map<number, number>>,
 ): boolean {
   if (unassignedShifts.length === 0) {
     return true // All scheduled successfully
@@ -80,9 +80,9 @@ function backtrack(
   const sortedShifts = sortShiftsByMRV(unassignedShifts, candidateCounts)
   const shiftToAssign = sortedShifts[0]
 
-  // Heuristic: LCV/Fairness. Try candidates furthest from target hours first.
+  // Heuristic: LCV/Fairness + Consecutive Days
   const rawCandidates = domains.get(shiftToAssign.id) ?? []
-  const candidates = sortCandidatesByFairness(rawCandidates, hourTotals)
+  const candidates = sortCandidatesByFairness(rawCandidates, hourTotals, shiftToAssign, assignments)
 
   // Try each candidate
   for (const candidate of candidates) {
@@ -94,8 +94,10 @@ function backtrack(
     empList.push(shiftToAssign)
     assignments.set(candidate.id, empList)
 
-    const curHours = hourTotals.get(candidate.id) ?? 0
-    hourTotals.set(candidate.id, curHours + shiftToAssign.durationHours)
+    const empWeekMap = hourTotals.get(candidate.id) ?? new Map<number, number>()
+    const curHours = empWeekMap.get(shiftToAssign.weekNumber) ?? 0
+    empWeekMap.set(shiftToAssign.weekNumber, curHours + shiftToAssign.durationHours)
+    hourTotals.set(candidate.id, empWeekMap)
 
     // Recurse with shift removed
     const remaining = unassignedShifts.filter((s) => s.id !== shiftToAssign.id)
@@ -111,7 +113,8 @@ function backtrack(
 
     empList.pop() // remove last
     assignments.set(candidate.id, empList)
-    hourTotals.set(candidate.id, curHours)
+    empWeekMap.set(shiftToAssign.weekNumber, curHours)
+    hourTotals.set(candidate.id, empWeekMap)
   }
 
   // No candidates worked, must backtrack up the tree

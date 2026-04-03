@@ -27,16 +27,39 @@ export function sortShiftsByMRV(shifts: Shift[], candidateCounts: Map<string, nu
  */
 export function sortCandidatesByFairness(
   candidates: Employee[],
-  currentHours: Map<string, number>,
+  hourTotals: Map<string, Map<number, number>>,
+  shiftToAssign: Shift,
+  assignments: Map<string, Shift[]>
 ): Employee[] {
   return [...candidates].sort((a, b) => {
-    const hoursA = currentHours.get(a.id) ?? 0
+    const empWeekMapA = hourTotals.get(a.id) ?? new Map<number, number>()
+    const hoursA = empWeekMapA.get(shiftToAssign.weekNumber) ?? 0
     const deficitA = a.targetHours - hoursA
 
-    const hoursB = currentHours.get(b.id) ?? 0
+    const empWeekMapB = hourTotals.get(b.id) ?? new Map<number, number>()
+    const hoursB = empWeekMapB.get(shiftToAssign.weekNumber) ?? 0
     const deficitB = b.targetHours - hoursB
 
-    // Sort descending by deficit (largest deficit comes first)
-    return deficitB - deficitA
+    // Consecutive Shift Bonus (Group Off-Days)
+    // Checks if candidate is already working yesterday or tomorrow natively cross-week
+    const hasConsecutiveA = (assignments.get(a.id) ?? []).some(s => 
+      (s.weekNumber === shiftToAssign.weekNumber && Math.abs(s.dayOfWeek - shiftToAssign.dayOfWeek) === 1) ||
+      (s.weekNumber === shiftToAssign.weekNumber - 1 && shiftToAssign.dayOfWeek === 0 && s.dayOfWeek === 6) ||
+      (s.weekNumber === shiftToAssign.weekNumber + 1 && shiftToAssign.dayOfWeek === 6 && s.dayOfWeek === 0)
+    )
+    
+    const hasConsecutiveB = (assignments.get(b.id) ?? []).some(s => 
+      (s.weekNumber === shiftToAssign.weekNumber && Math.abs(s.dayOfWeek - shiftToAssign.dayOfWeek) === 1) ||
+      (s.weekNumber === shiftToAssign.weekNumber - 1 && shiftToAssign.dayOfWeek === 0 && s.dayOfWeek === 6) ||
+      (s.weekNumber === shiftToAssign.weekNumber + 1 && shiftToAssign.dayOfWeek === 6 && s.dayOfWeek === 0)
+    )
+
+    // Deficit is primary metric (10pts per missing hour). Modulator adds massive 200pt (+20hr equivalent) weight 
+    // to candidates continuing a streak, drastically clumping workdays together which clumps off-days.
+    const scoreA = (deficitA * 10) + (hasConsecutiveA ? 200 : 0)
+    const scoreB = (deficitB * 10) + (hasConsecutiveB ? 200 : 0)
+
+    // Sort descending by score
+    return scoreB - scoreA
   })
 }
