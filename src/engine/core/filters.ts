@@ -13,7 +13,7 @@ export function getEligibleCandidates(
 ): Employee[] {
   return employees.filter((employee) => {
     const existing = existingAssignments.get(employee.id) || []
-    
+
     // Retrieve hours for specifically THIS shift's week
     const empWeekHoursMap = currentHourTotals.get(employee.id) || new Map<number, number>()
     const currentHoursThisWeek = empWeekHoursMap.get(shift.weekNumber) || 0

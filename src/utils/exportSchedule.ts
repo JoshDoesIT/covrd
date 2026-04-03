@@ -65,13 +65,51 @@ function escapeCsvField(value: string): string {
 /**
  * Serialize schedule state to a CSV string.
  * Each assignment becomes a row: Day, Start, End, Employee, Role.
+ * Can optionally export the entire ecosystem as stacked tables.
  *
  * @param state - The shareable state payload
+ * @param includeAllData - If true, exports stacked tables for ALL data
  * @returns CSV string ready for file download
  */
-export function serializeScheduleCSV(state: ShareableState): string {
-  const header = 'Day,Start,End,Employee,Role'
+export function serializeScheduleCSV(
+  state: ShareableState,
+  includeAllData: boolean = false,
+): string {
   const rows: string[] = []
+
+  // Optional: Dump Full Context
+  if (includeAllData) {
+    // 1. Employees Table
+    rows.push('--- EMPLOYEES ---')
+    rows.push('ID,Name,Role,Max Hours')
+    for (const emp of state.employees) {
+      rows.push(
+        [
+          escapeCsvField(emp.id),
+          escapeCsvField(emp.name),
+          escapeCsvField(emp.role),
+          emp.maxHoursPerWeek.toString(),
+        ].join(','),
+      )
+    }
+
+    rows.push('') // Blank line spacer
+
+    // 2. Coverage Targets Table
+    rows.push('--- COVERAGE REQUIREMENTS ---')
+    rows.push('Role,Day,Target')
+    for (const cov of state.coverageRequirements) {
+      for (const [day, target] of Object.entries(cov.targets)) {
+        rows.push([escapeCsvField(cov.role), escapeCsvField(day), target.toString()].join(','))
+      }
+    }
+
+    rows.push('') // Blank line spacer
+    rows.push('--- SCHEDULE ASSIGNMENTS ---')
+  }
+
+  // Primary Table: Schedule
+  rows.push('Day,Start,End,Employee,Role')
 
   for (const assignment of state.schedule.assignments) {
     const shift = state.schedule.shifts.find((s) => s.id === assignment.shiftId)
@@ -90,7 +128,7 @@ export function serializeScheduleCSV(state: ShareableState): string {
     )
   }
 
-  return rows.length > 0 ? `${header}\n${rows.join('\n')}` : header
+  return rows.join('\n')
 }
 
 /**

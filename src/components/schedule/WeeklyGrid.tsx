@@ -77,7 +77,13 @@ export const DroppableCell = React.memo(function DroppableCell({
     </div>
   )
 })
-export function WeeklyGrid({ weekNumber = 0, startDate }: { weekNumber?: number; startDate?: string }) {
+export function WeeklyGrid({
+  weekNumber = 0,
+  startDate,
+}: {
+  weekNumber?: number
+  startDate?: string
+}) {
   const { activeSchedule, setActiveSchedule } = useScheduleStore()
   const { employees } = useEmployeeStore()
 
@@ -233,7 +239,7 @@ export function WeeklyGrid({ weekNumber = 0, startDate }: { weekNumber?: number;
               const et = parseInt(s.endTime.split(':')[0], 10)
               let duration = et > st ? et - st : 24 - st + et
               if (s.unpaidBreakMinutes) {
-                duration -= (s.unpaidBreakMinutes / 60)
+                duration -= s.unpaidBreakMinutes / 60
               }
               totalHours += duration
             })

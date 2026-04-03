@@ -1,7 +1,13 @@
 import { useMemo } from 'react'
 import { useScheduleStore } from '../../stores/scheduleStore'
 import { useCoverageStore } from '../../stores/coverageStore'
-import type { Schedule, Shift, ShiftAssignment, CoverageRequirement, DayOfWeek } from '../../types/index'
+import type {
+  Schedule,
+  Shift,
+  ShiftAssignment,
+  CoverageRequirement,
+  DayOfWeek,
+} from '../../types/index'
 import './CoverageHeatmap.css'
 
 const DAY_SHORT: Record<DayOfWeek, string> = {
@@ -38,15 +44,17 @@ interface DayCoverage {
 function computeCoverage(
   schedule: Schedule | null,
   coverageReqs: CoverageRequirement[],
-  activeWeekNumber: number
+  activeWeekNumber: number,
 ): DayCoverage[] {
   if (!schedule) return []
 
   // Count assignments per day
   const shiftsByDay = new Map<DayOfWeek, number>()
-  
-  const weeklyShifts = schedule.shifts.filter((s: Shift) => (s.weekNumber || 0) === activeWeekNumber)
-  
+
+  const weeklyShifts = schedule.shifts.filter(
+    (s: Shift) => (s.weekNumber || 0) === activeWeekNumber,
+  )
+
   weeklyShifts.forEach((s: Shift) => {
     const assignedCount = schedule.assignments.filter(
       (a: ShiftAssignment) => a.shiftId === s.id,
@@ -70,8 +78,8 @@ function computeCoverage(
 
 function getCoverageColor(fillRate: number): string {
   if (fillRate >= 100) return '#00b894' // Fully covered (green match)
-  if (fillRate >= 75) return '#f59e0b'  // Mostly covered
-  return '#ef4444'                       // Under-covered
+  if (fillRate >= 75) return '#f59e0b' // Mostly covered
+  return '#ef4444' // Under-covered
 }
 
 /**
@@ -120,39 +128,68 @@ export function CoverageHeatmap({ activeWeekNumber }: { activeWeekNumber: number
         </div>
       </div>
 
-      <div className="heatmap-day-pills" style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.75rem', padding: '1rem 0', alignItems: 'stretch' }}>
+      <div
+        className="heatmap-day-pills"
+        style={{
+          flex: 1,
+          display: 'grid',
+          gridTemplateColumns: 'repeat(7, 1fr)',
+          gap: '0.75rem',
+          padding: '1rem 0',
+          alignItems: 'stretch',
+        }}
+      >
         {data.map((d) => (
           <div
             key={d.name}
             className="heatmap-pill"
-            style={{ 
+            style={{
               borderColor: getCoverageColor(d.fillRate),
               borderWidth: '2px',
               backgroundColor: `${getCoverageColor(d.fillRate)}15`,
               justifyContent: 'center',
-              borderRadius: '12px'
+              borderRadius: '12px',
             }}
           >
-            <span className="pill-day" style={{ fontSize: '0.85rem', marginBottom: '0.5rem' }}>{d.name.substring(0,3)}</span>
-            <span className="pill-ratio" style={{ color: getCoverageColor(d.fillRate), fontSize: '1.25rem' }}>
+            <span className="pill-day" style={{ fontSize: '0.85rem', marginBottom: '0.5rem' }}>
+              {d.name.substring(0, 3)}
+            </span>
+            <span
+              className="pill-ratio"
+              style={{ color: getCoverageColor(d.fillRate), fontSize: '1.25rem' }}
+            >
               {d.assigned}/{d.required}
             </span>
-            <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginTop: '0.25rem' }}>
+            <span
+              style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginTop: '0.25rem' }}
+            >
               {d.fillRate}%
             </span>
           </div>
         ))}
       </div>
 
-      <div className="coverage-legend" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+      <div
+        className="coverage-legend"
+        style={{
+          display: 'flex',
+          gap: '1rem',
+          justifyContent: 'center',
+          fontSize: '0.75rem',
+          color: 'var(--color-text-muted)',
+        }}
+      >
         <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#00b894' }} /> Fully covered
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#00b894' }} /> Fully
+          covered
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b' }} /> Mostly covered
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b' }} />{' '}
+          Mostly covered
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }} /> Under-covered
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }} />{' '}
+          Under-covered
         </span>
       </div>
     </div>

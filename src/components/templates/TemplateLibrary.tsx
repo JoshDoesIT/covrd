@@ -62,7 +62,9 @@ export function TemplateLibrary({ onEdit, onApply }: TemplateLibraryProps) {
                 <p>No coverage requirements defined yet.</p>
               )}
               {t.constraints.length > 0 && (
-                <p>{t.constraints.length} constraint{t.constraints.length !== 1 ? 's' : ''}</p>
+                <p>
+                  {t.constraints.length} constraint{t.constraints.length !== 1 ? 's' : ''}
+                </p>
               )}
               <p className="template-card-meta">
                 Last modified: {new Date(t.updatedAt).toLocaleDateString()}

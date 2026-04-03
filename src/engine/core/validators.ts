@@ -38,7 +38,7 @@ export function wouldExceedMaxHours(
  */
 export function hasShiftOnSameDay(proposedShift: Shift, existingShifts: Shift[]): boolean {
   return existingShifts.some(
-    (s) => s.dayOfWeek === proposedShift.dayOfWeek && s.weekNumber === proposedShift.weekNumber
+    (s) => s.dayOfWeek === proposedShift.dayOfWeek && s.weekNumber === proposedShift.weekNumber,
   )
 }
 

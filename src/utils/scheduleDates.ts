@@ -17,14 +17,14 @@ const DAY_OFFSETS: Record<DayOfWeek, number> = {
 export function getNextMonday(from: Date = new Date()): Date {
   const date = new Date(from.getTime())
   date.setHours(0, 0, 0, 0)
-  
+
   const day = date.getDay()
   // getDay() returns 0 for Sunday, 1 for Monday.
   // If it's Monday (1), we stay today.
   // If it's Tuesday (2), we add 6 days.
   // If it's Sunday (0), we add 1 day.
   const diffToMonday = day === 0 ? 1 : day === 1 ? 0 : 8 - day
-  
+
   date.setDate(date.getDate() + diffToMonday)
   return date
 }
@@ -36,13 +36,13 @@ export function getNextMonday(from: Date = new Date()): Date {
 export function getShiftDate(startDateIso: string, weekOffset: number, day: DayOfWeek): Date {
   const date = new Date(startDateIso)
   date.setHours(0, 0, 0, 0)
-  
+
   // Resiliency: Always align our base calculation to the Monday of the week `date` is in
   const currentDay = date.getDay()
   const daysToSubtract = currentDay === 0 ? 6 : currentDay - 1
   date.setDate(date.getDate() - daysToSubtract)
-  
-  const daysToAdd = (weekOffset * 7) + DAY_OFFSETS[day]
+
+  const daysToAdd = weekOffset * 7 + DAY_OFFSETS[day]
   date.setDate(date.getDate() + daysToAdd)
   return date
 }
@@ -63,7 +63,7 @@ export function formatDayHeader(startDateIso: string, weekOffset: number, day: D
 export function formatWeekRange(startDateIso: string, weekOffset: number): string {
   const start = getShiftDate(startDateIso, weekOffset, 'monday')
   const end = getShiftDate(startDateIso, weekOffset, 'sunday')
-  
+
   const formatter = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' })
   return `${formatter.format(start)} - ${formatter.format(end)}`
 }

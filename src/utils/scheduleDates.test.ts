@@ -20,7 +20,7 @@ describe('scheduleDates utilities', () => {
 
   test('getShiftDate handles offsets correctly', () => {
     const startIso = new Date(2026, 3, 6, 0, 0, 0).toISOString() // Apr 6, 2026
-    
+
     // Test same day
     const monW0 = getShiftDate(startIso, 0, 'monday')
     expect(monW0.getDate()).toBe(6)

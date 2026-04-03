@@ -88,7 +88,11 @@ export function AppShell() {
         aria-label="Sidebar"
       >
         <div className="shell__sidebar-header">
-          <a href="/" className="shell__brand" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+          <a
+            href="/"
+            className="shell__brand"
+            style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
+          >
             <img
               src="/logo-dark.png"
               alt="Covrd"

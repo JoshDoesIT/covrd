@@ -120,7 +120,9 @@ export function TemplateEditor({ templateId, onBack }: TemplateEditorProps) {
                 id="tp-weekA"
                 type="text"
                 value={localTemplate.pattern.weekA}
-                onChange={(e) => updatePatternField({ weekA: e.target.value } as Partial<RecurrencePattern>)}
+                onChange={(e) =>
+                  updatePatternField({ weekA: e.target.value } as Partial<RecurrencePattern>)
+                }
               />
             </div>
             <div className="editor-form-group">
@@ -129,7 +131,9 @@ export function TemplateEditor({ templateId, onBack }: TemplateEditorProps) {
                 id="tp-weekB"
                 type="text"
                 value={localTemplate.pattern.weekB}
-                onChange={(e) => updatePatternField({ weekB: e.target.value } as Partial<RecurrencePattern>)}
+                onChange={(e) =>
+                  updatePatternField({ weekB: e.target.value } as Partial<RecurrencePattern>)
+                }
               />
             </div>
           </div>
@@ -149,8 +153,12 @@ export function TemplateEditor({ templateId, onBack }: TemplateEditorProps) {
               value={localTemplate.pattern.cycleLength}
               onChange={(e) => {
                 const len = Math.max(1, Number(e.target.value))
-                const currentWeeks = localTemplate.pattern.kind === 'rotation' ? localTemplate.pattern.weeks : []
-                const weeks = Array.from({ length: len }, (_, i) => currentWeeks[i] || `Cycle ${i + 1}`)
+                const currentWeeks =
+                  localTemplate.pattern.kind === 'rotation' ? localTemplate.pattern.weeks : []
+                const weeks = Array.from(
+                  { length: len },
+                  (_, i) => currentWeeks[i] || `Cycle ${i + 1}`,
+                )
                 updatePatternField({ cycleLength: len, weeks } as Partial<RecurrencePattern>)
               }}
             />
@@ -187,7 +195,9 @@ export function TemplateEditor({ templateId, onBack }: TemplateEditorProps) {
               id="tp-weekOfMonth"
               value={localTemplate.pattern.weekOfMonth}
               onChange={(e) =>
-                updatePatternField({ weekOfMonth: Number(e.target.value) } as Partial<RecurrencePattern>)
+                updatePatternField({
+                  weekOfMonth: Number(e.target.value),
+                } as Partial<RecurrencePattern>)
               }
             >
               <option value={1}>1st week</option>

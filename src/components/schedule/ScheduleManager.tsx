@@ -1,5 +1,14 @@
 import { useState } from 'react'
-import { Sparkles, CalendarDays, RefreshCw, XCircle, Undo2, Redo2, ChevronLeft, ChevronRight } from 'lucide-react'
+import {
+  Sparkles,
+  CalendarDays,
+  RefreshCw,
+  XCircle,
+  Undo2,
+  Redo2,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react'
 import { useScheduleStore } from '../../stores/scheduleStore'
 import { useEmployeeStore } from '../../stores/employeeStore'
 import { useCoverageStore } from '../../stores/coverageStore'
@@ -55,7 +64,7 @@ export function ScheduleManager() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [progress, setProgress] = useState(0)
   const [errorStatus, setErrorStatus] = useState<string | null>(null)
-  
+
   // Format initial date as YYYY-MM-DD string for HTML input
   const [targetStartDate, setTargetStartDate] = useState(() => {
     const d = getNextMonday()
@@ -112,7 +121,7 @@ export function ScheduleManager() {
             requiredStaff: r.requiredStaff,
             weekNumber: w, // assign the explicit week instance
             role: r.role,
-            unpaidBreakMinutes: r.unpaidBreakMinutes
+            unpaidBreakMinutes: r.unpaidBreakMinutes,
           }),
         )
         generatedShifts.push(...weeklyOffsetShifts)
@@ -129,7 +138,7 @@ export function ScheduleManager() {
             requiredStaff: r.requiredStaff,
             weekNumber: w,
             role: r.role,
-            unpaidBreakMinutes: r.unpaidBreakMinutes
+            unpaidBreakMinutes: r.unpaidBreakMinutes,
           }),
         )
         generatedShifts.push(...weeklyOffsetShifts)
@@ -161,7 +170,7 @@ export function ScheduleManager() {
       let duration = endH > startH ? endH - startH : 24 - startH + endH
 
       if (s.unpaidBreakMinutes) {
-        duration -= (s.unpaidBreakMinutes / 60)
+        duration -= s.unpaidBreakMinutes / 60
       }
 
       // Expand requiredStaff to individual engine shifts
@@ -205,7 +214,9 @@ export function ScheduleManager() {
           ? `Generated from ${template.name}`
           : `Auto Generated - Week of ${actualStartMonday.toLocaleDateString()}`,
         startDate: actualStartMonday.toISOString(),
-        endDate: new Date(actualStartMonday.getTime() + totalWeeks * 7 * 24 * 60 * 60 * 1000).toISOString(),
+        endDate: new Date(
+          actualStartMonday.getTime() + totalWeeks * 7 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
         shifts: generatedShifts,
         assignments: finalAssignments,
         qualityScore: result.success ? 100 : 0,
@@ -322,69 +333,89 @@ export function ScheduleManager() {
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                <label htmlFor="sm-start-date" style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '0.1rem', paddingLeft: '2px' }}>Start Week (Mon)</label>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <button
-                    className="sm-btn-ghost"
-                    style={{ padding: '0.2rem', marginRight: '0.25rem' }}
-                    onClick={() => {
-                      const d = new Date(`${targetStartDate}T00:00:00`)
-                      d.setDate(d.getDate() - 7)
-                      setTargetStartDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)
-                    }}
-                    title="Previous Week"
-                  >
-                    <ChevronLeft size={16} />
-                  </button>
-                  <input 
-                    id="sm-start-date"
-                    type="date"
-                    value={targetStartDate}
-                    onChange={(e) => {
-                      const val = e.target.value
-                      if (!val) return
-                      // Enforce Monday selection visually if they typed it manually
-                      const d = new Date(`${val}T00:00:00`)
-                      if (d.getDay() !== 1) {
-                        // Snap to the Monday
-                        const nextMon = getNextMonday(d)
-                        setTargetStartDate(`${nextMon.getFullYear()}-${String(nextMon.getMonth() + 1).padStart(2, '0')}-${String(nextMon.getDate()).padStart(2, '0')}`)
-                      } else {
-                        setTargetStartDate(val)
-                      }
-                    }}
-                    style={{ 
-                      background: 'var(--color-bg-elevated)',
-                      color: 'var(--color-text-primary)',
-                      border: '1px solid var(--color-border)',
-                      padding: '0.4rem 0.5rem',
-                      borderRadius: 'var(--radius-lg)',
-                      fontSize: '0.85rem'
-                    }}
-                  />
-                  <button
-                    className="sm-btn-ghost"
-                    style={{ padding: '0.2rem', marginLeft: '0.25rem' }}
-                    onClick={() => {
-                      const d = new Date(`${targetStartDate}T00:00:00`)
-                      d.setDate(d.getDate() + 7)
-                      setTargetStartDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`)
-                    }}
-                    title="Next Week"
-                  >
-                    <ChevronRight size={16} />
-                  </button>
-                </div>
+              <label
+                htmlFor="sm-start-date"
+                style={{
+                  fontSize: '0.7rem',
+                  color: 'var(--color-text-muted)',
+                  marginBottom: '0.1rem',
+                  paddingLeft: '2px',
+                }}
+              >
+                Start Week (Mon)
+              </label>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <button
+                  className="sm-btn-ghost"
+                  style={{ padding: '0.2rem', marginRight: '0.25rem' }}
+                  onClick={() => {
+                    const d = new Date(`${targetStartDate}T00:00:00`)
+                    d.setDate(d.getDate() - 7)
+                    setTargetStartDate(
+                      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
+                    )
+                  }}
+                  title="Previous Week"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <input
+                  id="sm-start-date"
+                  type="date"
+                  value={targetStartDate}
+                  onChange={(e) => {
+                    const val = e.target.value
+                    if (!val) return
+                    // Enforce Monday selection visually if they typed it manually
+                    const d = new Date(`${val}T00:00:00`)
+                    if (d.getDay() !== 1) {
+                      // Snap to the Monday
+                      const nextMon = getNextMonday(d)
+                      setTargetStartDate(
+                        `${nextMon.getFullYear()}-${String(nextMon.getMonth() + 1).padStart(2, '0')}-${String(nextMon.getDate()).padStart(2, '0')}`,
+                      )
+                    } else {
+                      setTargetStartDate(val)
+                    }
+                  }}
+                  style={{
+                    background: 'var(--color-bg-elevated)',
+                    color: 'var(--color-text-primary)',
+                    border: '1px solid var(--color-border)',
+                    padding: '0.4rem 0.5rem',
+                    borderRadius: 'var(--radius-lg)',
+                    fontSize: '0.85rem',
+                  }}
+                />
+                <button
+                  className="sm-btn-ghost"
+                  style={{ padding: '0.2rem', marginLeft: '0.25rem' }}
+                  onClick={() => {
+                    const d = new Date(`${targetStartDate}T00:00:00`)
+                    d.setDate(d.getDate() + 7)
+                    setTargetStartDate(
+                      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
+                    )
+                  }}
+                  title="Next Week"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
             </div>
-            
-            <button className="sm-btn-generate" onClick={handleGenerateClick} disabled={isGenerating}>
-            {isGenerating ? (
-              <RefreshCw size={16} className="lucide-spin" />
-            ) : (
-              <Sparkles size={16} />
-            )}
-            {isGenerating ? 'Solving...' : 'Automagic Schedule'}
-          </button>
+
+            <button
+              className="sm-btn-generate"
+              onClick={handleGenerateClick}
+              disabled={isGenerating}
+            >
+              {isGenerating ? (
+                <RefreshCw size={16} className="lucide-spin" />
+              ) : (
+                <Sparkles size={16} />
+              )}
+              {isGenerating ? 'Solving...' : 'Automagic Schedule'}
+            </button>
           </div>
         </div>
       </header>
@@ -392,22 +423,56 @@ export function ScheduleManager() {
       <div className="sm-content">
         {isConfirmingGenerate && (
           <div className="sm-overlay" style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}>
-            <div style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)', padding: '2rem', borderRadius: 'var(--radius-lg)', maxWidth: 400, textAlign: 'center', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.2)' }}>
+            <div
+              style={{
+                background: 'var(--color-bg-elevated)',
+                border: '1px solid var(--color-border)',
+                padding: '2rem',
+                borderRadius: 'var(--radius-lg)',
+                maxWidth: 400,
+                textAlign: 'center',
+                boxShadow:
+                  '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.2)',
+              }}
+            >
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
-                <div style={{ background: 'rgba(239, 68, 68, 0.1)', padding: '1rem', borderRadius: '50%' }}>
+                <div
+                  style={{
+                    background: 'rgba(239, 68, 68, 0.1)',
+                    padding: '1rem',
+                    borderRadius: '50%',
+                  }}
+                >
                   <XCircle size={32} color="#ef4444" />
                 </div>
               </div>
-              <h3 style={{ color: 'var(--color-text-primary)', marginTop: 0 }}>Replace Schedule?</h3>
-              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', lineHeight: '1.5' }}>
-                This will overwrite your currently active schedule with a brand new mathematically optimized layout. Are you super sure you want to proceed?
+              <h3 style={{ color: 'var(--color-text-primary)', marginTop: 0 }}>
+                Replace Schedule?
+              </h3>
+              <p
+                style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', lineHeight: '1.5' }}
+              >
+                This will overwrite your currently active schedule with a brand new mathematically
+                optimized layout. Are you super sure you want to proceed?
               </p>
-              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem' }}>
-                <button className="sm-btn-ghost" onClick={() => setIsConfirmingGenerate(false)}>Cancel</button>
-                <button 
-                  className="sm-btn-generate" 
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '1rem',
+                  justifyContent: 'center',
+                  marginTop: '2rem',
+                }}
+              >
+                <button className="sm-btn-ghost" onClick={() => setIsConfirmingGenerate(false)}>
+                  Cancel
+                </button>
+                <button
+                  className="sm-btn-generate"
                   style={{ background: '#ef4444' }}
-                  onClick={() => { setIsConfirmingGenerate(false); executeGenerate(); }}
+                  onClick={() => {
+                    setIsConfirmingGenerate(false)
+                    executeGenerate()
+                  }}
                 >
                   Yes, Replace It
                 </button>
@@ -501,22 +566,46 @@ export function ScheduleManager() {
             )}
 
             {(() => {
-              const totalWeeksInSchedule = Math.ceil(
-                    (new Date(activeSchedule.endDate).getTime() -
-                      new Date(activeSchedule.startDate).getTime()) /
-                      (7 * 24 * 60 * 60 * 1000)
-              ) || 1
-              
+              const totalWeeksInSchedule =
+                Math.ceil(
+                  (new Date(activeSchedule.endDate).getTime() -
+                    new Date(activeSchedule.startDate).getTime()) /
+                    (7 * 24 * 60 * 60 * 1000),
+                ) || 1
+
               return (
-                <div className="schedule-week-container" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--color-bg-elevated)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)' }}>
+                <div
+                  className="schedule-week-container"
+                  style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '1rem' }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      background: 'var(--color-bg-elevated)',
+                      padding: '0.75rem 1rem',
+                      borderRadius: 'var(--radius-lg)',
+                      border: '1px solid var(--color-border)',
+                    }}
+                  >
                     <h4 style={{ margin: 0, color: 'var(--color-primary)' }}>
-                      Week {activeWeekNumber + 1} <span style={{ opacity: 0.6, fontSize: '0.9em', marginLeft: '0.5rem', color: 'var(--color-text-muted)' }}>({formatWeekRange(activeSchedule.startDate, activeWeekNumber)})</span>
+                      Week {activeWeekNumber + 1}{' '}
+                      <span
+                        style={{
+                          opacity: 0.6,
+                          fontSize: '0.9em',
+                          marginLeft: '0.5rem',
+                          color: 'var(--color-text-muted)',
+                        }}
+                      >
+                        ({formatWeekRange(activeSchedule.startDate, activeWeekNumber)})
+                      </span>
                     </h4>
-                    
+
                     {totalWeeksInSchedule > 1 && (
                       <div style={{ display: 'flex', gap: '0.25rem' }}>
-                        <button 
+                        <button
                           className="sm-btn-ghost"
                           onClick={() => setActiveWeekNumber(Math.max(0, activeWeekNumber - 1))}
                           disabled={activeWeekNumber <= 0}
@@ -524,12 +613,24 @@ export function ScheduleManager() {
                         >
                           <ChevronLeft size={20} />
                         </button>
-                        <span style={{ display: 'flex', alignItems: 'center', fontSize: '0.85rem', color: 'var(--color-text-muted)', padding: '0 0.5rem' }}>
+                        <span
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            fontSize: '0.85rem',
+                            color: 'var(--color-text-muted)',
+                            padding: '0 0.5rem',
+                          }}
+                        >
                           {activeWeekNumber + 1} of {totalWeeksInSchedule}
                         </span>
-                        <button 
+                        <button
                           className="sm-btn-ghost"
-                          onClick={() => setActiveWeekNumber(Math.min(totalWeeksInSchedule - 1, activeWeekNumber + 1))}
+                          onClick={() =>
+                            setActiveWeekNumber(
+                              Math.min(totalWeeksInSchedule - 1, activeWeekNumber + 1),
+                            )
+                          }
                           disabled={activeWeekNumber >= totalWeeksInSchedule - 1}
                           title="Next Week"
                         >
@@ -538,13 +639,19 @@ export function ScheduleManager() {
                       </div>
                     )}
                   </div>
-                  
+
                   <div className="scroll-matrix-wrapper" style={{ overflowY: 'auto' }}>
                     <div className="weekly-block">
                       {viewMode === 'matrix' ? (
-                        <WeeklyGrid weekNumber={activeWeekNumber} startDate={activeSchedule.startDate} />
+                        <WeeklyGrid
+                          weekNumber={activeWeekNumber}
+                          startDate={activeSchedule.startDate}
+                        />
                       ) : (
-                        <TimelineGrid weekNumber={activeWeekNumber} startDate={activeSchedule.startDate} />
+                        <TimelineGrid
+                          weekNumber={activeWeekNumber}
+                          startDate={activeSchedule.startDate}
+                        />
                       )}
                     </div>
                   </div>

@@ -40,7 +40,7 @@ function computeFairnessData(
     const eh = parseInt(s.endTime.split(':')[0], 10)
     let duration = eh > sh ? eh - sh : 24 - sh + eh
     if (s.unpaidBreakMinutes) {
-      duration -= (s.unpaidBreakMinutes / 60)
+      duration -= s.unpaidBreakMinutes / 60
     }
     shiftHours.set(s.id, duration)
   })
@@ -48,7 +48,7 @@ function computeFairnessData(
   // Accumulate hours per employee for the active week only
   const hoursMap = new Map<string, number>()
   activeSchedule.assignments.forEach((a: ShiftAssignment) => {
-    const shift = activeSchedule.shifts.find(s => s.id === a.shiftId)
+    const shift = activeSchedule.shifts.find((s) => s.id === a.shiftId)
     // Ignore assignments for shifts not in the active week
     if (!shift || (shift.weekNumber || 0) !== activeWeekNumber) return
 
@@ -67,7 +67,8 @@ function computeFairnessData(
       hours,
       max,
       utilization: Math.min(utilization, 150), // Cap at 150% for display
-      shifts: activeSchedule.assignments.filter((a: ShiftAssignment) => a.employeeId === emp.id).length,
+      shifts: activeSchedule.assignments.filter((a: ShiftAssignment) => a.employeeId === emp.id)
+        .length,
     }
   })
 
@@ -200,15 +201,45 @@ export function FairnessChart({ activeWeekNumber }: { activeWeekNumber: number }
         </ResponsiveContainer>
       </div>
 
-      <div className="fairness-legend" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-        <span className="legend-item" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          <span className="legend-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: '#00b894' }} /> On target
+      <div
+        className="fairness-legend"
+        style={{
+          display: 'flex',
+          gap: '1rem',
+          justifyContent: 'center',
+          fontSize: '0.75rem',
+          color: 'var(--color-text-muted)',
+        }}
+      >
+        <span
+          className="legend-item"
+          style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+        >
+          <span
+            className="legend-dot"
+            style={{ width: 8, height: 8, borderRadius: '50%', background: '#00b894' }}
+          />{' '}
+          On target
         </span>
-        <span className="legend-item" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          <span className="legend-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b' }} /> Slightly off
+        <span
+          className="legend-item"
+          style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+        >
+          <span
+            className="legend-dot"
+            style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b' }}
+          />{' '}
+          Slightly off
         </span>
-        <span className="legend-item" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          <span className="legend-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }} /> Needs attention
+        <span
+          className="legend-item"
+          style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}
+        >
+          <span
+            className="legend-dot"
+            style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }}
+          />{' '}
+          Needs attention
         </span>
       </div>
     </div>

@@ -129,7 +129,7 @@ export function generateOptimizedQrUrl(state: ShareableState): string {
     // Drop all requirements
     coverageRequirements: [],
     // Strip employee metadata that is only needed for building a schedule, not viewing it
-    employees: state.employees.map(emp => ({
+    employees: state.employees.map((emp) => ({
       ...emp,
       id: getId(emp.id),
       availability: [],
@@ -139,28 +139,29 @@ export function generateOptimizedQrUrl(state: ShareableState): string {
       minHoursPerWeek: 0,
       preferredShiftsPerWeek: null,
       createdAt: '',
-      updatedAt: ''
+      updatedAt: '',
     })),
     // Map schedule and its deeply nested IDs
     schedule: {
       ...state.schedule,
       id: getId(state.schedule.id),
       unfilledShiftIds: [],
-      shifts: state.schedule.shifts.map(s => ({
+      shifts: state.schedule.shifts.map((s) => ({
         ...s,
-        id: getId(s.id)
+        id: getId(s.id),
       })),
-      assignments: state.schedule.assignments.map(a => ({
+      assignments: state.schedule.assignments.map((a) => ({
         ...a,
         id: getId(a.id),
         shiftId: getId(a.shiftId),
-        employeeId: getId(a.employeeId)
-      }))
-    }
+        employeeId: getId(a.employeeId),
+      })),
+    },
   }
 
   const hash = encodeStateToHash(optimizedState)
-  const origin = typeof window !== 'undefined' ? window.location.origin + window.location.pathname : ''
+  const origin =
+    typeof window !== 'undefined' ? window.location.origin + window.location.pathname : ''
   return `${origin}#${hash}`
 }
 

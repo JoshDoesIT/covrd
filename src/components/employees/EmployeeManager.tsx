@@ -166,7 +166,6 @@ export function EmployeeManager() {
                     <span className="ec-stat-lbl">Constraints</span>
                   </div>
                 </div>
-
               </div>
             ))
           )}

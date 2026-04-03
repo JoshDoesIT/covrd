@@ -66,7 +66,7 @@ export const useScheduleStore = create<ScheduleState>((set) => ({
       }
       // Sort chronologically just in case
       newAll.sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
-      
+
       return { activeSchedule: schedule, allSchedules: newAll, canUndo: false, canRedo: false }
     })
   },

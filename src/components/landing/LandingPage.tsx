@@ -1,4 +1,11 @@
-import { Shield, LayoutDashboard, Calendar, Terminal, ServerOff, MonitorSmartphone } from 'lucide-react'
+import {
+  Shield,
+  LayoutDashboard,
+  Calendar,
+  Terminal,
+  ServerOff,
+  MonitorSmartphone,
+} from 'lucide-react'
 import './LandingPage.css'
 
 interface LandingPageProps {
@@ -60,24 +67,31 @@ export function LandingPage({ onLaunch, onShowPrivacy, onShowAccessibility }: La
             </div>
             <h3 className="landing__bento-title">Smart Auto-Scheduling</h3>
             <p className="landing__bento-desc">
-              Our embedded CSP solver uses fairness balancing to seamlessly create optimized schedules in
-              milliseconds. It learns your coverage requirements and instantly builds perfect shifts.
+              Our embedded CSP solver uses fairness balancing to seamlessly create optimized
+              schedules in milliseconds. It learns your coverage requirements and instantly builds
+              perfect shifts.
             </p>
             <div className="landing__mock-scheduler">
               <div className="landing__mock-calendar-header">
-                <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+                <span>S</span>
+                <span>M</span>
+                <span>T</span>
+                <span>W</span>
+                <span>T</span>
+                <span>F</span>
+                <span>S</span>
               </div>
               <div className="landing__mock-calendar-grid">
                 {Array.from({ length: 21 }).map((_, i) => {
-                  const isFixed = Math.random() > 0.7;
-                  const delay = (i % 7) * 0.15 + Math.random() * 0.5;
+                  const isFixed = Math.random() > 0.7
+                  const delay = (i % 7) * 0.15 + Math.random() * 0.5
                   return (
-                    <div 
-                      key={i} 
-                      className={`landing__mock-cell ${isFixed ? 'fixed' : ''}`} 
+                    <div
+                      key={i}
+                      className={`landing__mock-cell ${isFixed ? 'fixed' : ''}`}
                       style={!isFixed ? { animationDelay: `${delay}s` } : {}}
                     />
-                  );
+                  )
                 })}
               </div>
             </div>
@@ -90,7 +104,8 @@ export function LandingPage({ onLaunch, onShowPrivacy, onShowAccessibility }: La
             </div>
             <h3 className="landing__bento-title">Template Engines</h3>
             <p className="landing__bento-desc">
-              Generate rotating bi-weekly, monthly, or seasonal schedules instantly based on predefined templates.
+              Generate rotating bi-weekly, monthly, or seasonal schedules instantly based on
+              predefined templates.
             </p>
           </div>
 
@@ -101,7 +116,8 @@ export function LandingPage({ onLaunch, onShowPrivacy, onShowAccessibility }: La
             </div>
             <h3 className="landing__bento-title">Developer Ready</h3>
             <p className="landing__bento-desc">
-              Built on React, IndexedDB, and pure local TypeScript logic. Share state via URL hashing.
+              Built on React, IndexedDB, and pure local TypeScript logic. Share state via URL
+              hashing.
             </p>
           </div>
 
@@ -112,7 +128,9 @@ export function LandingPage({ onLaunch, onShowPrivacy, onShowAccessibility }: La
             </div>
             <h3 className="landing__bento-title">Zero Trust Architecture</h3>
             <p className="landing__bento-desc">
-              Covrd operates entirely within your browser's local sandbox. There is absolutely no server telemetry, no user accounts, and no backend database holding your employee data.
+              Covrd operates entirely within your browser's local sandbox. There is absolutely no
+              server telemetry, no user accounts, and no backend database holding your employee
+              data.
             </p>
             <div className="landing__mock-security">
               <div className="landing__security-node landing__security-node--browser">
@@ -131,9 +149,15 @@ export function LandingPage({ onLaunch, onShowPrivacy, onShowAccessibility }: La
         {/* Horizontal Privacy Pledge */}
         <section className="landing__privacy-banner">
           <div className="landing__privacy-capsules">
-            <div className="landing__privacy-capsule"><Shield size={16} color="var(--color-accent)" /> 0% Server Tracking</div>
-            <div className="landing__privacy-capsule"><Shield size={16} color="var(--color-accent)" /> Free Open Source</div>
-            <div className="landing__privacy-capsule"><Shield size={16} color="var(--color-accent)" /> Local Export</div>
+            <div className="landing__privacy-capsule">
+              <Shield size={16} color="var(--color-accent)" /> 0% Server Tracking
+            </div>
+            <div className="landing__privacy-capsule">
+              <Shield size={16} color="var(--color-accent)" /> Free Open Source
+            </div>
+            <div className="landing__privacy-capsule">
+              <Shield size={16} color="var(--color-accent)" /> Local Export
+            </div>
           </div>
           <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
             <button className="landing__link-btn" onClick={onShowPrivacy}>
@@ -148,7 +172,18 @@ export function LandingPage({ onLaunch, onShowPrivacy, onShowAccessibility }: La
       </main>
 
       <footer className="landing__footer">
-        <p>© 2026 Covrd. Built by <a href="https://www.joshdoes.it" target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>JoshDoesIT</a>.</p>
+        <p>
+          © 2026 Covrd. Built by{' '}
+          <a
+            href="https://www.joshdoes.it"
+            target="_blank"
+            rel="noreferrer"
+            style={{ color: 'inherit', textDecoration: 'underline' }}
+          >
+            JoshDoesIT
+          </a>
+          .
+        </p>
       </footer>
     </div>
   )

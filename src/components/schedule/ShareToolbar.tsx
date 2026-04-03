@@ -79,12 +79,12 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
       const optimizedUrl = generateOptimizedQrUrl(state)
 
       // Use lowest error correction ('L') to maximize capacity
-      const dataUrl = await QRCode.toDataURL(optimizedUrl, { 
-        width: 256, 
+      const dataUrl = await QRCode.toDataURL(optimizedUrl, {
+        width: 256,
         margin: 2,
-        errorCorrectionLevel: 'L' 
+        errorCorrectionLevel: 'L',
       })
-      
+
       setQrDataUrl(dataUrl)
       setShowQr(true)
     } catch (error: any) {
