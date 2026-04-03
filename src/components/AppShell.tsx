@@ -84,10 +84,9 @@ export function AppShell() {
         aria-label="Sidebar"
       >
         <div className="shell__sidebar-header">
-          <div className="shell__brand">
-            <span className="shell__brand-mark">
-              Covr<span className="shell__brand-accent">d</span>
-            </span>
+          <div className="shell__brand" style={{ display: 'flex', alignItems: 'center' }}>
+            <img src="/favicon.png" alt="Covrd" style={{ height: '28px', width: '28px' }} />
+            {!collapsed && <span style={{ marginLeft: '12px' }}>Covrd</span>}
           </div>
           <button
             className="shell__sidebar-toggle"
