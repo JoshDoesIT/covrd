@@ -27,6 +27,7 @@ import {
 function computeFairnessData(
   activeSchedule: Schedule | null,
   employees: Employee[],
+  activeWeekNumber: number,
 ) {
   if (!activeSchedule || activeSchedule.assignments.length === 0 || employees.length === 0) {
     return { chartData: [], fairnessScore: 0, avgUtilization: 0 }
@@ -41,9 +42,13 @@ function computeFairnessData(
     shiftHours.set(s.id, duration)
   })
 
-  // Accumulate hours per employee
+  // Accumulate hours per employee for the active week only
   const hoursMap = new Map<string, number>()
   activeSchedule.assignments.forEach((a: ShiftAssignment) => {
+    const shift = activeSchedule.shifts.find(s => s.id === a.shiftId)
+    // Ignore assignments for shifts not in the active week
+    if (!shift || (shift.weekNumber || 0) !== activeWeekNumber) return
+
     const current = hoursMap.get(a.employeeId) ?? 0
     const dur = shiftHours.get(a.shiftId) ?? 0
     hoursMap.set(a.employeeId, current + dur)
@@ -107,13 +112,13 @@ function getFairnessLabel(score: number): string {
  * with a target line at 100%. A computed fairness score (0-100) summarizes
  * how evenly distributed hours are across the team.
  */
-export function FairnessChart() {
+export function FairnessChart({ activeWeekNumber }: { activeWeekNumber: number }) {
   const { activeSchedule } = useScheduleStore()
   const { employees } = useEmployeeStore()
 
   const { chartData, fairnessScore, avgUtilization } = useMemo(
-    () => computeFairnessData(activeSchedule, employees),
-    [activeSchedule, employees],
+    () => computeFairnessData(activeSchedule, employees, activeWeekNumber),
+    [activeSchedule, employees, activeWeekNumber],
   )
 
   if (!activeSchedule) {

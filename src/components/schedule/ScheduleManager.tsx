@@ -535,8 +535,8 @@ export function ScheduleManager() {
                 padding: '2rem',
               }}
             >
-              <CoverageHeatmap />
-              <FairnessChart />
+              <CoverageHeatmap activeWeekNumber={activeWeekNumber} />
+              <FairnessChart activeWeekNumber={activeWeekNumber} />
             </div>
           </div>
         ) : (

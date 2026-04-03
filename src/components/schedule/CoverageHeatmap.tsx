@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { useScheduleStore } from '../../stores/scheduleStore'
 import { useCoverageStore } from '../../stores/coverageStore'
-import type { Shift, ShiftAssignment, CoverageRequirement, DayOfWeek } from '../../types/index'
+import type { Schedule, Shift, ShiftAssignment, CoverageRequirement, DayOfWeek } from '../../types/index'
 import {
   BarChart,
   Bar,
@@ -46,14 +46,18 @@ interface DayCoverage {
  * actually assigned in the active schedule.
  */
 function computeCoverage(
-  schedule: ReturnType<typeof useScheduleStore>['activeSchedule'],
+  schedule: Schedule | null,
   coverageReqs: CoverageRequirement[],
+  activeWeekNumber: number
 ): DayCoverage[] {
   if (!schedule) return []
 
   // Count assignments per day
   const shiftsByDay = new Map<DayOfWeek, number>()
-  schedule.shifts.forEach((s: Shift) => {
+  
+  const weeklyShifts = schedule.shifts.filter((s: Shift) => (s.weekNumber || 0) === activeWeekNumber)
+  
+  weeklyShifts.forEach((s: Shift) => {
     const assignedCount = schedule.assignments.filter(
       (a: ShiftAssignment) => a.shiftId === s.id,
     ).length
@@ -86,13 +90,13 @@ function getCoverageColor(fillRate: number): string {
  * Stacked bars show assigned (colored by fill rate) vs required staff.
  * A summary row shows the overall coverage score.
  */
-export function CoverageHeatmap() {
+export function CoverageHeatmap({ activeWeekNumber }: { activeWeekNumber: number }) {
   const { activeSchedule } = useScheduleStore()
   const { requirements } = useCoverageStore()
 
   const data = useMemo(
-    () => computeCoverage(activeSchedule, requirements),
-    [activeSchedule, requirements],
+    () => computeCoverage(activeSchedule, requirements, activeWeekNumber),
+    [activeSchedule, requirements, activeWeekNumber],
   )
 
   const overallFillRate = useMemo(() => {
