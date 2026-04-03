@@ -9,8 +9,8 @@
 }
 
 .modal-content {
-  background-color: var(--surface);
-  border: 1px solid var(--border);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: var(--space-4);
   width: 90%;
@@ -38,7 +38,7 @@
 .modal-close-btn {
   background: none;
   border: none;
-  color: var(--text-muted);
+  color: var(--color-text-muted);
   cursor: pointer;
   padding: var(--space-1);
   display: flex;
@@ -49,7 +49,7 @@
 }
 
 .modal-close-btn:hover {
-  background: var(--surface-hover);
+  background: var(--color-bg-hover);
   color: var(--text);
 }
 

@@ -34,8 +34,8 @@
 }
 
 .share-toolbar__qr-modal {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
   border-radius: 16px;
   padding: 2rem;
   display: flex;
@@ -46,7 +46,7 @@
 }
 
 .share-toolbar__qr-title {
-  color: var(--text-base);
+  color: var(--color-text-primary);
   margin: 0;
   font-size: 1rem;
   font-weight: 600;

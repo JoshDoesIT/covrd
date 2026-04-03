@@ -24,13 +24,13 @@
 
 .timeline-table th {
   background: rgba(0, 0, 0, 0.2);
-  color: var(--text-muted);
+  color: var(--color-text-muted);
   font-weight: 500;
 }
 
 .timeline-emp-name {
   font-weight: 500;
-  color: var(--text-base);
+  color: var(--color-text-primary);
   width: 150px;
 }
 
