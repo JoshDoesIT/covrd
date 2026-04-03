@@ -63,7 +63,9 @@ export function ScheduleManager() {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
   })
 
-  const handleGenerate = async () => {
+  const [isConfirmingGenerate, setIsConfirmingGenerate] = useState(false)
+
+  const handleGenerateClick = () => {
     const pendingTemplateId = useScheduleStore.getState().pendingTemplateId
     const template = pendingTemplateId ? templates.find((t) => t.id === pendingTemplateId) : null
 
@@ -72,13 +74,17 @@ export function ScheduleManager() {
       return
     }
 
-    // Warn if replacing an existing schedule
     if (activeSchedule && activeSchedule.assignments.length > 0) {
-      const confirmed = confirm(
-        'This will replace your current schedule with a newly generated one. Continue?',
-      )
-      if (!confirmed) return
+      setIsConfirmingGenerate(true)
+      return
     }
+
+    executeGenerate()
+  }
+
+  const executeGenerate = async () => {
+    const pendingTemplateId = useScheduleStore.getState().pendingTemplateId
+    const template = pendingTemplateId ? templates.find((t) => t.id === pendingTemplateId) : null
 
     // Clear pending template flag once we begin
     useScheduleStore.getState().setPendingTemplateId(null)
@@ -363,7 +369,7 @@ export function ScheduleManager() {
                 </div>
             </div>
             
-            <button className="sm-btn-generate" onClick={handleGenerate} disabled={isGenerating}>
+            <button className="sm-btn-generate" onClick={handleGenerateClick} disabled={isGenerating}>
             {isGenerating ? (
               <RefreshCw size={16} className="lucide-spin" />
             ) : (
@@ -376,6 +382,32 @@ export function ScheduleManager() {
       </header>
 
       <div className="sm-content">
+        {isConfirmingGenerate && (
+          <div className="sm-overlay" style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}>
+            <div style={{ background: 'var(--color-bg-elevated)', border: '1px solid var(--color-border)', padding: '2rem', borderRadius: 'var(--radius-lg)', maxWidth: 400, textAlign: 'center', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.2)' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+                <div style={{ background: 'rgba(239, 68, 68, 0.1)', padding: '1rem', borderRadius: '50%' }}>
+                  <XCircle size={32} color="#ef4444" />
+                </div>
+              </div>
+              <h3 style={{ color: 'var(--color-text-primary)', marginTop: 0 }}>Replace Schedule?</h3>
+              <p style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', lineHeight: '1.5' }}>
+                This will overwrite your currently active schedule with a brand new mathematically optimized layout. Are you super sure you want to proceed?
+              </p>
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '2rem' }}>
+                <button className="sm-btn-ghost" onClick={() => setIsConfirmingGenerate(false)}>Cancel</button>
+                <button 
+                  className="sm-btn-generate" 
+                  style={{ background: '#ef4444' }}
+                  onClick={() => { setIsConfirmingGenerate(false); executeGenerate(); }}
+                >
+                  Yes, Replace It
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {isGenerating && (
           <div className="sm-overlay">
             <Sparkles
@@ -534,7 +566,7 @@ export function ScheduleManager() {
                 description="Trigger the solver engine to generate a mathematically optimized schedule based on your coverage requirements and employee constraints."
                 icon={<Sparkles size={32} opacity={0.5} />}
                 ctaLabel="Automagic Schedule"
-                onCtaClick={handleGenerate}
+                onCtaClick={handleGenerateClick}
               />
             </div>
           )
