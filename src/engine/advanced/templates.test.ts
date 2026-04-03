@@ -1,5 +1,8 @@
 import { generateShiftsFromTemplate } from './templates'
-import type { EngineCoverageRequirement as CoverageRequirement, EngineShift as Shift } from '../types'
+import type {
+  EngineCoverageRequirement as CoverageRequirement,
+  EngineShift as Shift,
+} from '../types'
 
 describe('Template Expansion', () => {
   it('expands coverage requirements into individual shift permutations', () => {

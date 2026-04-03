@@ -7,7 +7,11 @@ class MockWorker {
   postMessage(data: unknown) {
     // Simulate async worker response
     setTimeout(() => {
-      if (typeof data === 'object' && data !== null && 'type' in (data as Record<string, unknown>)) {
+      if (
+        typeof data === 'object' &&
+        data !== null &&
+        'type' in (data as Record<string, unknown>)
+      ) {
         const payload = data as { type: string }
         if (payload.type === 'START_SOLVE') {
           // Send a progress event
