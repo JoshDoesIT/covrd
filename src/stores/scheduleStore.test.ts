@@ -7,9 +7,8 @@ describe('Schedule Store', () => {
   })
 
   it('starts with no active schedule', () => {
-    const { activeSchedule, scheduleHistory } = useScheduleStore.getState()
+    const { activeSchedule } = useScheduleStore.getState()
     expect(activeSchedule).toBeNull()
-    expect(scheduleHistory).toEqual([])
   })
 
   it('sets the active schedule', () => {
@@ -24,21 +23,6 @@ describe('Schedule Store', () => {
 
     const { activeSchedule } = useScheduleStore.getState()
     expect(activeSchedule?.name).toBe('Week 1')
-  })
-
-  it('saves a schedule to history', () => {
-    const { saveToHistory } = useScheduleStore.getState()
-    const schedule = createSchedule({
-      name: 'Week 1',
-      startDate: '2026-04-06',
-      endDate: '2026-04-12',
-    })
-
-    saveToHistory(schedule)
-
-    const { scheduleHistory } = useScheduleStore.getState()
-    expect(scheduleHistory).toHaveLength(1)
-    expect(scheduleHistory[0].name).toBe('Week 1')
   })
 
   it('adds an assignment to the active schedule', () => {

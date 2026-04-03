@@ -1,17 +1,24 @@
 import { create } from 'zustand'
 import type { Schedule, ShiftAssignment } from '../types/index'
+import { covrdDb } from '../db/db'
+import { UndoRedoManager } from '../hooks/useUndoRedo'
+
+const undoManager = new UndoRedoManager<Schedule>()
 
 /**
  * Schedule store state and actions.
  */
 interface ScheduleState {
   activeSchedule: Schedule | null
-  scheduleHistory: Schedule[]
+  hydrate: (schedules: Schedule[]) => void
   setActiveSchedule: (schedule: Schedule) => void
   clearActiveSchedule: () => void
-  saveToHistory: (schedule: Schedule) => void
   addAssignment: (assignment: Omit<ShiftAssignment, 'id'>) => void
   removeAssignment: (assignmentId: string) => void
+  undo: () => void
+  redo: () => void
+  canUndo: boolean
+  canRedo: boolean
   isSandboxMode: boolean
   baselineSchedule: Schedule | null
   enableSandbox: () => void
@@ -28,42 +35,53 @@ interface ScheduleState {
  */
 export const useScheduleStore = create<ScheduleState>((set) => ({
   activeSchedule: null,
-  scheduleHistory: [],
   isSandboxMode: false,
   baselineSchedule: null,
   pendingTemplateId: null,
+  canUndo: false,
+  canRedo: false,
 
   setPendingTemplateId: (id) => set({ pendingTemplateId: id }),
 
+  hydrate: (schedules) => {
+    // If there's a schedule, set the most recent as active. 
+    // In a full app you might track 'active' explicitly via a flag, but latest works for demo.
+    const active = schedules.length > 0 ? schedules[schedules.length - 1] : null
+    set({ activeSchedule: active })
+  },
+
   setActiveSchedule: (schedule) => {
-    set({ activeSchedule: schedule })
+    covrdDb.schedules.put(schedule).catch(console.error)
+    undoManager.clear()
+    set({ activeSchedule: schedule, canUndo: false, canRedo: false })
   },
 
   clearActiveSchedule: () => {
     set({ activeSchedule: null })
   },
 
-  saveToHistory: (schedule) => {
-    set((state) => ({
-      scheduleHistory: [...state.scheduleHistory, schedule],
-    }))
-  },
-
   addAssignment: (assignment) => {
     set((state) => {
       if (!state.activeSchedule) return state
+
+      undoManager.push(state.activeSchedule)
 
       const newAssignment: ShiftAssignment = {
         ...assignment,
         id: crypto.randomUUID(),
       }
 
+      const updated = {
+        ...state.activeSchedule,
+        assignments: [...state.activeSchedule.assignments, newAssignment],
+        updatedAt: new Date().toISOString(),
+      }
+      covrdDb.schedules.put(updated).catch(console.error)
+
       return {
-        activeSchedule: {
-          ...state.activeSchedule,
-          assignments: [...state.activeSchedule.assignments, newAssignment],
-          updatedAt: new Date().toISOString(),
-        },
+        activeSchedule: updated,
+        canUndo: undoManager.canUndo,
+        canRedo: undoManager.canRedo,
       }
     })
   },
@@ -72,12 +90,49 @@ export const useScheduleStore = create<ScheduleState>((set) => ({
     set((state) => {
       if (!state.activeSchedule) return state
 
+      undoManager.push(state.activeSchedule)
+
+      const updated = {
+        ...state.activeSchedule,
+        assignments: state.activeSchedule.assignments.filter((a) => a.id !== assignmentId),
+        updatedAt: new Date().toISOString(),
+      }
+      covrdDb.schedules.put(updated).catch(console.error)
+
       return {
-        activeSchedule: {
-          ...state.activeSchedule,
-          assignments: state.activeSchedule.assignments.filter((a) => a.id !== assignmentId),
-          updatedAt: new Date().toISOString(),
-        },
+        activeSchedule: updated,
+        canUndo: undoManager.canUndo,
+        canRedo: undoManager.canRedo,
+      }
+    })
+  },
+
+  undo: () => {
+    set((state) => {
+      if (!state.activeSchedule) return state
+      const prev = undoManager.undo()
+      if (!prev) return state
+      
+      covrdDb.schedules.put(prev).catch(console.error)
+      return {
+        activeSchedule: prev,
+        canUndo: undoManager.canUndo,
+        canRedo: undoManager.canRedo,
+      }
+    })
+  },
+
+  redo: () => {
+    set((state) => {
+      if (!state.activeSchedule) return state
+      const next = undoManager.redo()
+      if (!next) return state
+
+      covrdDb.schedules.put(next).catch(console.error)
+      return {
+        activeSchedule: next,
+        canUndo: undoManager.canUndo,
+        canRedo: undoManager.canRedo,
       }
     })
   },
@@ -109,6 +164,7 @@ export const useScheduleStore = create<ScheduleState>((set) => ({
   },
 
   reset: () => {
-    set({ activeSchedule: null, scheduleHistory: [], isSandboxMode: false, baselineSchedule: null })
+    undoManager.clear()
+    set({ activeSchedule: null, isSandboxMode: false, baselineSchedule: null, canUndo: false, canRedo: false })
   },
 }))

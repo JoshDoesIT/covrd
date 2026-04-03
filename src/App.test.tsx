@@ -2,23 +2,27 @@ import { render, screen } from '@testing-library/react'
 import { App } from './App'
 
 describe('App', () => {
-  it('renders the AppShell with sidebar navigation', () => {
+  beforeEach(() => {
+    localStorage.setItem('covrd-onboarding-complete', 'true')
+  })
+  it('renders the AppShell with sidebar navigation', async () => {
     render(<App />)
-    expect(screen.getByRole('navigation', { name: /sidebar/i })).toBeInTheDocument()
+    expect(await screen.findByRole('navigation', { name: /sidebar/i })).toBeInTheDocument()
   })
 
-  it('renders the layout header', () => {
+  it('renders the layout header', async () => {
     render(<App />)
-    expect(screen.getAllByRole('banner').length).toBeGreaterThanOrEqual(1)
+    const elements = await screen.findAllByRole('banner')
+    expect(elements.length).toBeGreaterThanOrEqual(1)
   })
 
-  it('renders a main content area', () => {
+  it('renders a main content area', async () => {
     render(<App />)
-    expect(screen.getByRole('main')).toBeInTheDocument()
+    expect(await screen.findByRole('main')).toBeInTheDocument()
   })
 
-  it('displays the Covrd brand', () => {
+  it('displays the Covrd brand', async () => {
     render(<App />)
-    expect(screen.getByText(/Covr/)).toBeInTheDocument()
+    expect(await screen.findByText(/Covr/)).toBeInTheDocument()
   })
 })

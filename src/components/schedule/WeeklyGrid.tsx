@@ -7,7 +7,7 @@ import { DAYS_OF_WEEK } from '../../types/index'
 import type { Shift, Employee } from '../../types/index'
 import './WeeklyGrid.css'
 
-function DraggableShift({
+export const DraggableShift = React.memo(function DraggableShift({
   shift,
   employee,
   isAssigned,
@@ -48,9 +48,8 @@ function DraggableShift({
       </div>
     </div>
   )
-}
-
-function DroppableCell({
+})
+export const DroppableCell = React.memo(function DroppableCell({
   id,
   day,
   children,
@@ -69,8 +68,7 @@ function DroppableCell({
       {children}
     </div>
   )
-}
-
+})
 export function WeeklyGrid({ weekNumber = 0 }: { weekNumber?: number }) {
   const { activeSchedule, setActiveSchedule } = useScheduleStore()
   const { employees } = useEmployeeStore()

@@ -4,6 +4,7 @@ import { useEmployeeStore } from '../../stores/employeeStore'
 import { createEmployee } from '../../types/factories'
 import type { Employee } from '../../types/index'
 import { AvailabilityGrid } from './AvailabilityGrid'
+import { EmptyState } from '../shared/EmptyState'
 import './EmployeeManager.css'
 
 export function EmployeeManager() {
@@ -105,12 +106,14 @@ export function EmployeeManager() {
       <div className="em-content">
         <div className="em-roster">
           {employees.length === 0 ? (
-            <div className="em-empty">
-              <Users size={40} opacity={0.5} />
-              <p>No employees configured yet.</p>
-              <button className="em-add-btn" onClick={handleStartCreate}>
-                Create your first Employee
-              </button>
+            <div style={{ margin: '2rem 1rem' }}>
+              <EmptyState
+                title="No employees configured yet"
+                description="Get started by adding your first team member to the roster."
+                icon={<Users size={32} opacity={0.5} />}
+                ctaLabel="Create Employee"
+                onCtaClick={handleStartCreate}
+              />
             </div>
           ) : (
             employees.map((emp) => (

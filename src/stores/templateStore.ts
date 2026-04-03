@@ -1,30 +1,10 @@
 import { create } from 'zustand'
-import { persist, createJSONStorage, type StateStorage } from 'zustand/middleware'
-import { get, set, del } from 'idb-keyval'
 import type { RecurringTemplate } from '../types/index'
-
-/**
- * Custom storage engine utilizing IndexedDB via idb-keyval.
- * Ensures that large template arrays do not aggressively hit LocalStorage quota.
- * Safely falls back to a dummy memory store in Test environments (JSDOM).
- */
-const idbStorageWrapper: StateStorage = {
-  getItem: async (name: string): Promise<string | null> => {
-    if (typeof indexedDB === 'undefined') return null
-    return (await get(name)) || null
-  },
-  setItem: async (name: string, value: string): Promise<void> => {
-    if (typeof indexedDB === 'undefined') return
-    await set(name, value)
-  },
-  removeItem: async (name: string): Promise<void> => {
-    if (typeof indexedDB === 'undefined') return
-    await del(name)
-  },
-}
+import { covrdDb } from '../db/db'
 
 interface TemplateState {
   templates: RecurringTemplate[]
+  hydrate: (templates: RecurringTemplate[]) => void
   addTemplate: (template: Omit<RecurringTemplate, 'id' | 'createdAt' | 'updatedAt'>) => void
   removeTemplate: (id: string) => void
   updateTemplate: (
@@ -35,79 +15,83 @@ interface TemplateState {
   reset: () => void
 }
 
-export const useTemplateStore = create<TemplateState>()(
-  persist(
-    (set, getFn) => ({
-      templates: [],
+export const useTemplateStore = create<TemplateState>((set, get) => ({
+  templates: [],
 
-      addTemplate: (templateData) => {
-        const now = new Date().toISOString()
-        const newTemplate: RecurringTemplate = {
-          ...templateData,
-          id: crypto.randomUUID(),
-          createdAt: now,
-          updatedAt: now,
+  hydrate: (templates) => {
+    set({ templates })
+  },
+
+  addTemplate: (templateData) => {
+    const now = new Date().toISOString()
+    const newTemplate: RecurringTemplate = {
+      ...templateData,
+      id: crypto.randomUUID(),
+      createdAt: now,
+      updatedAt: now,
+    }
+
+    covrdDb.templates.put(newTemplate).catch(console.error)
+
+    set((state) => ({
+      templates: [...state.templates, newTemplate],
+    }))
+  },
+
+  removeTemplate: (id) => {
+    covrdDb.templates.delete(id).catch(console.error)
+    set((state) => ({
+      templates: state.templates.filter((t) => t.id !== id),
+    }))
+  },
+
+  updateTemplate: (id, updates) => {
+    set((state) => {
+      const templates = state.templates.map((t) => {
+        if (t.id === id) {
+          const updated = {
+            ...t,
+            ...updates,
+            updatedAt: new Date().toISOString(),
+          }
+          covrdDb.templates.put(updated).catch(console.error)
+          return updated
         }
+        return t
+      })
+      return { templates }
+    })
+  },
 
-        set((state) => ({
-          templates: [...state.templates, newTemplate],
-        }))
-      },
+  cloneTemplate: (sourceId, cloneName) => {
+    const sourceLine = get().templates.find((t) => t.id === sourceId)
+    if (!sourceLine) return
 
-      removeTemplate: (id) => {
-        set((state) => ({
-          templates: state.templates.filter((t) => t.id !== id),
-        }))
-      },
+    const now = new Date().toISOString()
 
-      updateTemplate: (id, updates) => {
-        set((state) => ({
-          templates: state.templates.map((t) => {
-            if (t.id === id) {
-              return {
-                ...t,
-                ...updates,
-                updatedAt: new Date().toISOString(),
-              }
-            }
-            return t
-          }),
-        }))
-      },
+    // Deep clone properties via JSON to break references
+    const newRequirements = JSON.parse(JSON.stringify(sourceLine.coverageRequirements))
+    const newConstraints = JSON.parse(JSON.stringify(sourceLine.constraints))
+    const newPattern = JSON.parse(JSON.stringify(sourceLine.pattern))
 
-      cloneTemplate: (sourceId, cloneName) => {
-        const sourceLine = getFn().templates.find((t) => t.id === sourceId)
-        if (!sourceLine) return
+    const clone: RecurringTemplate = {
+      id: crypto.randomUUID(),
+      name: cloneName,
+      coverageRequirements: newRequirements,
+      constraints: newConstraints,
+      pattern: newPattern,
+      createdAt: now,
+      updatedAt: now,
+    }
 
-        const now = new Date().toISOString()
+    covrdDb.templates.put(clone).catch(console.error)
 
-        // Deep clone properties via JSON to break references
-        const newRequirements = JSON.parse(JSON.stringify(sourceLine.coverageRequirements))
-        const newConstraints = JSON.parse(JSON.stringify(sourceLine.constraints))
-        const newPattern = JSON.parse(JSON.stringify(sourceLine.pattern))
+    set((state) => ({
+      templates: [...state.templates, clone],
+    }))
+  },
 
-        const clone: RecurringTemplate = {
-          id: crypto.randomUUID(),
-          name: cloneName,
-          coverageRequirements: newRequirements,
-          constraints: newConstraints,
-          pattern: newPattern,
-          createdAt: now,
-          updatedAt: now,
-        }
-
-        set((state) => ({
-          templates: [...state.templates, clone],
-        }))
-      },
-
-      reset: () => {
-        set({ templates: [] })
-      },
-    }),
-    {
-      name: 'covrd-templates',
-      storage: createJSONStorage(() => idbStorageWrapper),
-    },
-  ),
-)
+  reset: () => {
+    set({ templates: [] })
+  },
+}))
