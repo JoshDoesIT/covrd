@@ -274,18 +274,85 @@ a:hover {
   background: var(--color-border-hover);
 }
 
-/* --- Print Styles --- */
+/* --- Print Styles (Story 6.4) --- */
 @media print {
-  body {
-    background: white;
-    color: black;
+  * {
+    color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 11pt;
+  }
+
+  /* Hide all chrome: sidebar, header, actions, form controls */
+  .shell__sidebar,
+  .shell__header,
+  .sm-header,
+  .sm-actions,
+  .share-toolbar,
+  .sandbox-banner,
+  .schedule-analytics,
+  .shell__cmd-trigger,
+  .toast,
+  .share-toolbar__qr-overlay,
   .no-print {
     display: none !important;
   }
 
   .print-only {
     display: block !important;
+  }
+
+  /* Make main content fill the page */
+  .shell {
+    display: block !important;
+  }
+
+  .shell__main-area {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .shell__content {
+    padding: 0 !important;
+  }
+
+  .sm-content {
+    border: none !important;
+    box-shadow: none !important;
+    background: white !important;
+  }
+
+  /* Schedule grid: visible borders, readable text */
+  .weekly-grid {
+    border: 1px solid #333 !important;
+    background: white !important;
+  }
+
+  .weekly-grid th,
+  .weekly-grid td {
+    border: 1px solid #999 !important;
+    color: black !important;
+    padding: 4px 6px !important;
+    font-size: 9pt !important;
+  }
+
+  .weekly-grid th {
+    background: #eee !important;
+    font-weight: bold !important;
+  }
+
+  /* Ensure each week block starts on a new page if needed */
+  .weekly-block {
+    page-break-inside: avoid;
+  }
+
+  .weekly-block h4 {
+    color: black !important;
+    font-size: 12pt !important;
   }
 }

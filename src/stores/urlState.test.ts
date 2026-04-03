@@ -1,4 +1,10 @@
-import { encodeStateToHash, decodeStateFromHash } from './urlState'
+import {
+  encodeStateToHash,
+  decodeStateFromHash,
+  generateShareUrl,
+  hydrateFromHash,
+  estimateUrlSize,
+} from './urlState'
 import { createEmployee, createCoverageRequirement, createSchedule } from '../types/factories'
 
 describe('URL State Encoding', () => {
@@ -117,6 +123,74 @@ describe('URL State Encoding', () => {
 
       // Compressed + base64 should still be smaller than raw JSON for repetitive data
       expect(hash.length).toBeLessThan(rawJson.length)
+    })
+  })
+
+  describe('generateShareUrl (Story 6.5)', () => {
+    it('produces a URL ending with the encoded hash', () => {
+      const state = {
+        employees: [sampleEmployee],
+        coverageRequirements: [sampleCoverage],
+        schedule: sampleSchedule,
+      }
+
+      const url = generateShareUrl(state)
+
+      expect(url).toContain('#')
+      const hashPart = url.split('#')[1]
+      expect(hashPart.length).toBeGreaterThan(0)
+    })
+
+    it('produces a URL that round-trips through decode', () => {
+      const state = {
+        employees: [sampleEmployee],
+        coverageRequirements: [sampleCoverage],
+        schedule: sampleSchedule,
+      }
+
+      const url = generateShareUrl(state)
+      const hashPart = url.split('#')[1]
+      const decoded = decodeStateFromHash(hashPart)
+
+      expect(decoded).not.toBeNull()
+      expect(decoded!.employees[0].name).toBe('Alice')
+    })
+  })
+
+  describe('hydrateFromHash (Story 6.6)', () => {
+    it('returns null when no hash is present', () => {
+      // jsdom has no hash by default
+      const result = hydrateFromHash()
+      expect(result).toBeNull()
+    })
+  })
+
+  describe('estimateUrlSize', () => {
+    it('returns the byte length of the encoded URL', () => {
+      const state = {
+        employees: [sampleEmployee],
+        coverageRequirements: [sampleCoverage],
+        schedule: sampleSchedule,
+      }
+
+      const size = estimateUrlSize(state)
+      expect(size).toBeGreaterThan(0)
+      expect(typeof size).toBe('number')
+    })
+
+    it('stays under 8KB for a typical schedule with 20 employees', () => {
+      const employees = Array.from({ length: 20 }, (_, i) =>
+        createEmployee({ id: `e${i}`, name: `Employee ${i}`, role: 'Staff' }),
+      )
+
+      const state = {
+        employees,
+        coverageRequirements: [sampleCoverage],
+        schedule: sampleSchedule,
+      }
+
+      const size = estimateUrlSize(state)
+      expect(size).toBeLessThan(8192)
     })
   })
 })
