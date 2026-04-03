@@ -21,6 +21,8 @@ import './CommandPalette.css'
 
 interface CommandPaletteProps {
   onNavigate: (view: string) => void
+  open: boolean
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 /**
@@ -29,8 +31,7 @@ interface CommandPaletteProps {
  * Provides navigation, scheduling actions, demo data loading,
  * data purge, and privacy audit commands.
  */
-export function CommandPalette({ onNavigate }: CommandPaletteProps) {
-  const [open, setOpen] = useState(false)
+export function CommandPalette({ onNavigate, open, setOpen }: CommandPaletteProps) {
   const [showPurge, setShowPurge] = useState(false)
   const { enableSandbox, commitSandbox, discardSandbox, isSandboxMode } = useScheduleStore()
 
@@ -39,13 +40,13 @@ export function CommandPalette({ onNavigate }: CommandPaletteProps) {
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
-        setOpen((open) => !open)
+        setOpen((o) => !o)
       }
     }
 
     document.addEventListener('keydown', down)
     return () => document.removeEventListener('keydown', down)
-  }, [])
+  }, [setOpen])
 
   const handleAction = (action: string) => {
     setOpen(false)

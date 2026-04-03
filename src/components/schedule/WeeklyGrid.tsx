@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { DndContext, useDraggable, useDroppable, closestCenter } from '@dnd-kit/core'
+import { DndContext, useDraggable, useDroppable, pointerWithin } from '@dnd-kit/core'
 import type { DragEndEvent } from '@dnd-kit/core'
 import { useScheduleStore } from '../../stores/scheduleStore'
 import { useEmployeeStore } from '../../stores/employeeStore'
@@ -167,7 +167,7 @@ export function WeeklyGrid({ weekNumber = 0 }: { weekNumber?: number }) {
   if (!activeSchedule) return null
 
   return (
-    <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+    <DndContext collisionDetection={pointerWithin} onDragEnd={handleDragEnd}>
       <div className="wg-wrapper">
         <div className="wg-grid">
           {/* Top-Left Empty Corner */}

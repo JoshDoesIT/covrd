@@ -54,6 +54,7 @@ export function AppShell() {
   const [collapsed, setCollapsed] = useState(false)
   const [activeNav, setActiveNav] = useState('schedule')
   const [policyModal, setPolicyModal] = useState<'privacy' | 'accessibility' | null>(null)
+  const [cmdOpen, setCmdOpen] = useState(false)
 
   const renderContent = () => {
     switch (activeNav) {
@@ -177,9 +178,7 @@ export function AppShell() {
             <button
               className="shell__cmd-trigger"
               aria-label="Open command palette"
-              onClick={() => {
-                document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))
-              }}
+              onClick={() => setCmdOpen(true)}
             >
               <svg
                 width="16"
@@ -213,7 +212,7 @@ export function AppShell() {
         </main>
       </div>
 
-      <CommandPalette onNavigate={setActiveNav} />
+      <CommandPalette onNavigate={setActiveNav} open={cmdOpen} setOpen={setCmdOpen} />
       <PolicyModal type={policyModal} onClose={() => setPolicyModal(null)} />
     </div>
   )
