@@ -72,9 +72,9 @@ export const DroppableCell = React.memo(function DroppableCell({
   })
 
   return (
-    <div ref={setNodeRef} className="wg-cell" data-is-over={isOver}>
+    <td ref={setNodeRef} className="wg-cell" data-is-over={isOver}>
       {children}
-    </div>
+    </td>
   )
 })
 export function WeeklyGrid({
@@ -182,14 +182,22 @@ export function WeeklyGrid({
   return (
     <DndContext collisionDetection={pointerWithin} onDragEnd={handleDragEnd}>
       <div className="wg-wrapper">
-        <div className="wg-grid">
+        <table className="wg-grid">
           {/* Print Table Header Group */}
-          <div className="wg-print-thead">
+          <thead className="wg-print-thead">
             {/* Print-only Document Title */}
-            <div className="wg-print-row-group wg-print-title-row" style={{ display: 'none' }}>
-              <div
+            <tr className="wg-print-row-group wg-print-title-row" style={{ display: 'none' }}>
+              <th
                 className="wg-header-cell"
-                style={{ textAlign: 'left', padding: '12px 6px', fontSize: '11pt', borderBottom: 'none' }}
+                colSpan={8}
+                style={{
+                  gridColumn: '1 / -1',
+                  textAlign: 'left',
+                  padding: '12px 6px',
+                  fontSize: '11pt',
+                  borderBottom: 'none',
+                  borderRight: 'none',
+                }}
               >
                 <strong>{activeSchedule?.name || 'Auto Generated'} - Week {weekNumber + 1}</strong>
                 {startDate && (
@@ -197,31 +205,31 @@ export function WeeklyGrid({
                     ({formatWeekRange(startDate, weekNumber)})
                   </span>
                 )}
-              </div>
-            </div>
+              </th>
+            </tr>
 
             {/* Header Row Wrapper */}
-            <div className="wg-print-row-group">
+            <tr className="wg-print-row-group">
               {/* Top-Left Empty Corner */}
-              <div className="wg-header-cell wg-corner">Roster</div>
+              <th className="wg-header-cell wg-corner">Roster</th>
 
               {/* Column Headers (Days) */}
               {DAYS_OF_WEEK.map((day) => (
-                <div key={day} className="wg-header-cell">
+                <th key={day} className="wg-header-cell">
                   {startDate ? formatDayHeader(startDate, weekNumber, day) : day}
-                </div>
+                </th>
               ))}
-            </div>
-          </div>
+            </tr>
+          </thead>
 
           {/* Print Table Body Group */}
-          <div className="wg-print-tbody">
+          <tbody className="wg-print-tbody">
             {/* Unassigned Pool Wrapper */}
-            <div className="wg-print-row-group">
-              <div className="wg-row-label wg-unassigned-pool">
+            <tr className="wg-print-row-group">
+              <th className="wg-row-label wg-unassigned-pool">
                 <span className="wg-emp-name">Unassigned / Need Staff</span>
                 <span className="wg-emp-target">Pending fulfilling</span>
-              </div>
+              </th>
 
               {DAYS_OF_WEEK.map((day) => {
                 const dayShifts = shiftsByDay.get(day) ?? []
@@ -245,7 +253,7 @@ export function WeeklyGrid({
                   </DroppableCell>
                 )
               })}
-            </div>
+            </tr>
 
           {/* Employee Rows */}
           {employees.map((emp) => {
@@ -267,8 +275,8 @@ export function WeeklyGrid({
             })
 
             return (
-              <div className="wg-print-row-group" key={emp.id}>
-                <div className="wg-row-label">
+              <tr className="wg-print-row-group" key={emp.id}>
+                <th className="wg-row-label">
                   <span className="wg-emp-name">{emp.name}</span>
                   <span
                     className="wg-emp-target"
@@ -276,7 +284,7 @@ export function WeeklyGrid({
                   >
                     {totalHours}h / {emp.maxHoursPerWeek}h
                   </span>
-                </div>
+                </th>
 
                 {DAYS_OF_WEEK.map((day) => {
                   const empDayShifts = assignedShifts.filter((s) => s.day === day)
@@ -294,11 +302,11 @@ export function WeeklyGrid({
                     </DroppableCell>
                   )
                 })}
-              </div>
+              </tr>
             )
           })}
-          </div>
-        </div>
+          </tbody>
+        </table>
       </div>
     </DndContext>
   )
