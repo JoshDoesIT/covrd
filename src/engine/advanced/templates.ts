@@ -1,4 +1,4 @@
-import { CoverageRequirement, Shift } from '../../types'
+import type { EngineCoverageRequirement as CoverageRequirement, EngineShift as Shift } from '../types'
 import { calculateDuration } from '../core/time'
 
 /**

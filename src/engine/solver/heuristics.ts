@@ -1,4 +1,4 @@
-import { Employee, Shift } from '../../types'
+import type { EngineEmployee as Employee, EngineShift as Shift } from '../types'
 
 /**
  * Minimum Remaining Values (MRV) Heuristic

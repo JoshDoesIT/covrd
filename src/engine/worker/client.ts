@@ -1,5 +1,5 @@
-import { Employee, Shift } from '../../types'
-import { SolveResult } from '../solver/csp'
+import type { EngineEmployee as Employee, EngineShift as Shift } from '../types'
+import type { SolveResult } from '../solver/csp'
 
 export type ProgressCallback = (percentComplete: number) => void
 

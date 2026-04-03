@@ -1,5 +1,5 @@
 import { calculateScheduleScore } from './scorer'
-import { Shift, Employee } from '../../types'
+import type { EngineShift as Shift, EngineEmployee as Employee } from '../types'
 
 describe('Quality Score Calculator', () => {
   it('returns 100 for a perfect schedule', () => {

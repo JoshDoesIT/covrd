@@ -7,23 +7,26 @@ class MockWorker {
   postMessage(data: unknown) {
     // Simulate async worker response
     setTimeout(() => {
-      if (data.type === 'START_SOLVE') {
-        // Send a progress event
-        if (this.onmessage) {
-          this.onmessage({ data: { type: 'PROGRESS', percent: 50 } } as MessageEvent)
-        }
-
-        // Send completion event
-        setTimeout(() => {
+      if (typeof data === 'object' && data !== null && 'type' in (data as Record<string, unknown>)) {
+        const payload = data as { type: string }
+        if (payload.type === 'START_SOLVE') {
+          // Send a progress event
           if (this.onmessage) {
-            this.onmessage({
-              data: {
-                type: 'COMPLETE',
-                payload: { success: true, assignedShifts: [], unfilledShifts: [] },
-              },
-            } as MessageEvent)
+            this.onmessage({ data: { type: 'PROGRESS', percent: 50 } } as MessageEvent)
           }
-        }, 10)
+
+          // Send completion event
+          setTimeout(() => {
+            if (this.onmessage) {
+              this.onmessage({
+                data: {
+                  type: 'COMPLETE',
+                  payload: { success: true, assignedShifts: [], unfilledShifts: [] },
+                },
+              } as MessageEvent)
+            }
+          }, 10)
+        }
       }
     }, 10)
   }

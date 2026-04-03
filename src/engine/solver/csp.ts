@@ -1,4 +1,4 @@
-import { Employee, Shift } from '../../types'
+import type { EngineEmployee as Employee, EngineShift as Shift } from '../types'
 import { getEligibleCandidates } from '../core/filters'
 import { sortShiftsByMRV, sortCandidatesByFairness } from './heuristics'
 
