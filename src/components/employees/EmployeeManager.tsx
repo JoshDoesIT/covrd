@@ -285,8 +285,8 @@ export function EmployeeManager() {
                   <p
                     style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}
                   >
-                    Access the Availability Grid and Restrictions forms via the dedicated tools in
-                    Epic 4A.
+                    Set which days and hours this employee is available, plus any scheduling
+                    restrictions.
                   </p>
                   <button
                     className="btn-secondary"
