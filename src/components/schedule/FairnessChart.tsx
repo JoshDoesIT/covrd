@@ -205,10 +205,10 @@ export function FairnessChart({ activeWeekNumber }: { activeWeekNumber: number }
           <span className="legend-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: '#00b894' }} /> On target (80-110%)
         </span>
         <span className="legend-item" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          <span className="legend-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b' }} /> Slightly off (60-79%)
+          <span className="legend-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b' }} /> Slightly off (60-79%, 111-130%)
         </span>
         <span className="legend-item" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          <span className="legend-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }} /> Needs attention (&lt;60%)
+          <span className="legend-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }} /> Needs attention (&lt;60%, &gt;130%)
         </span>
       </div>
     </div>
