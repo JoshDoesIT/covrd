@@ -1,5 +1,6 @@
 import { useState, lazy, Suspense } from 'react'
 import { CommandPalette } from './tooling/CommandPalette'
+import { PolicyModal } from './shared/PolicyModal'
 import './AppShell.css'
 
 /** Lazy-loaded views for bundle size optimization (Story 7.6). */
@@ -52,6 +53,7 @@ const isMac = typeof navigator !== 'undefined' && /Mac/i.test(navigator.userAgen
 export function AppShell() {
   const [collapsed, setCollapsed] = useState(false)
   const [activeNav, setActiveNav] = useState('schedule')
+  const [policyModal, setPolicyModal] = useState<'privacy' | 'accessibility' | null>(null)
 
   const renderContent = () => {
     switch (activeNav) {
@@ -143,6 +145,15 @@ export function AppShell() {
             <span className="shell__privacy-dot" aria-hidden="true" />
             <span className="shell__privacy-label">Client-side only</span>
           </div>
+          <div className="shell__policy-links" aria-hidden={collapsed ? 'true' : 'false'}>
+            <button className="shell__policy-link" onClick={() => setPolicyModal('privacy')}>
+              Privacy
+            </button>
+            <span className="shell__policy-dot">•</span>
+            <button className="shell__policy-link" onClick={() => setPolicyModal('accessibility')}>
+              Accessibility
+            </button>
+          </div>
         </div>
       </nav>
 
@@ -196,6 +207,7 @@ export function AppShell() {
       </div>
 
       <CommandPalette onNavigate={setActiveNav} />
+      <PolicyModal type={policyModal} onClose={() => setPolicyModal(null)} />
     </div>
   )
 }

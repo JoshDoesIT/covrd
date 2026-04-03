@@ -7,6 +7,8 @@ import { useEmployeeStore } from './stores/employeeStore'
 import { useCoverageStore } from './stores/coverageStore'
 import { useTemplateStore } from './stores/templateStore'
 import { covrdDb } from './db/db'
+import { LandingPage } from './components/landing/LandingPage'
+import { PolicyModal } from './components/shared/PolicyModal'
 
 /** LocalStorage key for tracking onboarding completion. */
 const ONBOARDING_KEY = 'covrd-onboarding-complete'
@@ -19,10 +21,14 @@ const ONBOARDING_KEY = 'covrd-onboarding-complete'
  * Also checks the URL hash for shared state to hydrate.
  */
 export function App() {
+  const [isAppLaunched, setIsAppLaunched] = useState(
+    () => window.location.search.includes('app') || localStorage.getItem(ONBOARDING_KEY) === 'true',
+  )
   const [showOnboarding, setShowOnboarding] = useState(
     () => localStorage.getItem(ONBOARDING_KEY) !== 'true',
   )
   const [isLoading, setIsLoading] = useState(true)
+  const [policyModal, setPolicyModal] = useState<'privacy' | 'accessibility' | null>(null)
 
   useEffect(() => {
     async function initData() {
@@ -62,10 +68,25 @@ export function App() {
 
   if (isLoading) return null // Hide shell until data hydrates
 
+  // Show Landing Page if not launched yet
+  if (!isAppLaunched) {
+    return (
+      <>
+        <LandingPage
+          onLaunch={() => setIsAppLaunched(true)}
+          onShowPrivacy={() => setPolicyModal('privacy')}
+        />
+        <PolicyModal type={policyModal} onClose={() => setPolicyModal(null)} />
+      </>
+    )
+  }
+
   return (
     <>
       {showOnboarding && <OnboardingWizard onComplete={handleOnboardingComplete} />}
       <AppShell />
+      {/* AppShell handles its own PolicyModal for the footer links, but we can also use a global one.
+          Actually AppShell has its own state. So we don't need PolicyModal here for the app side. */}
     </>
   )
 }
