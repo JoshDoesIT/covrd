@@ -1,4 +1,3 @@
-
 import { useTemplateStore } from '../../stores/templateStore'
 import './TemplateLibrary.css'
 
