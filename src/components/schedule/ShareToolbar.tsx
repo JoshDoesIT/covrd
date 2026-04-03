@@ -72,13 +72,26 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
 
   const handleQrCode = async () => {
     try {
-      const QRCode = await import('qrcode')
+      const QRCodeModule = await import('qrcode')
+      const QRCode = QRCodeModule.default || QRCodeModule
       const url = generateShareUrl(state)
-      const dataUrl = await QRCode.toDataURL(url, { width: 256, margin: 2 })
+      
+      // Use lowest error correction ('L') to maximize data capacity (up to ~2953 bytes)
+      const dataUrl = await QRCode.toDataURL(url, { 
+        width: 256, 
+        margin: 2,
+        errorCorrectionLevel: 'L' 
+      })
+      
       setQrDataUrl(dataUrl)
       setShowQr(true)
-    } catch {
-      setToastMessage('Failed to generate QR code')
+    } catch (error: any) {
+      console.error('QR Code Generation Error:', error)
+      if (error?.message?.includes('too big')) {
+        setToastMessage('Schedule too large for QR. Use Share Link or Export instead.')
+      } else {
+        setToastMessage('Failed to generate QR code')
+      }
     }
   }
 
