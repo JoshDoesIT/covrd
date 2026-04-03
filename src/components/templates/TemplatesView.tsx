@@ -9,10 +9,10 @@ export function TemplatesView({ onNavigate }: { onNavigate?: (nav: string) => vo
 
   if (editingTemplateId) {
     return (
-      <TemplateEditor 
+      <TemplateEditor
         key={editingTemplateId}
-        templateId={editingTemplateId} 
-        onBack={() => setEditingTemplateId(null)} 
+        templateId={editingTemplateId}
+        onBack={() => setEditingTemplateId(null)}
       />
     )
   }

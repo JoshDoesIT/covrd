@@ -10,10 +10,10 @@ interface TemplateEditorProps {
 
 export function TemplateEditor({ templateId, onBack }: TemplateEditorProps) {
   const { templates, updateTemplate } = useTemplateStore()
-  
+
   // Safe to initialize eagerly because parent sets key={templateId} forcing remount
   const [localTemplate, setLocalTemplate] = useState<RecurringTemplate | null>(
-    templates.find((tmp) => tmp.id === templateId) || null
+    templates.find((tmp) => tmp.id === templateId) || null,
   )
 
   if (!localTemplate) return null
