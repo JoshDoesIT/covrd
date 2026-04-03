@@ -13,6 +13,7 @@ import { CoverageHeatmap } from './CoverageHeatmap'
 import { FairnessChart } from './FairnessChart'
 import { ShareToolbar } from './ShareToolbar'
 import { readFileAsText, deserializeScheduleJSON } from '../../utils/exportSchedule'
+import { getNextMonday, formatWeekRange } from '../../utils/scheduleDates'
 import { EmptyState } from '../shared/EmptyState'
 import './ScheduleManager.css'
 
@@ -167,12 +168,13 @@ export function ScheduleManager() {
           isManual: false,
         }))
 
+      const nextMonday = getNextMonday()
       const newSchedule = createSchedule({
         name: template
           ? `Generated from ${template.name}`
-          : `Auto Generated - Week of ${new Date().toLocaleDateString()}`,
-        startDate: new Date().toISOString(),
-        endDate: new Date(Date.now() + totalWeeks * 7 * 24 * 60 * 60 * 1000).toISOString(),
+          : `Auto Generated - Week of ${nextMonday.toLocaleDateString()}`,
+        startDate: nextMonday.toISOString(),
+        endDate: new Date(nextMonday.getTime() + totalWeeks * 7 * 24 * 60 * 60 * 1000).toISOString(),
         shifts: generatedShifts,
         assignments: finalAssignments,
         qualityScore: result.success ? 100 : 0,
@@ -377,36 +379,36 @@ export function ScheduleManager() {
               </div>
             )}
 
-            {viewMode === 'matrix' ? (
-              <div
-                className="scroll-matrix-wrapper"
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '3rem',
-                  padding: '1rem',
-                  overflowY: 'auto',
-                }}
-              >
-                {Array.from({
-                  length:
-                    Math.ceil(
-                      (new Date(activeSchedule.endDate).getTime() -
-                        new Date(activeSchedule.startDate).getTime()) /
-                        (7 * 24 * 60 * 60 * 1000),
-                    ) || 1,
-                }).map((_, i) => (
-                  <div key={i} className="weekly-block">
-                    <h4 style={{ margin: '0 0 1rem 0', color: 'var(--color-text-muted)' }}>
-                      Week {i + 1}
-                    </h4>
-                    <WeeklyGrid weekNumber={i} />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <TimelineGrid />
-            )}
+            <div
+              className="scroll-matrix-wrapper"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '3rem',
+                padding: '1rem',
+                overflowY: 'auto',
+              }}
+            >
+              {Array.from({
+                length:
+                  Math.ceil(
+                    (new Date(activeSchedule.endDate).getTime() -
+                      new Date(activeSchedule.startDate).getTime()) /
+                      (7 * 24 * 60 * 60 * 1000),
+                  ) || 1,
+              }).map((_, i) => (
+                <div key={i} className="weekly-block">
+                  <h4 style={{ margin: '0 0 1rem 0', color: 'var(--color-text-muted)' }}>
+                    Week {i + 1} <span style={{ opacity: 0.6, fontSize: '0.9em', marginLeft: '0.5rem' }}>({formatWeekRange(activeSchedule.startDate, i)})</span>
+                  </h4>
+                  {viewMode === 'matrix' ? (
+                    <WeeklyGrid weekNumber={i} startDate={activeSchedule.startDate} />
+                  ) : (
+                    <TimelineGrid weekNumber={i} startDate={activeSchedule.startDate} />
+                  )}
+                </div>
+              ))}
+            </div>
 
             <div
               className="schedule-analytics"

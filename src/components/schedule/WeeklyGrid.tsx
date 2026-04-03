@@ -7,6 +7,7 @@ import { useSettingsStore } from '../../stores/settingsStore'
 import { DAYS_OF_WEEK } from '../../types/index'
 import type { Shift, Employee } from '../../types/index'
 import { formatTime } from '../../utils/formatTime'
+import { formatDayHeader } from '../../utils/scheduleDates'
 import './WeeklyGrid.css'
 
 export const DraggableShift = React.memo(function DraggableShift({
@@ -76,7 +77,7 @@ export const DroppableCell = React.memo(function DroppableCell({
     </div>
   )
 })
-export function WeeklyGrid({ weekNumber = 0 }: { weekNumber?: number }) {
+export function WeeklyGrid({ weekNumber = 0, startDate }: { weekNumber?: number; startDate?: string }) {
   const { activeSchedule, setActiveSchedule } = useScheduleStore()
   const { employees } = useEmployeeStore()
 
@@ -182,7 +183,7 @@ export function WeeklyGrid({ weekNumber = 0 }: { weekNumber?: number }) {
           {/* Column Headers (Days) */}
           {DAYS_OF_WEEK.map((day) => (
             <div key={day} className="wg-header-cell">
-              {day}
+              {startDate ? formatDayHeader(startDate, weekNumber, day) : day}
             </div>
           ))}
 

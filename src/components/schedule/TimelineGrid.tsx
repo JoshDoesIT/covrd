@@ -4,10 +4,11 @@ import { useEmployeeStore } from '../../stores/employeeStore'
 import { useSettingsStore } from '../../stores/settingsStore'
 import { DAYS_OF_WEEK } from '../../types/index'
 import type { DayOfWeek, Shift } from '../../types/index'
+import { formatDayHeader } from '../../utils/scheduleDates'
 import { formatTime } from '../../utils/formatTime'
 import './TimelineGrid.css'
 
-export function TimelineGrid() {
+export function TimelineGrid({ weekNumber = 0, startDate }: { weekNumber?: number; startDate?: string }) {
   const { activeSchedule } = useScheduleStore()
   const { employees } = useEmployeeStore()
   const { timeFormat } = useSettingsStore()
@@ -29,9 +30,16 @@ export function TimelineGrid() {
     const shiftMap = new Map<string, Shift>()
     activeSchedule.shifts.forEach((s: Shift) => shiftMap.set(s.id, s))
 
+    // Filter shifts strictly by this weekNumber and that have assignments
+    const validShiftIds = new Set(
+      activeSchedule.shifts
+        .filter((s) => (s.weekNumber || 0) === weekNumber)
+        .map((s) => s.id)
+    )
+
     // Populate assignments
     activeSchedule.assignments.forEach((a) => {
-      if (!data[a.employeeId]) return
+      if (!data[a.employeeId] || !validShiftIds.has(a.shiftId)) return
       const shift = shiftMap.get(a.shiftId)
       if (shift) {
         data[a.employeeId][shift.day].push(shift)
@@ -39,7 +47,7 @@ export function TimelineGrid() {
     })
 
     return data
-  }, [activeSchedule, employees])
+  }, [activeSchedule, employees, weekNumber])
 
   if (!activeSchedule || !timelineData) {
     return (
@@ -70,7 +78,7 @@ export function TimelineGrid() {
               <th className="timeline-emp-col">Employee</th>
               {DAYS_OF_WEEK.map((day) => (
                 <th key={day} className="timeline-day-col">
-                  {day.charAt(0).toUpperCase() + day.slice(1, 3)}
+                  {startDate ? formatDayHeader(startDate, weekNumber, day) : day.charAt(0).toUpperCase() + day.slice(1, 3)}
                   <div className="timeline-time-ticks">
                      {/* Mini markers for 6am, 12pm, 6pm just for visual scale */}
                      <span style={{ left: '25%' }}>6a</span>
