@@ -1,4 +1,4 @@
-import { Shield, LayoutDashboard, Calendar, Share2, Download, Terminal } from 'lucide-react'
+import { Shield, LayoutDashboard, Calendar, Terminal } from 'lucide-react'
 import './LandingPage.css'
 
 interface LandingPageProps {
@@ -9,6 +9,10 @@ interface LandingPageProps {
 export function LandingPage({ onLaunch, onShowPrivacy }: LandingPageProps) {
   return (
     <div className="landing">
+      {/* Ambient backgrounds */}
+      <div className="landing__bg-mesh" />
+      <div className="landing__glow-orb" />
+
       <header className="landing__header">
         <div className="landing__logo" style={{ display: 'flex', alignItems: 'center' }}>
           <img
@@ -46,83 +50,75 @@ export function LandingPage({ onLaunch, onShowPrivacy }: LandingPageProps) {
           </div>
         </section>
 
-        <section className="landing__features">
-          <div className="landing__feature">
-            <div className="landing__feature-icon">
+        {/* Bento Grid */}
+        <section className="landing__bento-grid">
+          {/* Card 1: Spans 2 Columns */}
+          <div className="landing__bento-card landing__bento-span-2">
+            <div className="landing__bento-icon">
               <LayoutDashboard size={24} />
             </div>
-            <h3 className="landing__feature-title">Smart Auto-Scheduling</h3>
-            <p className="landing__feature-desc">
-              CSP solver with fairness balancing seamlessly creates optimized schedules in
-              milliseconds.
+            <h3 className="landing__bento-title">Smart Auto-Scheduling</h3>
+            <p className="landing__bento-desc">
+              Our embedded CSP solver uses fairness balancing to seamlessly create optimized schedules in
+              milliseconds. It learns your coverage requirements and instantly builds perfect shifts.
             </p>
+            <div className="landing__mock-ui">
+              <div className="landing__mock-row" />
+              <div className="landing__mock-row" />
+              <div className="landing__mock-row" />
+            </div>
           </div>
-          <div className="landing__feature">
-            <div className="landing__feature-icon">
+
+          {/* Card 2: 1 Column */}
+          <div className="landing__bento-card landing__bento-span-1">
+            <div className="landing__bento-icon">
               <Calendar size={24} />
             </div>
-            <h3 className="landing__feature-title">Templates & Heatmaps</h3>
-            <p className="landing__feature-desc">
-              Support for Week A/B rotations, shift patterns, and instant visual staffing density.
+            <h3 className="landing__bento-title">Template Engines</h3>
+            <p className="landing__bento-desc">
+              Generate rotating bi-weekly, monthly, or seasonal schedules instantly based on predefined templates.
             </p>
           </div>
-          <div className="landing__feature">
-            <div className="landing__feature-icon">
+
+          {/* Card 3: 1 Column */}
+          <div className="landing__bento-card landing__bento-span-1">
+            <div className="landing__bento-icon">
               <Terminal size={24} />
             </div>
-            <h3 className="landing__feature-title">Power-user Workflow</h3>
-            <p className="landing__feature-desc">
-              Command Palette (Cmd/Ctrl+K) and snappy keyboard shortcuts for maximum efficiency.
+            <h3 className="landing__bento-title">Developer Ready</h3>
+            <p className="landing__bento-desc">
+              Built on React, IndexedDB, and pure local TypeScript logic. Share state via URL hashing.
             </p>
           </div>
-          <div className="landing__feature">
-            <div className="landing__feature-icon">
-              <Share2 size={24} />
-            </div>
-            <h3 className="landing__feature-title">Share securely</h3>
-            <p className="landing__feature-desc">
-              Share schedules securely via compressed URL links that never touch a server.
-            </p>
-          </div>
-          <div className="landing__feature">
-            <div className="landing__feature-icon">
-              <Download size={24} />
-            </div>
-            <h3 className="landing__feature-title">Offline PWA</h3>
-            <p className="landing__feature-desc">
-              Works completely offline after the very first load. Export to JSON, CSV, or Print.
-            </p>
-          </div>
-          <div className="landing__feature">
-            <div className="landing__feature-icon">
+
+          {/* Card 4: 2 Columns */}
+          <div className="landing__bento-card landing__bento-span-2">
+            <div className="landing__bento-icon">
               <Shield size={24} />
             </div>
-            <h3 className="landing__feature-title">Zero Trust</h3>
-            <p className="landing__feature-desc">
-              All data stored locally in your browser automatically using IndexedDB.
+            <h3 className="landing__bento-title">Zero Trust Architecture</h3>
+            <p className="landing__bento-desc">
+              Covrd operates entirely within your browser's local sandbox. There is absolutely no server telemetry, no user accounts, and no backend database holding your employee data.
             </p>
+            <div className="landing__mock-ui" style={{ marginTop: 'var(--space-2)' }}>
+              <div className="landing__mock-row" style={{ width: '80%' }} />
+              <div className="landing__mock-row" style={{ width: '30%', background: 'var(--color-success)' }} />
+            </div>
           </div>
         </section>
 
-        <section className="landing__privacy">
-          <h2>Our Privacy Pledge</h2>
-          <div className="landing__privacy-grid">
-            <div className="landing__privacy-item">
-              <strong>Zero server-side data handling.</strong> All data stays in your browser.
-            </div>
-            <div className="landing__privacy-item">
-              <strong>Zero analytics or tracking.</strong> No telemetry, no cookies.
-            </div>
-            <div className="landing__privacy-item">
-              <strong>Zero accounts required.</strong> No sign-up, no login.
-            </div>
-            <div className="landing__privacy-item">
-              <strong>Full data ownership.</strong> Export, share, or delete your data anytime.
-            </div>
+        {/* Horizontal Privacy Pledge */}
+        <section className="landing__privacy-banner">
+          <div className="landing__privacy-capsules">
+            <div className="landing__privacy-capsule"><Shield size={16} color="var(--color-accent)" /> 0% Server Tracking</div>
+            <div className="landing__privacy-capsule"><Shield size={16} color="var(--color-accent)" /> Free Open Source</div>
+            <div className="landing__privacy-capsule"><Shield size={16} color="var(--color-accent)" /> Local Export</div>
           </div>
-          <button className="landing__link-btn" onClick={onShowPrivacy}>
-            Read the full Privacy Policy
-          </button>
+          <div>
+            <button className="landing__link-btn" onClick={onShowPrivacy}>
+              Read Full Privacy Policy →
+            </button>
+          </div>
         </section>
       </main>
 

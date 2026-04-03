@@ -3,7 +3,7 @@ import { App } from './App'
 
 describe('App', () => {
   beforeEach(() => {
-    localStorage.setItem('covrd-onboarding-complete', 'true')
+    window.location.hash = 'app'
   })
   it('renders the AppShell with sidebar navigation', async () => {
     render(<App />)

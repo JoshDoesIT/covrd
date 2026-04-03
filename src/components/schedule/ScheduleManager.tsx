@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Sparkles, CalendarDays, RefreshCw, XCircle, Undo2, Redo2 } from 'lucide-react'
+import { Sparkles, CalendarDays, RefreshCw, XCircle, Undo2, Redo2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useScheduleStore } from '../../stores/scheduleStore'
 import { useEmployeeStore } from '../../stores/employeeStore'
 import { useCoverageStore } from '../../stores/coverageStore'
@@ -33,6 +33,7 @@ const DAY_MAP: Record<string, number> = {
 
 export function ScheduleManager() {
   const {
+    allSchedules,
     activeSchedule,
     setActiveSchedule,
     clearActiveSchedule,
@@ -203,12 +204,51 @@ export function ScheduleManager() {
   return (
     <div className="schedule-manager">
       <header className="sm-header">
-        <div>
-          <h2 className="sm-title">
-            <CalendarDays size={20} color="var(--color-accent)" />
-            Schedule Builder
-          </h2>
-          <p className="sm-subtitle">Interactive visualization and solver dispatch.</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div>
+            <h2 className="sm-title">
+              <CalendarDays size={20} color="var(--color-accent)" />
+              Schedule Builder
+            </h2>
+            <p className="sm-subtitle">Interactive visualization and solver dispatch.</p>
+          </div>
+
+          {/* Pagination Controls */}
+          {activeSchedule && allSchedules.length > 1 && (
+            <div style={{ display: 'flex', gap: '0.25rem', paddingLeft: '1rem', borderLeft: '1px solid var(--color-border)' }}>
+              <button
+                className="sm-btn-ghost"
+                onClick={() => {
+                  const sorted = [...allSchedules].sort((a,b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+                  const idx = sorted.findIndex(s => s.id === activeSchedule.id)
+                  if (idx > 0) setActiveSchedule(sorted[idx - 1])
+                }}
+                disabled={(() => {
+                  const sorted = [...allSchedules].sort((a,b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+                  return sorted.findIndex(s => s.id === activeSchedule.id) <= 0
+                })()}
+                title="View previous schedule"
+              >
+                <ChevronLeft size={20} />
+              </button>
+              <button
+                className="sm-btn-ghost"
+                onClick={() => {
+                  const sorted = [...allSchedules].sort((a,b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+                  const idx = sorted.findIndex(s => s.id === activeSchedule.id)
+                  if (idx !== -1 && idx < sorted.length - 1) setActiveSchedule(sorted[idx + 1])
+                }}
+                disabled={(() => {
+                  const sorted = [...allSchedules].sort((a,b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+                  const idx = sorted.findIndex(s => s.id === activeSchedule.id)
+                  return idx === -1 || idx >= sorted.length - 1
+                })()}
+                title="View next schedule"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          )}
         </div>
         <div className="sm-actions">
           {activeSchedule && (
