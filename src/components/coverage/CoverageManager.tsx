@@ -11,7 +11,7 @@ import './CoverageManager.css'
 
 export function CoverageManager() {
   const { requirements, addRequirement, updateRequirement, removeRequirement, getRequirementsForDay } = useCoverageStore()
-  
+  const { timeFormat } = useSettingsStore()
   const [activeDay, setActiveDay] = useState<DayOfWeek>('monday')
   
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -141,7 +141,7 @@ export function CoverageManager() {
                 <div className="rc-info">
                   <h3 className="rc-name">{req.name}</h3>
                   <div className="rc-time">
-                    <Clock size={12} /> {formatTime(req.startTime, useSettingsStore.getState().timeFormat)} &rarr; {formatTime(req.endTime, useSettingsStore.getState().timeFormat)}
+                    <Clock size={12} /> {formatTime(req.startTime, timeFormat)} &rarr; {formatTime(req.endTime, timeFormat)}
                   </div>
                 </div>
 

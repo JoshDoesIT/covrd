@@ -14,7 +14,7 @@ describe('WeeklyGrid Performance (React.memo)', () => {
     })
 
     const { rerender } = render(<DraggableShift shift={shift} isAssigned={false} />)
-    expect(screen.getByText('09:00 - 17:00')).toBeInTheDocument()
+    expect(screen.getByText('9:00 AM - 5:00 PM')).toBeInTheDocument()
 
     // Now if we mutate internal state but not the props, React.memo skips.
     // In React testing library we just trigger a rerender with identical object references.
@@ -23,7 +23,7 @@ describe('WeeklyGrid Performance (React.memo)', () => {
     // We can't strictly mock a functional component under React.memo easily without spying before import.
     // But testing the existence and ensuring no blow-ups is baseline.
     // To truly verify, we just ensure it does not throw when pure.
-    expect(screen.getByText('09:00 - 17:00')).toBeInTheDocument()
+    expect(screen.getByText('9:00 AM - 5:00 PM')).toBeInTheDocument()
   })
 
   test('DroppableCell is memoized and accepts children identically', () => {

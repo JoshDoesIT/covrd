@@ -3,8 +3,10 @@ import { DndContext, useDraggable, useDroppable, pointerWithin } from '@dnd-kit/
 import type { DragEndEvent } from '@dnd-kit/core'
 import { useScheduleStore } from '../../stores/scheduleStore'
 import { useEmployeeStore } from '../../stores/employeeStore'
+import { useSettingsStore } from '../../stores/settingsStore'
 import { DAYS_OF_WEEK } from '../../types/index'
 import type { Shift, Employee } from '../../types/index'
+import { formatTime } from '../../utils/formatTime'
 import './WeeklyGrid.css'
 
 export const DraggableShift = React.memo(function DraggableShift({
@@ -17,6 +19,8 @@ export const DraggableShift = React.memo(function DraggableShift({
   isAssigned: boolean
 }) {
   const assignmentId = isAssigned && employee ? `${shift.id}__${employee.id}` : shift.id
+
+  const { timeFormat } = useSettingsStore()
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: assignmentId,
@@ -47,7 +51,7 @@ export const DraggableShift = React.memo(function DraggableShift({
       data-dragging={isDragging}
     >
       <div className="wg-shift-time">
-        {shift.startTime} - {shift.endTime}
+        {formatTime(shift.startTime, timeFormat)} - {formatTime(shift.endTime, timeFormat)}
       </div>
     </div>
   )
