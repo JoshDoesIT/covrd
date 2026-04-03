@@ -41,7 +41,7 @@ describe('TemplateEditor', () => {
     const targetId = useTemplateStore.getState().templates[0].id
     render(<TemplateEditor templateId={targetId} onBack={() => {}} />)
 
-    const patternSelect = screen.getByLabelText(/Recursion Pattern/i)
+    const patternSelect = screen.getByLabelText(/Recurrence Pattern/i)
     await userEvent.selectOptions(patternSelect, 'rotation')
 
     const saveBtn = screen.getByRole('button', { name: /save/i })

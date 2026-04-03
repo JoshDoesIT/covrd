@@ -216,4 +216,6 @@ export interface AppSettings {
   sidebarCollapsed: boolean
   /** Default view for the schedule. */
   defaultView: 'grid' | 'timeline'
+  /** Time display format. */
+  timeFormat: '12h' | '24h'
 }

@@ -2,7 +2,7 @@
   padding: 1.5rem;
   background-color: var(--color-bg-surface);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
+  border-radius: var(--radius-xl);
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
@@ -10,8 +10,9 @@
 
 .template-editor h2 {
   margin: 0;
-  color: var(--color-text);
-  font-size: 1.5rem;
+  color: var(--color-text-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
 }
 
 .editor-form-group {
@@ -21,32 +22,95 @@
 }
 
 .editor-form-group label {
-  font-weight: 500;
-  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .editor-form-group input,
 .editor-form-group select {
-  padding: 0.75rem;
-  background-color: var(--color-bg-page);
+  padding: 0.625rem;
+  background-color: var(--color-bg-primary);
   border: 1px solid var(--color-border);
-  border-radius: 6px;
-  color: var(--color-text);
-  font-size: 1rem;
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  font-family: var(--font-body);
+  transition: border-color 0.2s ease;
 }
 
 .editor-form-group input:focus,
 .editor-form-group select:focus {
   border-color: var(--color-accent);
   outline: none;
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
 }
 
+/* Pattern description text */
+.pattern-description {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+/* Pattern-specific config fieldsets */
+.pattern-config {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  margin: 0;
+  background: var(--color-bg-primary);
+}
+
+.pattern-config legend {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-accent);
+  padding: 0 0.5rem;
+}
+
+.pattern-config-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.pattern-config-row > .editor-form-group {
+  flex: 1;
+}
+
+/* Cycle label inputs list */
+.cycle-labels {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cycle-labels input {
+  padding: 0.5rem;
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-primary);
+  font-size: 0.875rem;
+  font-family: var(--font-body);
+  transition: border-color 0.2s ease;
+}
+
+.cycle-labels input:focus {
+  border-color: var(--color-accent);
+  outline: none;
+}
+
+/* Save/Cancel */
 .editor-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 1rem;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
   padding-top: 1rem;
   border-top: 1px solid var(--color-border);
 }

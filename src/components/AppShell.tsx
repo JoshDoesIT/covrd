@@ -1,6 +1,7 @@
 import { useState, lazy, Suspense } from 'react'
 import { CommandPalette } from './tooling/CommandPalette'
 import { PolicyModal } from './shared/PolicyModal'
+import { useSettingsStore } from '../stores/settingsStore'
 import './AppShell.css'
 
 /** Lazy-loaded views for bundle size optimization (Story 7.6). */
@@ -55,6 +56,7 @@ export function AppShell() {
   const [activeNav, setActiveNav] = useState('schedule')
   const [policyModal, setPolicyModal] = useState<'privacy' | 'accessibility' | null>(null)
   const [cmdOpen, setCmdOpen] = useState(false)
+  const { timeFormat, update: updateSettings } = useSettingsStore()
 
   const renderContent = () => {
     switch (activeNav) {
@@ -150,6 +152,22 @@ export function AppShell() {
         </div>
 
         <div className="shell__sidebar-footer">
+          <div className="shell__time-toggle" aria-hidden={collapsed ? 'true' : 'false'}>
+            <button
+              className={`shell__time-btn ${timeFormat === '12h' ? 'active' : ''}`}
+              onClick={() => updateSettings({ timeFormat: '12h' })}
+              title="12-hour format"
+            >
+              12h
+            </button>
+            <button
+              className={`shell__time-btn ${timeFormat === '24h' ? 'active' : ''}`}
+              onClick={() => updateSettings({ timeFormat: '24h' })}
+              title="24-hour format"
+            >
+              24h
+            </button>
+          </div>
           <div className="shell__privacy-badge">
             <span className="shell__privacy-dot" aria-hidden="true" />
             <span className="shell__privacy-label">Client-side only</span>

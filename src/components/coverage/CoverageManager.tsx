@@ -1,9 +1,11 @@
 import { useState, useMemo } from 'react'
 import { Plus, Edit2, Trash2, X, Clock, LayoutTemplate } from 'lucide-react'
 import { useCoverageStore } from '../../stores/coverageStore'
+import { useSettingsStore } from '../../stores/settingsStore'
 import { createCoverageRequirement } from '../../types/factories'
 import { DAYS_OF_WEEK } from '../../types/index'
 import type { DayOfWeek, CoverageRequirement } from '../../types/index'
+import { formatTime } from '../../utils/formatTime'
 import { EmptyState } from '../shared/EmptyState'
 import './CoverageManager.css'
 
@@ -139,7 +141,7 @@ export function CoverageManager() {
                 <div className="rc-info">
                   <h3 className="rc-name">{req.name}</h3>
                   <div className="rc-time">
-                    <Clock size={12} /> {req.startTime} &rarr; {req.endTime}
+                    <Clock size={12} /> {formatTime(req.startTime, useSettingsStore.getState().timeFormat)} &rarr; {formatTime(req.endTime, useSettingsStore.getState().timeFormat)}
                   </div>
                 </div>
 
