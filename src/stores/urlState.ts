@@ -88,3 +88,49 @@ function base64UrlToUint8(base64url: string): Uint8Array {
   }
   return bytes
 }
+
+/**
+ * Generate a full shareable URL with the encoded state in the hash fragment.
+ *
+ * The hash fragment (`#`) is never sent to the server in HTTP requests,
+ * ensuring zero server-side data exposure.
+ *
+ * @param state - The application state to encode
+ * @returns Full URL with hash fragment
+ */
+export function generateShareUrl(state: ShareableState): string {
+  const hash = encodeStateToHash(state)
+  const origin =
+    typeof window !== 'undefined' ? window.location.origin + window.location.pathname : ''
+  return `${origin}#${hash}`
+}
+
+/**
+ * Attempt to hydrate application state from the current URL hash fragment.
+ *
+ * Returns null if no hash is present or if the hash is invalid.
+ * All input from URLs is treated as untrusted.
+ *
+ * @returns Decoded state, or null if no valid hash is present
+ */
+export function hydrateFromHash(): ShareableState | null {
+  if (typeof window === 'undefined') return null
+
+  const hash = window.location.hash.replace(/^#/, '')
+  if (!hash) return null
+
+  return decodeStateFromHash(hash)
+}
+
+/**
+ * Estimate the byte size of a share URL for the given state.
+ * Used to verify that URLs stay within browser limits (~8KB).
+ *
+ * @param state - The application state to measure
+ * @returns Estimated URL size in bytes
+ */
+export function estimateUrlSize(state: ShareableState): number {
+  const hash = encodeStateToHash(state)
+  // Approximate: origin + '#' + hash, measured in UTF-8 bytes
+  return new TextEncoder().encode(hash).length
+}

@@ -11,6 +11,8 @@ import { WeeklyGrid } from './WeeklyGrid'
 import { TimelineGrid } from './TimelineGrid'
 import { CoverageHeatmap } from './CoverageHeatmap'
 import { FairnessChart } from './FairnessChart'
+import { ShareToolbar } from './ShareToolbar'
+import { readFileAsText, deserializeScheduleJSON } from '../../utils/exportSchedule'
 import './ScheduleManager.css'
 
 type ViewMode = 'matrix' | 'timeline'
@@ -233,6 +235,23 @@ export function ScheduleManager() {
               <button className="sm-btn-ghost" onClick={clearActiveSchedule}>
                 Clear View
               </button>
+
+              <ShareToolbar
+                state={{
+                  employees,
+                  coverageRequirements: requirements,
+                  schedule: activeSchedule,
+                }}
+                onImport={async (file) => {
+                  try {
+                    const text = await readFileAsText(file)
+                    const imported = deserializeScheduleJSON(text)
+                    setActiveSchedule(imported.schedule)
+                  } catch (err: unknown) {
+                    setErrorStatus(err instanceof Error ? err.message : 'Failed to import schedule')
+                  }
+                }}
+              />
             </>
           )}
           <button className="sm-btn-generate" onClick={handleGenerate} disabled={isGenerating}>
