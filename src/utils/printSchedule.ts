@@ -32,8 +32,6 @@ export function printSchedule(
   const weekTables: string[] = []
 
   for (let w = 0; w < totalWeeks; w++) {
-    const weekShifts = schedule.shifts.filter((s) => (s.weekNumber || 0) === w)
-
     const weekRange = formatWeekRange(startDate, w)
 
     // Build header row
@@ -43,30 +41,6 @@ export function printSchedule(
 
     // Build employee rows
     const bodyRows: string[] = []
-
-    // Unassigned pool row
-    const unassignedCells = DAYS_OF_WEEK.map((day) => {
-      const dayShifts = weekShifts.filter((s) => s.day === day)
-      const unassigned = dayShifts.filter((s) => {
-        const assignedCount = schedule.assignments.filter((a) => a.shiftId === s.id).length
-        return assignedCount === 0
-      })
-
-      if (unassigned.length === 0) return '<td></td>'
-
-      const pills = unassigned
-        .map(
-          (s) =>
-            `<div class="shift-pill unassigned">${formatTime(s.startTime, timeFormat)} - ${formatTime(s.endTime, timeFormat)}${s.role ? `<br><small>${s.role}</small>` : ''}</div>`,
-        )
-        .join('')
-
-      return `<td>${pills}</td>`
-    }).join('')
-
-    bodyRows.push(
-      `<tr class="unassigned-row"><th class="row-label">Unassigned<br><small>Need Staff</small></th>${unassignedCells}</tr>`,
-    )
 
     // Employee rows
     for (const emp of employees) {
@@ -165,12 +139,11 @@ export function printSchedule(
     }
 
     .week-section {
-      page-break-after: always;
       margin-bottom: 24px;
     }
 
-    .week-section:last-child {
-      page-break-after: auto;
+    .week-section + .week-section {
+      page-break-before: always;
     }
 
     .week-section h2 {
@@ -237,14 +210,7 @@ export function printSchedule(
       break-inside: avoid;
     }
 
-    .unassigned-row {
-      background: #fff5f5;
-    }
 
-    .unassigned-row .row-label {
-      background: #fff0f0;
-      color: #c00;
-    }
 
     .shift-pill {
       background: #f0f0f0;
@@ -256,10 +222,7 @@ export function printSchedule(
       line-height: 1.3;
     }
 
-    .shift-pill.unassigned {
-      background: #ffe8e8;
-      border-color: #e0a0a0;
-    }
+
 
     .shift-pill small {
       color: #666;
