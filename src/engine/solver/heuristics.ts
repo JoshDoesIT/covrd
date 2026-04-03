@@ -25,12 +25,21 @@ export function sortShiftsByMRV(shifts: Shift[], candidateCounts: Map<string, nu
  * By assigning to them first, we balance the schedule and preserve
  * the hours of people who are close to hitting overtime.
  */
+function getAbsoluteDayIndex(weekNum: number, dayOfWeek: number): number {
+  // Our weeks start on Monday. DAY_MAP makes Sunday = 0, Monday = 1...
+  // Normalize so Monday = 0, Tuesday = 1, ..., Sunday = 6
+  const normalizedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1
+  return weekNum * 7 + normalizedDay
+}
+
 export function sortCandidatesByFairness(
   candidates: Employee[],
   hourTotals: Map<string, Map<number, number>>,
   shiftToAssign: Shift,
   assignments: Map<string, Shift[]>
 ): Employee[] {
+  const targetDayIndex = getAbsoluteDayIndex(shiftToAssign.weekNumber, shiftToAssign.dayOfWeek)
+
   return [...candidates].sort((a, b) => {
     const empWeekMapA = hourTotals.get(a.id) ?? new Map<number, number>()
     const hoursA = empWeekMapA.get(shiftToAssign.weekNumber) ?? 0
@@ -41,17 +50,12 @@ export function sortCandidatesByFairness(
     const deficitB = b.targetHours - hoursB
 
     // Consecutive Shift Bonus (Group Off-Days)
-    // Checks if candidate is already working yesterday or tomorrow natively cross-week
     const hasConsecutiveA = (assignments.get(a.id) ?? []).some(s => 
-      (s.weekNumber === shiftToAssign.weekNumber && Math.abs(s.dayOfWeek - shiftToAssign.dayOfWeek) === 1) ||
-      (s.weekNumber === shiftToAssign.weekNumber - 1 && shiftToAssign.dayOfWeek === 0 && s.dayOfWeek === 6) ||
-      (s.weekNumber === shiftToAssign.weekNumber + 1 && shiftToAssign.dayOfWeek === 6 && s.dayOfWeek === 0)
+      Math.abs(getAbsoluteDayIndex(s.weekNumber, s.dayOfWeek) - targetDayIndex) === 1
     )
     
     const hasConsecutiveB = (assignments.get(b.id) ?? []).some(s => 
-      (s.weekNumber === shiftToAssign.weekNumber && Math.abs(s.dayOfWeek - shiftToAssign.dayOfWeek) === 1) ||
-      (s.weekNumber === shiftToAssign.weekNumber - 1 && shiftToAssign.dayOfWeek === 0 && s.dayOfWeek === 6) ||
-      (s.weekNumber === shiftToAssign.weekNumber + 1 && shiftToAssign.dayOfWeek === 6 && s.dayOfWeek === 0)
+      Math.abs(getAbsoluteDayIndex(s.weekNumber, s.dayOfWeek) - targetDayIndex) === 1
     )
 
     // Deficit is primary metric (10pts per missing hour). Modulator adds massive 200pt (+20hr equivalent) weight 
