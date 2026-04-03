@@ -65,13 +65,7 @@ npm run security:deps   # Snyk SCA scan
 npm run security        # Run all security scans
 ```
 
-## Screenshots
-
-![Covrd App Screenshot](docs/images/app-screenshot.png)
-
 ## Architecture
-
-![Covrd Technical Architecture](docs/images/architecture.png)
 
 | Layer          | Technology                          |
 | -------------- | ----------------------------------- |
