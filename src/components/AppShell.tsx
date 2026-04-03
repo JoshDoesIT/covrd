@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { ScheduleManager } from './schedule/ScheduleManager'
+import { CommandPalette } from './tooling/CommandPalette'
 import './AppShell.css'
 
 /** Navigation items for the sidebar. */
@@ -37,6 +39,21 @@ const isMac = typeof navigator !== 'undefined' && /Mac/i.test(navigator.userAgen
 export function AppShell() {
   const [collapsed, setCollapsed] = useState(false)
   const [activeNav, setActiveNav] = useState('schedule')
+
+  const renderContent = () => {
+    switch (activeNav) {
+      case 'schedule':
+        return <ScheduleManager />
+      default:
+        return (
+          <div className="shell__placeholder">
+            <p className="shell__placeholder-text">
+              Select a section from the sidebar to get started.
+            </p>
+          </div>
+        )
+    }
+  }
 
   return (
     <div className="shell">
@@ -120,7 +137,13 @@ export function AppShell() {
             </h1>
           </div>
           <div className="shell__header-right">
-            <button className="shell__cmd-trigger" aria-label="Open command palette">
+            <button
+              className="shell__cmd-trigger"
+              aria-label="Open command palette"
+              onClick={() => {
+                document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))
+              }}
+            >
               <svg
                 width="16"
                 height="16"
@@ -141,13 +164,11 @@ export function AppShell() {
 
         {/* Content */}
         <main className="shell__content" id="main-content">
-          <div className="shell__placeholder">
-            <p className="shell__placeholder-text">
-              Select a section from the sidebar to get started.
-            </p>
-          </div>
+          {renderContent()}
         </main>
       </div>
+
+      <CommandPalette onNavigate={setActiveNav} />
     </div>
   )
 }
