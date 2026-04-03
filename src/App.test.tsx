@@ -2,23 +2,23 @@ import { render, screen } from '@testing-library/react'
 import { App } from './App'
 
 describe('App', () => {
-  it('renders the Covrd brand name', () => {
+  it('renders the AppShell with sidebar navigation', () => {
     render(<App />)
-    expect(screen.getByText(/Covr/)).toBeInTheDocument()
+    expect(screen.getByRole('navigation', { name: /sidebar/i })).toBeInTheDocument()
   })
 
-  it('renders the tagline', () => {
+  it('renders the header', () => {
     render(<App />)
-    expect(screen.getByText('Every shift. Covered.')).toBeInTheDocument()
+    expect(screen.getByRole('banner')).toBeInTheDocument()
   })
 
-  it('renders the privacy badge', () => {
-    render(<App />)
-    expect(screen.getByText('Privacy-first scheduling')).toBeInTheDocument()
-  })
-
-  it('has an accessible main landmark', () => {
+  it('renders a main content area', () => {
     render(<App />)
     expect(screen.getByRole('main')).toBeInTheDocument()
+  })
+
+  it('displays the Covrd brand', () => {
+    render(<App />)
+    expect(screen.getByText(/Covr/)).toBeInTheDocument()
   })
 })
