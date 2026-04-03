@@ -1,4 +1,4 @@
-import { Shield, LayoutDashboard, Calendar, Terminal } from 'lucide-react'
+import { Shield, LayoutDashboard, Calendar, Terminal, ServerOff, MonitorSmartphone } from 'lucide-react'
 import './LandingPage.css'
 
 interface LandingPageProps {
@@ -63,10 +63,19 @@ export function LandingPage({ onLaunch, onShowPrivacy, onShowAccessibility }: La
               Our embedded CSP solver uses fairness balancing to seamlessly create optimized schedules in
               milliseconds. It learns your coverage requirements and instantly builds perfect shifts.
             </p>
-            <div className="landing__mock-ui">
-              <div className="landing__mock-row" />
-              <div className="landing__mock-row" />
-              <div className="landing__mock-row" />
+            <div className="landing__mock-scheduler">
+              {Array.from({ length: 21 }).map((_, i) => {
+                // Randomly assign some blocks to be pre-filled vs animated
+                const isFixed = Math.random() > 0.7;
+                const delay = (i % 7) * 0.15 + Math.random() * 0.5;
+                return (
+                  <div 
+                    key={i} 
+                    className={`landing__mock-cell ${isFixed ? 'fixed' : ''}`} 
+                    style={!isFixed ? { animationDelay: `${delay}s` } : {}}
+                  />
+                );
+              })}
             </div>
           </div>
 
@@ -101,9 +110,16 @@ export function LandingPage({ onLaunch, onShowPrivacy, onShowAccessibility }: La
             <p className="landing__bento-desc">
               Covrd operates entirely within your browser's local sandbox. There is absolutely no server telemetry, no user accounts, and no backend database holding your employee data.
             </p>
-            <div className="landing__mock-ui" style={{ marginTop: 'var(--space-2)' }}>
-              <div className="landing__mock-row" style={{ width: '80%' }} />
-              <div className="landing__mock-row" style={{ width: '30%', background: 'var(--color-success)' }} />
+            <div className="landing__mock-security">
+              <div className="landing__security-node landing__security-node--cloud">
+                <ServerOff size={24} />
+                <span>Blocked</span>
+              </div>
+              <div className="landing__security-flow" />
+              <div className="landing__security-node landing__security-node--browser">
+                <MonitorSmartphone size={24} />
+                <span>Local Sandbox</span>
+              </div>
             </div>
           </div>
         </section>

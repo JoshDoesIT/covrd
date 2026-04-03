@@ -17,9 +17,11 @@
   right: 0;
   bottom: 0;
   z-index: -2;
-  background-image: radial-gradient(circle at 1px 1px, var(--color-border) 1px, transparent 0);
-  background-size: 24px 24px;
-  opacity: 0.2;
+  background-image: 
+    radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.15) 1px, transparent 0),
+    radial-gradient(circle at 4px 4px, rgba(255, 255, 255, 0.05) 1px, transparent 0);
+  background-size: 60px 60px, 120px 120px;
+  animation: driftStars 100s linear infinite;
 }
 
 .landing__glow-orb {
@@ -53,6 +55,20 @@
   0% { left: -100%; }
   100% { left: 200%; }
 }
+
+@keyframes driftStars {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: -60px 60px, -120px 120px; }
+}
+
+@keyframes scanSweep {
+  0% { left: -100%; }
+  50%, 100% { left: 200%; }
+}
+
+@keyframes pulseWidth1 { 0%, 100% { width: 40%; } 50% { width: 85%; } }
+@keyframes pulseWidth2 { 0%, 100% { width: 70%; } 50% { width: 45%; } }
+@keyframes pulseWidth3 { 0%, 100% { width: 55%; } 50% { width: 90%; } }
 
 @keyframes floatApp {
   0%, 100% { transform: translateY(0) rotateX(5deg) rotateY(-5deg); box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 0 1px var(--color-border); }
@@ -285,29 +301,106 @@
   margin-bottom: var(--space-6);
 }
 
-/* CSS Mock UI for Bento Box */
-.landing__mock-ui {
-  flex: 1;
-  background: var(--color-bg-primary);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
-  display: flex;
-  flex-direction: column;
-  padding: var(--space-3);
+/* CSS Mock UI for Smart Scheduling Bento Box */
+.landing__mock-scheduler {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
   gap: var(--space-2);
   margin-top: auto;
-  opacity: 0.8;
+  padding-top: var(--space-4);
+  opacity: 0.9;
 }
 
-.landing__mock-row {
-  height: 8px;
+.landing__mock-cell {
+  aspect-ratio: 1;
   border-radius: 4px;
-  background: var(--color-bg-hover);
-  width: 100%;
+  background: var(--color-bg-elevated);
+  border: 1px solid var(--color-border);
+  animation: solveCell 4s ease-in-out infinite;
 }
-.landing__mock-row:nth-child(1) { width: 40%; background: var(--color-accent-muted); }
-.landing__mock-row:nth-child(2) { width: 70%; }
-.landing__mock-row:nth-child(3) { width: 55%; }
+
+.landing__mock-cell.fixed {
+  background: rgba(108, 92, 231, 0.4);
+  border-color: rgba(108, 92, 231, 0.6);
+  animation: none;
+}
+
+@keyframes solveCell {
+  0%, 15% { background: var(--color-bg-elevated); transform: scale(1); border-color: var(--color-border); }
+  25% { background: rgba(108, 92, 231, 0.8); transform: scale(1.15); border-color: var(--color-accent); box-shadow: 0 0 10px var(--color-accent-glow); z-index: 10; }
+  35%, 100% { background: rgba(108, 92, 231, 0.4); transform: scale(1); border-color: rgba(108, 92, 231, 0.6); box-shadow: none; z-index: 1; }
+}
+
+/* CSS Mock UI for Zero Trust Security Box */
+.landing__mock-security {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: var(--space-4);
+}
+
+.landing__security-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border: 1px solid var(--color-border);
+  z-index: 2;
+}
+
+.landing__security-node--cloud {
+  color: var(--color-danger);
+  background: rgba(225, 112, 85, 0.1);
+  border-color: rgba(225, 112, 85, 0.3);
+}
+
+.landing__security-node--browser {
+  color: var(--color-success);
+  background: rgba(0, 184, 148, 0.1);
+  border-color: rgba(0, 184, 148, 0.3);
+  box-shadow: 0 0 15px rgba(0, 184, 148, 0.2);
+  animation: pulseSuccess 2s infinite alternate;
+}
+
+@keyframes pulseSuccess {
+  0% { box-shadow: 0 0 10px rgba(0, 184, 148, 0.1); }
+  100% { box-shadow: 0 0 25px rgba(0, 184, 148, 0.5); }
+}
+
+.landing__security-flow {
+  flex: 1;
+  height: 2px;
+  background: repeating-linear-gradient(90deg, var(--color-border) 0, var(--color-border) 4px, transparent 4px, transparent 8px);
+  margin: 0 var(--space-4);
+  position: relative;
+  overflow: visible;
+  z-index: 1;
+}
+
+.landing__security-flow::after {
+  content: '✕';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--color-danger);
+  font-size: 20px;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(225, 112, 85, 0.8), 0 0 20px var(--color-bg-primary);
+  animation: pulseDanger 2s infinite alternate;
+}
+
+@keyframes pulseDanger {
+  0% { opacity: 0.6; transform: translate(-50%, -50%) scale(0.9); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+}
 
 /* --- Sleek Privacy Banner --- */
 .landing__privacy-banner {
