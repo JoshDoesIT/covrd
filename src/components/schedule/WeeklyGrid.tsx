@@ -199,7 +199,7 @@ export function WeeklyGrid({
                   borderRight: 'none',
                 }}
               >
-                <strong>{activeSchedule?.name || 'Auto Generated'} - Week {weekNumber + 1}</strong>
+                <strong>{activeSchedule?.name || 'Weekly Schedule'} - Week {weekNumber + 1}</strong>
                 {startDate && (
                   <span style={{ marginLeft: '12px', fontWeight: 'normal' }}>
                     ({formatWeekRange(startDate, weekNumber)})
