@@ -4,7 +4,7 @@
 
 **Covrd** is a privacy-first, client-side-only staff scheduling application. The brand communicates quiet confidence, technical precision, and trustworthiness.
 
-**Tagline:** Every shift. Covered.
+**Tagline:** Every shift. Covrd.
 
 **Positioning:** Covrd is not another clunky scheduling tool. It is a private, intelligent, and elegant utility that respects both the manager's time and their team's data.
 
@@ -236,10 +236,7 @@ Based on a 4px base unit:
 
 ```
 public/
-  logo.svg           (wordmark, dark background)
-  logo-light.svg     (wordmark, light background)
-  logo-mono.svg      (monochrome wordmark)
-  favicon.svg        (letter "C" with accent "d" dot)
+  logo-dark.png      (primary wordmark/icon, dark background)
 ```
 
 ### Logo Variations
