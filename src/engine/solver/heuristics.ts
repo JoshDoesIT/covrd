@@ -41,11 +41,16 @@ function getClumpingModifier(assignedDays: number[], targetDay: number): number 
     if (dist < minDistance) minDistance = dist
   }
   
-  if (minDistance === 0) return -1000 // Same day (double shift). BRUTAL penalty to avoid 14 hour days.
-  if (minDistance === 1) return 200   // Consecutive day. Great clumping!
-  if (minDistance === 2) return -500  // 1-day gap (Working, Off, Working). TERRIBLE! Punish heavily.
-  if (minDistance === 3) return -100  // 2-day gap. Sub-optimal but sometimes necessary.
-  return 0 // 3+ day gap. Represents a solid block of off-days, entirely neutral/acceptable.
+  if (minDistance === 0) return -1000 // Double shift. Brutal penalty.
+  if (minDistance === 1) return 400   // Consecutive day. Massive bonus to ALWAYS extend the chain!
+  
+  // Create a cascading penalty for breaking the chain.
+  // 1-day gaps (dist=2) are the absolute worst as they create isolated single days off.
+  // Large gaps (dist=5) are less bad mathematically because it means they just got a 4-day block off.
+  if (minDistance === 2) return -500
+  if (minDistance === 3) return -300
+  if (minDistance === 4) return -100
+  return 0 
 }
 
 export function sortCandidatesByFairness(
