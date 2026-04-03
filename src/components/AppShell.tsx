@@ -89,7 +89,7 @@ export function AppShell() {
         <div className="shell__sidebar-header">
           <div className="shell__brand" style={{ display: 'flex', alignItems: 'center' }}>
             <img
-              src="/favicon.png"
+              src="/logo-dark.png"
               alt="Covrd"
               style={{
                 height: '64px' /* Larger height to fill the new 72px header */,

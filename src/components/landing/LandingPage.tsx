@@ -12,7 +12,7 @@ export function LandingPage({ onLaunch, onShowPrivacy }: LandingPageProps) {
       <header className="landing__header">
         <div className="landing__logo" style={{ display: 'flex', alignItems: 'center' }}>
           <img
-            src="/favicon.png"
+            src="/logo-dark.png"
             alt="Covrd Logo"
             style={{ height: '56px', width: 'auto', objectFit: 'contain' }}
           />
