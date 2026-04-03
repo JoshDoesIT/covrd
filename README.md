@@ -1,6 +1,21 @@
-# Covrd
+<p align="center">
+  <img src="docs/brand/logo-dark.png" alt="Covrd" width="400">
+</p>
 
-> **Every shift. Covered.** — Auto staff scheduling that respects your privacy.
+<p align="center">
+  <strong>Every shift. Covered.</strong> — Auto staff scheduling that respects your privacy.
+</p>
+
+<p align="center">
+  <a href="https://github.com/JoshDoesIT/Covrd/actions/workflows/ci.yml"><img src="https://github.com/JoshDoesIT/Covrd/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <img src="https://img.shields.io/badge/privacy-client--side%20only-00B894" alt="Privacy: Client-Side Only">
+  <img src="https://img.shields.io/badge/license-MIT-6C5CE7" alt="License: MIT">
+  <img src="https://img.shields.io/badge/react-19-74B9FF" alt="React 19">
+  <img src="https://img.shields.io/badge/typescript-5.9-3178C6" alt="TypeScript 5.9">
+  <img src="https://img.shields.io/badge/tests-68%20passing-00B894" alt="Tests: 68 passing">
+</p>
+
+---
 
 Covrd is a **privacy-first, client-side-only** web application that automatically generates optimized staff work schedules. Your data never leaves your browser — no accounts, no servers, no tracking.
 
@@ -40,12 +55,15 @@ npm run dev
 ## Development
 
 ```bash
-npm run dev          # Start dev server
-npm run test:run     # Run unit tests
-npm run lint         # Lint code
-npm run format       # Format code
-npm run typecheck    # Type check
-npm run build        # Production build
+npm run dev             # Start dev server
+npm run test:run        # Run unit tests
+npm run lint            # Lint code
+npm run format          # Format code
+npm run typecheck       # Type check
+npm run build           # Production build
+npm run security:code   # Snyk SAST scan
+npm run security:deps   # Snyk SCA scan
+npm run security        # Run all security scans
 ```
 
 ## Architecture
@@ -59,6 +77,11 @@ npm run build        # Production build
 | **Scheduling** | Custom CSP solver (Web Worker)      |
 | **Styling**    | Vanilla CSS (custom properties)     |
 | **Testing**    | Vitest + Testing Library            |
+| **Security**   | Snyk (SAST + SCA)                   |
+
+## Brand
+
+See [Brand Guide](docs/brand/BRAND_GUIDE.md) for the complete visual identity, color palette, typography, and component style guidelines.
 
 ## Contributing
 
