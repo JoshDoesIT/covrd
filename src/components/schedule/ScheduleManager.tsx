@@ -54,6 +54,13 @@ export function ScheduleManager() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [progress, setProgress] = useState(0)
   const [errorStatus, setErrorStatus] = useState<string | null>(null)
+  
+  // Format initial date as YYYY-MM-DD string for HTML input
+  const [targetStartDate, setTargetStartDate] = useState(() => {
+    const d = getNextMonday()
+    // Avoid UTC timezone shifting when formatting as string
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  })
 
   const handleGenerate = async () => {
     const pendingTemplateId = useScheduleStore.getState().pendingTemplateId
@@ -168,13 +175,17 @@ export function ScheduleManager() {
           isManual: false,
         }))
 
-      const nextMonday = getNextMonday()
+      // Ensure the start date behaves as local-time midnight
+      const baseDate = new Date(`${targetStartDate}T00:00:00`)
+      // Pass the explicit date to getNextMonday to enforce Monday alignment securely
+      const actualStartMonday = getNextMonday(baseDate)
+
       const newSchedule = createSchedule({
         name: template
           ? `Generated from ${template.name}`
-          : `Auto Generated - Week of ${nextMonday.toLocaleDateString()}`,
-        startDate: nextMonday.toISOString(),
-        endDate: new Date(nextMonday.getTime() + totalWeeks * 7 * 24 * 60 * 60 * 1000).toISOString(),
+          : `Auto Generated - Week of ${actualStartMonday.toLocaleDateString()}`,
+        startDate: actualStartMonday.toISOString(),
+        endDate: new Date(actualStartMonday.getTime() + totalWeeks * 7 * 24 * 60 * 60 * 1000).toISOString(),
         shifts: generatedShifts,
         assignments: finalAssignments,
         qualityScore: result.success ? 100 : 0,
@@ -283,7 +294,41 @@ export function ScheduleManager() {
               />
             </>
           )}
-          <button className="sm-btn-generate" onClick={handleGenerate} disabled={isGenerating}>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+               <label htmlFor="sm-start-date" style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginBottom: '0.1rem', paddingLeft: '2px' }}>Start Week (Mon)</label>
+               <input 
+                 id="sm-start-date"
+                 type="date"
+                 value={targetStartDate}
+                 onChange={(e) => {
+                   const val = e.target.value
+                   if (!val) return
+                   // Enforce Monday selection visually if they typed it manually
+                   const d = new Date(`${val}T00:00:00`)
+                   if (d.getDay() !== 1) {
+                     // Snap to the Monday
+                     const nextMon = getNextMonday(d)
+                     setTargetStartDate(`${nextMon.getFullYear()}-${String(nextMon.getMonth() + 1).padStart(2, '0')}-${String(nextMon.getDate()).padStart(2, '0')}`)
+                   } else {
+                     setTargetStartDate(val)
+                   }
+                 }}
+                 // Optional HTML5 validation trick: step by 7 days starting from a known Monday
+                 // step="7" 
+                 style={{ 
+                   background: 'var(--color-bg-elevated)',
+                   color: 'var(--color-text-primary)',
+                   border: '1px solid var(--color-border)',
+                   padding: '0.4rem 0.5rem',
+                   borderRadius: 'var(--radius-lg)',
+                   fontSize: '0.85rem'
+                 }}
+               />
+            </div>
+            
+            <button className="sm-btn-generate" onClick={handleGenerate} disabled={isGenerating}>
             {isGenerating ? (
               <RefreshCw size={16} className="lucide-spin" />
             ) : (
@@ -291,6 +336,7 @@ export function ScheduleManager() {
             )}
             {isGenerating ? 'Solving...' : 'Automagic Schedule'}
           </button>
+          </div>
         </div>
       </header>
 

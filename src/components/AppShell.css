@@ -109,17 +109,18 @@
 /* --- Navigation --- */
 .shell__nav {
   flex: 1;
-  padding: var(--space-3) var(--space-2);
+  padding: var(--space-3) var(--space-3);
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  align-items: stretch;
+  gap: var(--space-2);
 }
 
 .shell__nav-item {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  padding: var(--space-2) var(--space-3);
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
   border: none;
   border-radius: var(--radius-lg);
   background: transparent;
@@ -133,6 +134,7 @@
     color var(--transition-fast);
   white-space: nowrap;
   width: 100%;
+  box-sizing: border-box;
   text-align: left;
 }
 

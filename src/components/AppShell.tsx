@@ -2,6 +2,7 @@ import { useState, lazy, Suspense } from 'react'
 import { CommandPalette } from './tooling/CommandPalette'
 import { PolicyModal } from './shared/PolicyModal'
 import { useSettingsStore } from '../stores/settingsStore'
+import { Users, Target, CalendarDays, LayoutTemplate } from 'lucide-react'
 import './AppShell.css'
 
 /** Lazy-loaded views for bundle size optimization (Story 7.6). */
@@ -23,22 +24,22 @@ const NAV_ITEMS = [
   {
     id: 'employees',
     label: 'Employees',
-    icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+    icon: Users,
   },
   {
     id: 'coverage',
     label: 'Coverage',
-    icon: 'M4 5a1 1 0 011-1h14a1 1 0 010 2H5a1 1 0 01-1-1zm0 4a1 1 0 011-1h14a1 1 0 010 2H5a1 1 0 01-1-1zm0 4a1 1 0 011-1h14a1 1 0 010 2H5a1 1 0 01-1-1zm0 4a1 1 0 011-1h14a1 1 0 010 2H5a1 1 0 01-1-1z',
+    icon: Target,
   },
   {
     id: 'schedule',
     label: 'Schedule',
-    icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
+    icon: CalendarDays,
   },
   {
     id: 'templates',
     label: 'Templates',
-    icon: 'M4 5a1 1 0 011-1h14a1 1 0 010 2H5a1 1 0 01-1-1zm2 4a1 1 0 011-1h10a1 1 0 010 2H7a1 1 0 01-1-1zm4 4a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1z',
+    icon: LayoutTemplate,
   },
 ] as const
 
@@ -133,19 +134,7 @@ export function AppShell() {
               aria-current={activeNav === item.id ? 'page' : undefined}
               title={collapsed ? item.label : undefined}
             >
-              <svg
-                className="shell__nav-icon"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d={item.icon} />
-              </svg>
+              <item.icon className="shell__nav-icon" size={20} strokeWidth={1.5} />
               <span className="shell__nav-label">{item.label}</span>
             </button>
           ))}

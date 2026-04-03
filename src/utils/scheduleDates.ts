@@ -35,8 +35,12 @@ export function getNextMonday(from: Date = new Date()): Date {
  */
 export function getShiftDate(startDateIso: string, weekOffset: number, day: DayOfWeek): Date {
   const date = new Date(startDateIso)
-  // Ensure we are working with the start of the day
-  // (In case startDateIso wasn't explicitly normalized to 00:00)
+  date.setHours(0, 0, 0, 0)
+  
+  // Resiliency: Always align our base calculation to the Monday of the week `date` is in
+  const currentDay = date.getDay()
+  const daysToSubtract = currentDay === 0 ? 6 : currentDay - 1
+  date.setDate(date.getDate() - daysToSubtract)
   
   const daysToAdd = (weekOffset * 7) + DAY_OFFSETS[day]
   date.setDate(date.getDate() + daysToAdd)
