@@ -32,43 +32,44 @@ function getAbsoluteDayIndex(weekNum: number, dayOfWeek: number): number {
   return weekNum * 7 + normalizedDay
 }
 
-function countClusters(days: number[]): number {
-  if (days.length === 0) return 0
-  
-  const sorted = [...new Set(days)].sort((a,b) => a - b)
-  let clusters = 1
-  for (let i = 1; i < sorted.length; i++) {
-    if (sorted[i] - sorted[i-1] > 1) {
-      clusters++
-    }
-  }
-  return clusters
-}
-
 function getClumpingModifier(assignedDays: number[], targetDay: number): number {
   if (assignedDays.length === 0) return 0
 
-  // Hard penalty for double shifts on the same day
   if (assignedDays.includes(targetDay)) return -2000
   
-  const currentClusters = countClusters(assignedDays)
-  const proposedClusters = countClusters([...assignedDays, targetDay])
+  const proposedDays = [...new Set([...assignedDays, targetDay])].sort((a,b) => a - b)
   
-  if (proposedClusters < currentClusters) {
-    // Bridged a gap! Perfect!
-    return 1000
+  let isolatedGaps = 0
+  let clusters = 1
+  for (let i = 1; i < proposedDays.length; i++) {
+    const diff = proposedDays[i] - proposedDays[i-1]
+    if (diff > 1) clusters++
+    if (diff === 2) isolatedGaps++ // A diff of 2 means exactly 1 missing day (an isolated day off!)
   }
-  
-  if (proposedClusters === currentClusters) {
-    // Extending an existing block on the edge. Excellent!
-    return 500
+
+  const currentDays = [...new Set(assignedDays)].sort((a,b) => a - b)
+  let currentIsolatedGaps = 0
+  let currentClusters = 1
+  for (let i = 1; i < currentDays.length; i++) {
+    const diff = currentDays[i] - currentDays[i-1]
+    if (diff > 1) currentClusters++
+    if (diff === 2) currentIsolatedGaps++
   }
-  
-  if (proposedClusters > currentClusters) {
-    // Starting a brand new disjointed block. This causes fragmented "on-off-on" days!
-    // Massive penalty so the solver only does this if literally no one else can extend a block.
-    return -1000
+
+  // If assigning this shift CREATES a new isolated gap, VETO it. This is the root cause of fragmented off-days.
+  if (isolatedGaps > currentIsolatedGaps) {
+    return -2000
   }
+
+  // If assigning this shift CLOSES an isolated gap (e.g. they had [0, 2] and we assign 1), REWARD IT massively!
+  // This causes the solver to mathematically self-heal any fragmented schedules that were forced by limited staff availability
+  if (isolatedGaps < currentIsolatedGaps) {
+    return 2000
+  }
+
+  if (clusters < currentClusters) return 1000 // Bridging a larger gap into a single cluster
+  if (clusters === currentClusters) return 500 // Extending an existing contiguous block seamlessly
+  if (clusters > currentClusters) return -100 // Starting a new contiguous block (acceptable if gap > 1, but still worse than extending)
   
   return 0
 }
