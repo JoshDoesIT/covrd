@@ -134,7 +134,7 @@
   /* Layout */
   --sidebar-width: 260px;
   --sidebar-collapsed-width: 64px;
-  --header-height: 56px;
+  --header-height: 72px; /* Increased from 56px for more breathing room */
   --content-max-width: 1400px;
 }
 
