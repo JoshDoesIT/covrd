@@ -10,9 +10,14 @@ export function LandingPage({ onLaunch, onShowPrivacy }: LandingPageProps) {
   return (
     <div className="landing">
       <header className="landing__header">
-        <div className="landing__logo" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div
+          className="landing__logo"
+          style={{ display: 'flex', alignItems: 'center', gap: '12px' }}
+        >
           <img src="/favicon.png" alt="Covrd Logo" style={{ height: '36px', width: '36px' }} />
-          <span>Covr<span className="landing__logo-accent">d</span></span>
+          <span>
+            Covr<span className="landing__logo-accent">d</span>
+          </span>
         </div>
       </header>
 
