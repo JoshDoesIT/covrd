@@ -5,17 +5,14 @@ import {
   Users,
   Briefcase,
   Activity,
-  Settings,
-  RefreshCcw,
   Zap,
   Trash2,
-  Shield,
+  RefreshCcw,
 } from 'lucide-react'
 import { useScheduleStore } from '../../stores/scheduleStore'
 import { useEmployeeStore } from '../../stores/employeeStore'
 import { useCoverageStore } from '../../stores/coverageStore'
 import { loadDemoData } from '../../data/demoData'
-import { auditPrivacy } from '../../utils/privacyAudit'
 import { DataPurge } from '../settings/DataPurge'
 import './CommandPalette.css'
 
@@ -68,9 +65,6 @@ export function CommandPalette({ onNavigate, open, setOpen }: CommandPaletteProp
       useScheduleStore.getState().setActiveSchedule(schedule)
     } else if (action === 'action_purge') {
       setShowPurge(true)
-    } else if (action === 'action_privacy_audit') {
-      const report = auditPrivacy()
-      console.log(report.formatted)
     }
   }
 
@@ -142,29 +136,12 @@ export function CommandPalette({ onNavigate, open, setOpen }: CommandPaletteProp
               <Zap size={18} />
               Load Demo Data
             </Command.Item>
-          </Command.Group>
-
-          <Command.Group heading="Settings">
-            <Command.Item
-              onSelect={() => handleAction('action_privacy_audit')}
-              className="covrd-command-item"
-            >
-              <Shield size={18} />
-              Run Privacy Audit
-            </Command.Item>
             <Command.Item
               onSelect={() => handleAction('action_purge')}
               className="covrd-command-item"
             >
               <Trash2 size={18} color="var(--color-danger)" />
               Purge All Data
-            </Command.Item>
-            <Command.Item
-              onSelect={() => handleAction('nav_settings')}
-              className="covrd-command-item"
-            >
-              <Settings size={18} />
-              Preferences
             </Command.Item>
           </Command.Group>
         </Command.List>
