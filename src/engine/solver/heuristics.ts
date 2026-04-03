@@ -73,6 +73,22 @@ function getClumpingModifier(assignedDays: number[], targetDay: number): number 
   return 0
 }
 
+function getConsistencyModifier(assignedShifts: Shift[], targetShift: Shift): number {
+  if (assignedShifts.length === 0) return 0
+
+  // Check if they worked this exact day of the week in any OTHER week
+  const workedSameDayInOtherWeek = assignedShifts.some(
+    s => s.weekNumber !== targetShift.weekNumber && s.dayOfWeek === targetShift.dayOfWeek
+  )
+
+  if (workedSameDayInOtherWeek) {
+    // Massive bonus to establish repeating schedules across multi-week horizons
+    return 600 
+  }
+
+  return 0
+}
+
 export function sortCandidatesByFairness(
   candidates: Employee[],
   hourTotals: Map<string, Map<number, number>>,
@@ -90,16 +106,21 @@ export function sortCandidatesByFairness(
     const hoursB = empWeekMapB.get(shiftToAssign.weekNumber) ?? 0
     const deficitB = b.targetHours - hoursB
 
-    const assignedDaysA = (assignments.get(a.id) ?? []).map(s => getAbsoluteDayIndex(s.weekNumber, s.dayOfWeek))
+    const assignedShiftsA = assignments.get(a.id) ?? []
+    const assignedDaysA = assignedShiftsA.map(s => getAbsoluteDayIndex(s.weekNumber, s.dayOfWeek))
     const clumpModifierA = getClumpingModifier(assignedDaysA, targetDayIndex)
+    const consistencyModifierA = getConsistencyModifier(assignedShiftsA, shiftToAssign)
 
-    const assignedDaysB = (assignments.get(b.id) ?? []).map(s => getAbsoluteDayIndex(s.weekNumber, s.dayOfWeek))
+    const assignedShiftsB = assignments.get(b.id) ?? []
+    const assignedDaysB = assignedShiftsB.map(s => getAbsoluteDayIndex(s.weekNumber, s.dayOfWeek))
     const clumpModifierB = getClumpingModifier(assignedDaysB, targetDayIndex)
+    const consistencyModifierB = getConsistencyModifier(assignedShiftsB, shiftToAssign)
 
-    // Deficit is primary metric (10pts per missing hour). Modulator adds enormous weight to close gaps 
-    // and actively penalizes assignments that would create isolated fragmented off-days.
-    const scoreA = (deficitA * 10) + clumpModifierA
-    const scoreB = (deficitB * 10) + clumpModifierB
+    // Deficit is primary metric (10pts per missing hour). 
+    // Clumping Modulator closes gaps and penalizes fragmented off-days.
+    // Consistency Modulator rewards repeating schedules across different weeks.
+    const scoreA = (deficitA * 10) + clumpModifierA + consistencyModifierA
+    const scoreB = (deficitB * 10) + clumpModifierB + consistencyModifierB
 
     // Sort descending by score
     return scoreB - scoreA
