@@ -348,6 +348,11 @@ a:hover {
     display: table-row-group !important;
   }
 
+  /* Renders above the thead naturally and repeats natively due to standard caption mechanics or by being inside thead */
+  .wg-print-title-row {
+    display: table-row !important;
+  }
+
   .wg-print-row-group {
     display: table-row !important;
     width: 100% !important;

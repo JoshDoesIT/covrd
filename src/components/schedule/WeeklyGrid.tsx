@@ -7,7 +7,7 @@ import { useSettingsStore } from '../../stores/settingsStore'
 import { DAYS_OF_WEEK } from '../../types/index'
 import type { Shift, Employee } from '../../types/index'
 import { formatTime } from '../../utils/formatTime'
-import { formatDayHeader } from '../../utils/scheduleDates'
+import { formatDayHeader, formatWeekRange } from '../../utils/scheduleDates'
 import './WeeklyGrid.css'
 
 export const DraggableShift = React.memo(function DraggableShift({
@@ -185,6 +185,21 @@ export function WeeklyGrid({
         <div className="wg-grid">
           {/* Print Table Header Group */}
           <div className="wg-print-thead">
+            {/* Print-only Document Title */}
+            <div className="wg-print-row-group wg-print-title-row" style={{ display: 'none' }}>
+              <div
+                className="wg-header-cell"
+                style={{ textAlign: 'left', padding: '12px 6px', fontSize: '11pt', borderBottom: 'none' }}
+              >
+                <strong>{activeSchedule?.name || 'Auto Generated'} - Week {weekNumber + 1}</strong>
+                {startDate && (
+                  <span style={{ marginLeft: '12px', fontWeight: 'normal' }}>
+                    ({formatWeekRange(startDate, weekNumber)})
+                  </span>
+                )}
+              </div>
+            </div>
+
             {/* Header Row Wrapper */}
             <div className="wg-print-row-group">
               {/* Top-Left Empty Corner */}
