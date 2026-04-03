@@ -536,7 +536,7 @@ export function ScheduleManager() {
             >
               <div>
                 <h3 style={{ color: 'var(--color-text-primary)', margin: 0 }}>
-                  {activeSchedule.name}
+                  {activeSchedule.name.startsWith('Auto Generated') ? 'Weekly Schedule' : activeSchedule.name}
                 </h3>
                 <p
                   style={{

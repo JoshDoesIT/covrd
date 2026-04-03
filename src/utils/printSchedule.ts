@@ -20,6 +20,7 @@ export function printSchedule(
   timeFormat: '12h' | '24h',
 ): void {
   const startDate = schedule.startDate
+  const displayName = schedule.name.startsWith('Auto Generated') ? 'Weekly Schedule' : schedule.name
 
   // Calculate total weeks in this schedule
   const totalWeeks =
@@ -118,7 +119,7 @@ export function printSchedule(
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>${schedule.name} — Covrd Schedule</title>
+  <title>${displayName} — Covrd Schedule</title>
   <style>
     @page {
       size: landscape;
@@ -335,7 +336,7 @@ export function printSchedule(
   <!-- Cover Page -->
   <div class="cover-page">
     <div class="cover-title">
-      <h1>${schedule.name}</h1>
+      <h1>${displayName}</h1>
       <div class="subtitle">${dateRange}</div>
     </div>
 
