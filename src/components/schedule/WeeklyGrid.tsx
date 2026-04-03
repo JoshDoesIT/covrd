@@ -71,21 +71,31 @@ function DroppableCell({
   )
 }
 
-export function WeeklyGrid() {
+export function WeeklyGrid({ weekNumber = 0 }: { weekNumber?: number }) {
   const { activeSchedule, setActiveSchedule } = useScheduleStore()
   const { employees } = useEmployeeStore()
+
+  // Pre-calculate shifts filtered strictly by this weekNumber
+  const weeklyShifts = useMemo(() => {
+    if (!activeSchedule) return []
+    return activeSchedule.shifts.filter((s) => (s.weekNumber || 0) === weekNumber)
+  }, [activeSchedule, weekNumber])
 
   // Track map of assignments: Map<ShiftId, EmployeeId[]>
   const assignmentsByShift = useMemo(() => {
     const map = new Map<string, string[]>()
     if (!activeSchedule) return map
+
+    // Only map assignments for shifts in this week
+    const validShiftIds = new Set(weeklyShifts.map((s) => s.id))
     activeSchedule.assignments.forEach((a) => {
+      if (!validShiftIds.has(a.shiftId)) return
       const emps = map.get(a.shiftId) ?? []
       emps.push(a.employeeId)
       map.set(a.shiftId, emps)
     })
     return map
-  }, [activeSchedule])
+  }, [activeSchedule, weeklyShifts])
 
   const handleDragEnd = (event: DragEndEvent) => {
     if (!activeSchedule) return
@@ -145,13 +155,13 @@ export function WeeklyGrid() {
   const shiftsByDay = useMemo(() => {
     const map = new Map<string, Shift[]>()
     if (!activeSchedule) return map
-    activeSchedule.shifts.forEach((s) => {
+    weeklyShifts.forEach((s) => {
       const arr = map.get(s.day) ?? []
       arr.push(s)
       map.set(s.day, arr)
     })
     return map
-  }, [activeSchedule])
+  }, [activeSchedule, weeklyShifts])
 
   if (!activeSchedule) return null
 

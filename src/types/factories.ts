@@ -95,7 +95,7 @@ export function createCoverageRequirement(
  */
 export function createShift(
   fields: Pick<Shift, 'day' | 'startTime' | 'endTime' | 'requiredStaff'> &
-    Partial<Pick<Shift, 'id'>>,
+    Partial<Pick<Shift, 'id' | 'weekNumber'>>,
 ): Shift {
   return {
     id: fields.id ?? generateId(),
@@ -103,6 +103,7 @@ export function createShift(
     startTime: fields.startTime,
     endTime: fields.endTime,
     requiredStaff: fields.requiredStaff,
+    weekNumber: fields.weekNumber,
   }
 }
 

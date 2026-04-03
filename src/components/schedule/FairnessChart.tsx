@@ -1,4 +1,7 @@
+import { useMemo } from 'react'
 import { useScheduleStore } from '../../stores/scheduleStore'
+import { useEmployeeStore } from '../../stores/employeeStore'
+import type { Employee } from '../../types/index'
 import {
   BarChart,
   Bar,
@@ -16,13 +19,44 @@ import {
  */
 export function FairnessChart() {
   const { activeSchedule } = useScheduleStore()
+  const { employees } = useEmployeeStore()
 
-  // Build basic mock data for now
-  const data = [
-    { name: 'Alice', hours: 32, max: 40 },
-    { name: 'Bob', hours: 45, max: 40 }, // Overtime!
-    { name: 'Charlie', hours: 20, max: 20 },
-  ]
+  // Calculate actual hours dynamically
+  const data = useMemo(() => {
+    if (!activeSchedule || activeSchedule.assignments.length === 0) return []
+
+    // Determine total weeks spanned
+    const startTime = new Date(activeSchedule.startDate).getTime()
+    const endTime = new Date(activeSchedule.endDate).getTime()
+    const diff = endTime - startTime
+    const totalWeeks = Math.max(1, Math.ceil(diff / (7 * 24 * 60 * 60 * 1000)))
+
+    // Map shifts by ID for quick hour lookup
+    const shiftHours = new Map<string, number>()
+    activeSchedule.shifts.forEach((s) => {
+      const sh = parseInt(s.startTime.split(':')[0], 10)
+      const eh = parseInt(s.endTime.split(':')[0], 10)
+      const duration = eh > sh ? eh - sh : 24 - sh + eh
+      shiftHours.set(s.id, duration)
+    })
+
+    // Accumulate sum per employee
+    const acc = new Map<string, number>()
+    activeSchedule.assignments.forEach((a) => {
+      const current = acc.get(a.employeeId) ?? 0
+      const dur = shiftHours.get(a.shiftId) ?? 0
+      acc.set(a.employeeId, current + dur)
+    })
+
+    // Map to final chart data array, scaling bounds across multiple weeks
+    return employees.map((emp: Employee) => {
+      return {
+        name: emp.name.split(' ')[0], // Short name representation
+        hours: acc.get(emp.id) ?? 0,
+        max: emp.maxHoursPerWeek * totalWeeks,
+      }
+    })
+  }, [activeSchedule, employees])
 
   if (!activeSchedule) {
     return (
