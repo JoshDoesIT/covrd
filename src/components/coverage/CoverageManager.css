@@ -285,6 +285,8 @@
   font-size: 0.95rem;
   transition: all 0.2s ease;
   width: 100%;
+  box-sizing: border-box;
+  height: 46px;
 }
 
 .form-input:focus {

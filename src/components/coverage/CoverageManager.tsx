@@ -209,6 +209,7 @@ export function CoverageManager() {
                   className="form-input"
                   value={formData.day ?? activeDay}
                   onChange={(e) => setFormData({ ...formData, day: e.target.value as DayOfWeek })}
+                  style={{ textTransform: 'capitalize' }}
                 >
                   {DAYS_OF_WEEK.map(d => (
                     <option key={d} value={d}>{d}</option>
