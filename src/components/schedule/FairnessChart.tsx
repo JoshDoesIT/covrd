@@ -87,7 +87,7 @@ function computeFairnessData(
  * Green (on target) → Yellow (under) → Red (over).
  */
 function getUtilizationColor(utilization: number): string {
-  if (utilization >= 80 && utilization <= 110) return '#0ea5e9' // On target (cyan pop)
+  if (utilization >= 80 && utilization <= 110) return '#00b894' // On target (green sync)
   if (utilization >= 60 && utilization < 80) return '#f59e0b' // Slightly under
   if (utilization > 110 && utilization <= 130) return '#f59e0b' // Slightly over
   if (utilization < 60) return '#ef4444' // Very under-scheduled
@@ -95,7 +95,7 @@ function getUtilizationColor(utilization: number): string {
 }
 
 function getFairnessColor(score: number): string {
-  if (score >= 80) return '#0ea5e9'
+  if (score >= 80) return '#00b894'
   if (score >= 60) return '#f59e0b'
   return '#ef4444'
 }
@@ -186,7 +186,7 @@ export function FairnessChart({ activeWeekNumber }: { activeWeekNumber: number }
               strokeWidth={1.5}
               label={{
                 value: 'Target',
-                position: 'right',
+                position: 'insideTopLeft',
                 fill: 'var(--color-text-muted)',
                 fontSize: 11,
               }}
@@ -202,7 +202,7 @@ export function FairnessChart({ activeWeekNumber }: { activeWeekNumber: number }
 
       <div className="fairness-legend" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
         <span className="legend-item" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          <span className="legend-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: '#0ea5e9' }} /> On target (80-110%)
+          <span className="legend-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: '#00b894' }} /> On target (80-110%)
         </span>
         <span className="legend-item" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
           <span className="legend-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b' }} /> Slightly off

@@ -29,12 +29,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 0.125rem;
   background: var(--color-bg-primary);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 0.5rem 1rem;
-  min-width: 90px;
+  min-width: 110px;
+  height: 64px;
 }
 
 .heatmap-score-label {

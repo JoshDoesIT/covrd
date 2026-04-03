@@ -2,16 +2,6 @@ import { useMemo } from 'react'
 import { useScheduleStore } from '../../stores/scheduleStore'
 import { useCoverageStore } from '../../stores/coverageStore'
 import type { Schedule, Shift, ShiftAssignment, CoverageRequirement, DayOfWeek } from '../../types/index'
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Cell,
-} from 'recharts'
 import './CoverageHeatmap.css'
 
 const DAY_SHORT: Record<DayOfWeek, string> = {
@@ -79,7 +69,7 @@ function computeCoverage(
 }
 
 function getCoverageColor(fillRate: number): string {
-  if (fillRate >= 100) return '#0ea5e9' // Fully covered (cyan pop)
+  if (fillRate >= 100) return '#00b894' // Fully covered (green match)
   if (fillRate >= 75) return '#f59e0b'  // Mostly covered
   return '#ef4444'                       // Under-covered
 }
@@ -130,42 +120,25 @@ export function CoverageHeatmap({ activeWeekNumber }: { activeWeekNumber: number
         </div>
       </div>
 
-      <div style={{ width: '100%', flex: 1, minHeight: 280 }}>
-        <ResponsiveContainer>
-          <BarChart data={data} margin={{ top: 10, right: 20, left: 10, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
-            <XAxis dataKey="name" stroke="var(--color-text-muted)" fontSize={12} />
-            <YAxis stroke="var(--color-text-muted)" fontSize={12} allowDecimals={false} />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'var(--color-bg-surface)',
-                border: '1px solid var(--color-border)',
-                borderRadius: '8px',
-                fontSize: '0.8rem',
-              }}
-              itemStyle={{ color: 'var(--color-text-primary)' }}
-            />
-            <Bar dataKey="required" fill="var(--color-text-muted)" opacity={0.2} radius={[4, 4, 0, 0]} name="Required" />
-            <Bar dataKey="assigned" radius={[4, 4, 0, 0]} name="Assigned">
-              {data.map((entry, index) => (
-                <Cell key={index} fill={getCoverageColor(entry.fillRate)} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
-      {/* Day-by-day quick stats */}
-      <div className="heatmap-day-pills">
+      <div className="heatmap-day-pills" style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '0.75rem', padding: '1rem 0', alignItems: 'stretch' }}>
         {data.map((d) => (
           <div
             key={d.name}
             className="heatmap-pill"
-            style={{ borderColor: getCoverageColor(d.fillRate) }}
+            style={{ 
+              borderColor: getCoverageColor(d.fillRate),
+              borderWidth: '2px',
+              backgroundColor: `${getCoverageColor(d.fillRate)}15`,
+              justifyContent: 'center',
+              borderRadius: '12px'
+            }}
           >
-            <span className="pill-day">{d.name}</span>
-            <span className="pill-ratio" style={{ color: getCoverageColor(d.fillRate) }}>
+            <span className="pill-day" style={{ fontSize: '0.85rem', marginBottom: '0.5rem' }}>{d.name.substring(0,3)}</span>
+            <span className="pill-ratio" style={{ color: getCoverageColor(d.fillRate), fontSize: '1.25rem' }}>
               {d.assigned}/{d.required}
+            </span>
+            <span style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginTop: '0.25rem' }}>
+              {d.fillRate}%
             </span>
           </div>
         ))}
@@ -173,7 +146,7 @@ export function CoverageHeatmap({ activeWeekNumber }: { activeWeekNumber: number
 
       <div className="coverage-legend" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#0ea5e9' }} /> 100%+ Coverage
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#00b894' }} /> 100%+ Coverage
         </span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
           <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b' }} /> 75%+ Coverage
