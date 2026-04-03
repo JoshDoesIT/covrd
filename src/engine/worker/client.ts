@@ -9,19 +9,19 @@ export type ProgressCallback = (percentComplete: number) => void
 export function generateScheduleAsync(
   employees: Employee[],
   shifts: Shift[],
-  onProgress?: ProgressCallback
+  onProgress?: ProgressCallback,
 ): Promise<SolveResult> {
   return new Promise((resolve, reject) => {
-    // Note: In Vite, you typically format this slightly differently 
-    // if not relying on standard bundler pathing, but for tests 
+    // Note: In Vite, you typically format this slightly differently
+    // if not relying on standard bundler pathing, but for tests
     // the global Worker injection will intercept this.
     const worker = new Worker(new URL('./scheduler.worker.ts', import.meta.url), {
-      type: 'module'
+      type: 'module',
     })
 
     worker.onmessage = (e: MessageEvent) => {
       const msg = e.data
-      
+
       switch (msg.type) {
         case 'PROGRESS':
           if (onProgress) onProgress(msg.percent)
@@ -44,7 +44,7 @@ export function generateScheduleAsync(
 
     worker.postMessage({
       type: 'START_SOLVE',
-      payload: { employees, shifts }
+      payload: { employees, shifts },
     })
   })
 }

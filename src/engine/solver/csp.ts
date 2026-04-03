@@ -33,7 +33,7 @@ export function solveSchedule(employees: Employee[], targetShifts: Shift[]): Sol
     return {
       success: true,
       assignedShifts: finalShifts,
-      unfilledShifts: []
+      unfilledShifts: [],
     }
   }
 
@@ -41,7 +41,7 @@ export function solveSchedule(employees: Employee[], targetShifts: Shift[]): Sol
   return {
     success: false,
     assignedShifts: [],
-    unfilledShifts: unassignedShifts // All failed in this simplified non-partial test logic
+    unfilledShifts: unassignedShifts, // All failed in this simplified non-partial test logic
   }
 }
 
@@ -52,13 +52,13 @@ function backtrack(
   unassignedShifts: Shift[],
   employees: Employee[],
   assignments: Map<string, Shift[]>,
-  hourTotals: Map<string, number>
+  hourTotals: Map<string, number>,
 ): boolean {
   if (unassignedShifts.length === 0) {
     return true // All scheduled successfully
   }
 
-  // Forward Checking & Optimization: 
+  // Forward Checking & Optimization:
   // Calculate who can work what shift right now to build the domains.
   const domains = new Map<string, Employee[]>()
   for (const shift of unassignedShifts) {
@@ -76,7 +76,7 @@ function backtrack(
   for (const [shiftId, emps] of domains.entries()) {
     candidateCounts.set(shiftId, emps.length)
   }
-  
+
   const sortedShifts = sortShiftsByMRV(unassignedShifts, candidateCounts)
   const shiftToAssign = sortedShifts[0]
 
@@ -108,7 +108,7 @@ function backtrack(
     // Backtrack (revert assignment)
     shiftToAssign.isAssigned = false
     shiftToAssign.employeeId = undefined
-    
+
     empList.pop() // remove last
     assignments.set(candidate.id, empList)
     hourTotals.set(candidate.id, curHours)

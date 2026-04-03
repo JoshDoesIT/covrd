@@ -18,10 +18,10 @@ describe('Constraint Validators', () => {
     availability: [
       { dayOfWeek: 1, isAvailable: true, preferences: [] }, // Monday available
       { dayOfWeek: 2, isAvailable: false, preferences: [] }, // Tuesday unavailable
-      { dayOfWeek: 3, isAvailable: true, preferences: [{ start: '09:00', end: '17:00' }] } // Wed preferred block
+      { dayOfWeek: 3, isAvailable: true, preferences: [{ start: '09:00', end: '17:00' }] }, // Wed preferred block
     ],
     createdAt: 0,
-    updatedAt: 0
+    updatedAt: 0,
   }
 
   const mockShift: Shift = {
@@ -31,7 +31,7 @@ describe('Constraint Validators', () => {
     end: '17:00',
     role: 'RN',
     durationHours: 8,
-    isAssigned: false
+    isAssigned: false,
   }
 
   describe('isAvailableForShift', () => {
@@ -60,7 +60,7 @@ describe('Constraint Validators', () => {
       const currentAssignedHours = 36
       expect(wouldExceedMaxHours(mockEmployee, mockShift, currentAssignedHours)).toBe(true)
     })
-    
+
     it('returns false if maxHours is not set (null/undefined)', () => {
       const unlimitedEmp: Employee = { ...mockEmployee, maxHours: null }
       expect(wouldExceedMaxHours(unlimitedEmp, mockShift, 80)).toBe(false)
@@ -69,7 +69,7 @@ describe('Constraint Validators', () => {
 
   describe('hasOverlappingShift', () => {
     const existingShifts: Shift[] = [
-      { ...mockShift, id: 'shift-a', start: '08:00', end: '12:00', dayOfWeek: 1 }
+      { ...mockShift, id: 'shift-a', start: '08:00', end: '12:00', dayOfWeek: 1 },
     ]
 
     it('returns true if shift overlaps with existing assignments on same day', () => {

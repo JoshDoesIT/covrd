@@ -27,7 +27,7 @@ export function sortShiftsByMRV(shifts: Shift[], candidateCounts: Map<string, nu
  */
 export function sortCandidatesByFairness(
   candidates: Employee[],
-  currentHours: Map<string, number>
+  currentHours: Map<string, number>,
 ): Employee[] {
   return [...candidates].sort((a, b) => {
     const hoursA = currentHours.get(a.id) ?? 0

@@ -1,9 +1,4 @@
-import {
-  timeToMinutes,
-  minutesToTime,
-  isOverlapping,
-  calculateDuration,
-} from './time'
+import { timeToMinutes, minutesToTime, isOverlapping, calculateDuration } from './time'
 
 describe('Time Utils', () => {
   describe('timeToMinutes', () => {
@@ -32,20 +27,32 @@ describe('Time Utils', () => {
   describe('isOverlapping', () => {
     it('returns true if time blocks overlap', () => {
       // Overlap fully inside
-      expect(isOverlapping({ start: '09:00', end: '13:00' }, { start: '10:00', end: '12:00' })).toBe(true)
+      expect(
+        isOverlapping({ start: '09:00', end: '13:00' }, { start: '10:00', end: '12:00' }),
+      ).toBe(true)
       // Overlap partial start
-      expect(isOverlapping({ start: '09:00', end: '13:00' }, { start: '08:00', end: '10:00' })).toBe(true)
+      expect(
+        isOverlapping({ start: '09:00', end: '13:00' }, { start: '08:00', end: '10:00' }),
+      ).toBe(true)
       // Overlap partial end
-      expect(isOverlapping({ start: '09:00', end: '13:00' }, { start: '12:00', end: '14:00' })).toBe(true)
+      expect(
+        isOverlapping({ start: '09:00', end: '13:00' }, { start: '12:00', end: '14:00' }),
+      ).toBe(true)
       // Exact match
-      expect(isOverlapping({ start: '09:00', end: '13:00' }, { start: '09:00', end: '13:00' })).toBe(true)
+      expect(
+        isOverlapping({ start: '09:00', end: '13:00' }, { start: '09:00', end: '13:00' }),
+      ).toBe(true)
     })
 
     it('returns false if time blocks do not overlap', () => {
       // Adjacent
-      expect(isOverlapping({ start: '09:00', end: '11:00' }, { start: '11:00', end: '13:00' })).toBe(false)
+      expect(
+        isOverlapping({ start: '09:00', end: '11:00' }, { start: '11:00', end: '13:00' }),
+      ).toBe(false)
       // Completely disjoint
-      expect(isOverlapping({ start: '09:00', end: '11:00' }, { start: '15:00', end: '17:00' })).toBe(false)
+      expect(
+        isOverlapping({ start: '09:00', end: '11:00' }, { start: '15:00', end: '17:00' }),
+      ).toBe(false)
     })
   })
 

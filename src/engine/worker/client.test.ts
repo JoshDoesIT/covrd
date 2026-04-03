@@ -4,7 +4,7 @@ import { generateScheduleAsync } from './client'
 // Simplified mock of the Web Worker API for testing
 class MockWorker {
   onmessage: ((e: MessageEvent) => void) | null = null
-  postMessage(data: any) {
+  postMessage(data: unknown) {
     // Simulate async worker response
     setTimeout(() => {
       if (data.type === 'START_SOLVE') {
@@ -12,15 +12,15 @@ class MockWorker {
         if (this.onmessage) {
           this.onmessage({ data: { type: 'PROGRESS', percent: 50 } } as MessageEvent)
         }
-        
+
         // Send completion event
         setTimeout(() => {
           if (this.onmessage) {
-            this.onmessage({ 
-              data: { 
-                type: 'COMPLETE', 
-                payload: { success: true, assignedShifts: [], unfilledShifts: [] } 
-              } 
+            this.onmessage({
+              data: {
+                type: 'COMPLETE',
+                payload: { success: true, assignedShifts: [], unfilledShifts: [] },
+              },
             } as MessageEvent)
           }
         }, 10)
@@ -42,7 +42,7 @@ describe('Worker Client', () => {
 
   it('runs solve async and resolves on complete', async () => {
     const progressCallback = vi.fn()
-    
+
     // Pass empty arrays for the payload
     const result = await generateScheduleAsync([], [], progressCallback)
 

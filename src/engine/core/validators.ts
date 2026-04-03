@@ -21,12 +21,16 @@ export function isAvailableForShift(employee: Employee, shift: Shift): boolean {
 /**
  * Checks if adding this shift to the current total would exceed the employee's max hours.
  */
-export function wouldExceedMaxHours(employee: Employee, shift: Shift, currentHours: number): boolean {
+export function wouldExceedMaxHours(
+  employee: Employee,
+  shift: Shift,
+  currentHours: number,
+): boolean {
   if (employee.maxHours === null || employee.maxHours === undefined) {
     return false
   }
 
-  return (currentHours + shift.durationHours) > employee.maxHours
+  return currentHours + shift.durationHours > employee.maxHours
 }
 
 /**
@@ -35,7 +39,7 @@ export function wouldExceedMaxHours(employee: Employee, shift: Shift, currentHou
 export function hasOverlappingShift(proposedShift: Shift, existingShifts: Shift[]): boolean {
   // Only check shifts on the same day (or adjacent overnight days logic could be added here later if needed)
   const sameDayShifts = existingShifts.filter((s) => s.dayOfWeek === proposedShift.dayOfWeek)
-  
+
   for (const existing of sameDayShifts) {
     if (isOverlapping(proposedShift, existing)) {
       return true
@@ -53,7 +57,7 @@ export function isEligibleForShift(
   employee: Employee,
   shift: Shift,
   existingShifts: Shift[],
-  currentHours: number
+  currentHours: number,
 ): boolean {
   // Role mismatch is an immediate hard constraint failure
   if (employee.role !== shift.role) {

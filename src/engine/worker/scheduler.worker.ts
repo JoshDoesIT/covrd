@@ -6,12 +6,12 @@ self.onmessage = (e: MessageEvent) => {
   if (msg.type === 'START_SOLVE') {
     try {
       const { employees, shifts } = msg.payload
-      
+
       // Send an initial progress ping
       self.postMessage({ type: 'PROGRESS', percent: 10 })
 
-      // Note: A true long-running solver would yield to emit progress, 
-      // but for Covrd typical datasets (50 emps, 7 days) the CSP is 
+      // Note: A true long-running solver would yield to emit progress,
+      // but for Covrd typical datasets (50 emps, 7 days) the CSP is
       // very fast. In the future we can interleave progress emits during backtracking.
       const result = solveSchedule(employees, shifts)
 
@@ -20,12 +20,12 @@ self.onmessage = (e: MessageEvent) => {
 
       self.postMessage({
         type: 'COMPLETE',
-        payload: result
+        payload: result,
       })
-    } catch (error: any) {
+    } catch (error: unknown) {
       self.postMessage({
         type: 'ERROR',
-        message: error.message || 'Unknown solver error'
+        message: error instanceof Error ? error.message : 'Unknown solver error',
       })
     }
   }

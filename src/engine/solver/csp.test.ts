@@ -2,17 +2,55 @@ import { Employee, Shift } from '../../types'
 import { solveSchedule } from './csp'
 
 describe('Constraint Satisfaction Problem Solver', () => {
-  const alice: Employee = { id: 'emp-1', name: 'Alice', role: 'RN', maxHours: 12, minHours: 0, targetHours: 8, isFullTime: true, availability: [], createdAt: 0, updatedAt: 0 }
-  const bob: Employee = { id: 'emp-2', name: 'Bob', role: 'RN', maxHours: 12, minHours: 0, targetHours: 8, isFullTime: true, availability: [], createdAt: 0, updatedAt: 0 }
+  const alice: Employee = {
+    id: 'emp-1',
+    name: 'Alice',
+    role: 'RN',
+    maxHours: 12,
+    minHours: 0,
+    targetHours: 8,
+    isFullTime: true,
+    availability: [],
+    createdAt: 0,
+    updatedAt: 0,
+  }
+  const bob: Employee = {
+    id: 'emp-2',
+    name: 'Bob',
+    role: 'RN',
+    maxHours: 12,
+    minHours: 0,
+    targetHours: 8,
+    isFullTime: true,
+    availability: [],
+    createdAt: 0,
+    updatedAt: 0,
+  }
   const employees = [alice, bob]
 
-  const shift1: Shift = { id: 's1', dayOfWeek: 1, start: '08:00', end: '16:00', role: 'RN', durationHours: 8, isAssigned: false }
-  const shift2: Shift = { id: 's2', dayOfWeek: 1, start: '16:00', end: '24:00', role: 'RN', durationHours: 8, isAssigned: false }
+  const shift1: Shift = {
+    id: 's1',
+    dayOfWeek: 1,
+    start: '08:00',
+    end: '16:00',
+    role: 'RN',
+    durationHours: 8,
+    isAssigned: false,
+  }
+  const shift2: Shift = {
+    id: 's2',
+    dayOfWeek: 1,
+    start: '16:00',
+    end: '24:00',
+    role: 'RN',
+    durationHours: 8,
+    isAssigned: false,
+  }
 
   it('assigns all shifts to eligible employees', () => {
     // Both Alice and Bob can work. One takes shift 1, one takes shift 2 (to prevent overtime)
     const result = solveSchedule(employees, [shift1, shift2])
-    
+
     expect(result.success).toBe(true)
     expect(result.assignedShifts).toHaveLength(2)
 
@@ -30,8 +68,19 @@ describe('Constraint Satisfaction Problem Solver', () => {
 
   it('detects an unsolvable schedule (unsatisfiable constraints)', () => {
     // Both shifts overlap. Max hours for Charlie is 4. No one can work.
-    const charlie: Employee = { id: 'emp-3', name: 'C', role: 'RN', maxHours: 4, minHours: 0, targetHours: 4, isFullTime: true, availability: [], createdAt: 0, updatedAt: 0 }
-    
+    const charlie: Employee = {
+      id: 'emp-3',
+      name: 'C',
+      role: 'RN',
+      maxHours: 4,
+      minHours: 0,
+      targetHours: 4,
+      isFullTime: true,
+      availability: [],
+      createdAt: 0,
+      updatedAt: 0,
+    }
+
     const result = solveSchedule([charlie], [shift1, shift2]) // Shifts are 8 hours! Charlie only has 4.
 
     expect(result.success).toBe(false)

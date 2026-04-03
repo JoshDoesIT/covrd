@@ -8,7 +8,7 @@ export type TimeBlock = {
  */
 export function timeToMinutes(time: string): number {
   const [hours, minutes] = time.split(':').map(Number)
-  return (hours * 60) + minutes
+  return hours * 60 + minutes
 }
 
 /**
@@ -28,12 +28,12 @@ export function minutesToTime(minutes: number): string {
 export function calculateDuration(start: string, end: string): number {
   const startMins = timeToMinutes(start)
   const endMins = timeToMinutes(end)
-  
+
   if (endMins < startMins) {
     // Overnight shift
-    return ((1440 - startMins) + endMins) / 60
+    return (1440 - startMins + endMins) / 60
   }
-  
+
   return (endMins - startMins) / 60
 }
 
