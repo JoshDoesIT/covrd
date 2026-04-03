@@ -21,7 +21,9 @@ export function TimelineGrid() {
     <div className="timeline-grid">
       <div className="timeline-header">
         <h3 className="sr-only">Timeline Gantt View</h3>
-        <p className="text-muted">Gantt visualization pending complete time-block scalar mapping.</p>
+        <p className="text-muted">
+          Gantt visualization pending complete time-block scalar mapping.
+        </p>
       </div>
 
       <div className="timeline-wrapper">
@@ -39,14 +41,20 @@ export function TimelineGrid() {
             </tr>
           </thead>
           <tbody>
-            {employees.map(emp => (
+            {employees.map((emp) => (
               <tr key={emp.id}>
                 <td className="timeline-emp-name">{emp.name}</td>
                 {/* Mocked out timeline scalar blocks for now */}
-                <td><div className="timeline-block" style={{ width: '100%' }}></div></td>
-                <td><div className="timeline-block" style={{ width: '50%' }}></div></td>
+                <td>
+                  <div className="timeline-block" style={{ width: '100%' }}></div>
+                </td>
+                <td>
+                  <div className="timeline-block" style={{ width: '50%' }}></div>
+                </td>
                 <td></td>
-                <td><div className="timeline-block" style={{ width: '80%' }}></div></td>
+                <td>
+                  <div className="timeline-block" style={{ width: '80%' }}></div>
+                </td>
                 <td></td>
                 <td></td>
                 <td></td>

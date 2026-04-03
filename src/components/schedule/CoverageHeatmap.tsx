@@ -1,5 +1,14 @@
 import { useScheduleStore } from '../../stores/scheduleStore'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts'
 
 /**
  * CoverageHeatmap
@@ -10,7 +19,7 @@ export function CoverageHeatmap() {
 
   // Build basic mock data for now
   const data = [
-    { name: 'Monday',  coverage: 4 },
+    { name: 'Monday', coverage: 4 },
     { name: 'Tuesday', coverage: 3 },
     { name: 'Wednesday', coverage: 5 },
     { name: 'Thursday', coverage: 2 },
@@ -34,15 +43,16 @@ export function CoverageHeatmap() {
       <h3 className="heatmap-title">Coverage Analytics</h3>
       <div style={{ width: '100%', height: 300 }}>
         <ResponsiveContainer>
-          <BarChart
-            data={data}
-            margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
-          >
+          <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
             <XAxis dataKey="name" stroke="var(--text-muted)" />
             <YAxis stroke="var(--text-muted)" />
-            <Tooltip 
-              contentStyle={{ backgroundColor: 'var(--bg-surface)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)' }}
+            <Tooltip
+              contentStyle={{
+                backgroundColor: 'var(--bg-surface)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 'var(--radius-md)',
+              }}
               itemStyle={{ color: 'var(--text-base)' }}
             />
             <Legend />

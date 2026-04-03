@@ -137,8 +137,8 @@ export function AppShell() {
             </h1>
           </div>
           <div className="shell__header-right">
-            <button 
-              className="shell__cmd-trigger" 
+            <button
+              className="shell__cmd-trigger"
               aria-label="Open command palette"
               onClick={() => {
                 document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))

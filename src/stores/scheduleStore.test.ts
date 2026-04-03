@@ -112,9 +112,9 @@ describe('Schedule Store', () => {
       name: 'Sandbox Week',
       startDate: '2026-04-06',
       endDate: '2026-04-12',
-      assignments: [{ id: 'a1', shiftId: 's1', employeeId: 'e1', isManual: true }]
+      assignments: [{ id: 'a1', shiftId: 's1', employeeId: 'e1', isManual: true }],
     })
-    
+
     setActiveSchedule(schedule)
     enableSandbox()
 
@@ -122,28 +122,29 @@ describe('Schedule Store', () => {
     expect(isSandboxMode).toBe(true)
     expect(baselineSchedule).not.toBeNull()
     expect(baselineSchedule?.assignments).toHaveLength(1)
-    
+
     // Baseline should be a deep clone, so modifying active doesn't mutate baseline natively
     expect(baselineSchedule).toEqual(activeSchedule)
     expect(baselineSchedule).not.toBe(activeSchedule)
   })
 
   it('discards sandbox changes, restoring the active schedule back to baseline', () => {
-    const { setActiveSchedule, enableSandbox, addAssignment, discardSandbox } = useScheduleStore.getState()
+    const { setActiveSchedule, enableSandbox, addAssignment, discardSandbox } =
+      useScheduleStore.getState()
     const schedule = createSchedule({
       name: 'Sandbox Week',
       startDate: '2026-04-06',
       endDate: '2026-04-12',
     })
-    
+
     setActiveSchedule(schedule)
     enableSandbox() // baseline is now 0 assignments
 
     // Simulate an edit in sandbox mode
     addAssignment({ shiftId: 's1', employeeId: 'e1', isManual: true })
-    
+
     expect(useScheduleStore.getState().activeSchedule?.assignments).toHaveLength(1)
-    
+
     discardSandbox()
 
     const { isSandboxMode, baselineSchedule, activeSchedule } = useScheduleStore.getState()
@@ -153,19 +154,20 @@ describe('Schedule Store', () => {
   })
 
   it('commits sandbox changes, destroying baseline but keeping active schedule modifications', () => {
-    const { setActiveSchedule, enableSandbox, addAssignment, commitSandbox } = useScheduleStore.getState()
+    const { setActiveSchedule, enableSandbox, addAssignment, commitSandbox } =
+      useScheduleStore.getState()
     const schedule = createSchedule({
       name: 'Sandbox Week',
       startDate: '2026-04-06',
       endDate: '2026-04-12',
     })
-    
+
     setActiveSchedule(schedule)
     enableSandbox() // baseline is 0 assignments
 
     // Simulate an edit in sandbox mode
     addAssignment({ shiftId: 's1', employeeId: 'e2', isManual: true })
-    
+
     commitSandbox()
 
     const { isSandboxMode, baselineSchedule, activeSchedule } = useScheduleStore.getState()

@@ -96,7 +96,9 @@
   gap: 0.25rem;
   cursor: grab;
   position: relative;
-  transition: box-shadow 0.2s, transform 0.2s;
+  transition:
+    box-shadow 0.2s,
+    transform 0.2s;
   user-select: none;
 }
 
@@ -108,9 +110,9 @@
   opacity: 0.5;
 }
 
-.wg-shift[style*="transform"] {
+.wg-shift[style*='transform'] {
   z-index: 50;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
 }
 
 .wg-shift-time {

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { CommandPalette } from './CommandPalette'
 import { expect, vi } from 'vitest'
 

@@ -10,7 +10,9 @@
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4), 0 0 0 100vw rgba(0, 0, 0, 0.6);
+  box-shadow:
+    0 16px 32px rgba(0, 0, 0, 0.4),
+    0 0 0 100vw rgba(0, 0, 0, 0.6);
   z-index: 1000;
   overflow: hidden;
   font-family: var(--font-mono);
@@ -68,11 +70,11 @@
   user-select: none;
 }
 
-.covrd-command-item[cmdk-item][data-selected="true"] {
+.covrd-command-item[cmdk-item][data-selected='true'] {
   background-color: rgba(99, 102, 241, 0.15); /* primary-color with alpha */
   color: var(--primary-color);
 }
 
-.covrd-command-item[cmdk-item][data-selected="true"] svg {
+.covrd-command-item[cmdk-item][data-selected='true'] svg {
   filter: drop-shadow(0 0 4px var(--primary-color));
 }

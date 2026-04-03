@@ -80,7 +80,9 @@ export const useScheduleStore = create<ScheduleState>((set) => ({
   enableSandbox: () => {
     set((state) => ({
       isSandboxMode: true,
-      baselineSchedule: state.activeSchedule ? JSON.parse(JSON.stringify(state.activeSchedule)) : null,
+      baselineSchedule: state.activeSchedule
+        ? JSON.parse(JSON.stringify(state.activeSchedule))
+        : null,
     }))
   },
 
@@ -94,7 +96,9 @@ export const useScheduleStore = create<ScheduleState>((set) => ({
   discardSandbox: () => {
     set((state) => ({
       isSandboxMode: false,
-      activeSchedule: state.baselineSchedule ? JSON.parse(JSON.stringify(state.baselineSchedule)) : null,
+      activeSchedule: state.baselineSchedule
+        ? JSON.parse(JSON.stringify(state.baselineSchedule))
+        : null,
       baselineSchedule: null,
     }))
   },

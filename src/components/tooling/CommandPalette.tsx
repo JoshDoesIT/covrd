@@ -38,37 +38,60 @@ export function CommandPalette({ onNavigate }: CommandPaletteProps) {
   }
 
   return (
-    <Command.Dialog open={open} onOpenChange={setOpen} label="Global Command Menu" className="covrd-command-dialog">
+    <Command.Dialog
+      open={open}
+      onOpenChange={setOpen}
+      label="Global Command Menu"
+      className="covrd-command-dialog"
+    >
       <Command.Input placeholder="Type a command or search..." className="covrd-command-input" />
       <Command.List className="covrd-command-list">
         <Command.Empty className="covrd-command-empty">No results found.</Command.Empty>
 
         <Command.Group heading="Navigation">
-          <Command.Item onSelect={() => handleAction('nav_employees')} className="covrd-command-item">
+          <Command.Item
+            onSelect={() => handleAction('nav_employees')}
+            className="covrd-command-item"
+          >
             <Users className="w-4 h-4 mr-2" />
             Go to Employee Roster
           </Command.Item>
-          <Command.Item onSelect={() => handleAction('nav_coverage')} className="covrd-command-item">
+          <Command.Item
+            onSelect={() => handleAction('nav_coverage')}
+            className="covrd-command-item"
+          >
             <Briefcase className="w-4 h-4 mr-2" />
             Go to Coverage Rules
           </Command.Item>
-          <Command.Item onSelect={() => handleAction('nav_schedule')} className="covrd-command-item">
+          <Command.Item
+            onSelect={() => handleAction('nav_schedule')}
+            className="covrd-command-item"
+          >
             <Calendar className="w-4 h-4 mr-2" />
             Go to Schedule Builder
           </Command.Item>
         </Command.Group>
 
         <Command.Group heading="Actions">
-          <Command.Item onSelect={() => handleAction('nav_schedule')} className="covrd-command-item">
+          <Command.Item
+            onSelect={() => handleAction('nav_schedule')}
+            className="covrd-command-item"
+          >
             <Activity className="w-4 h-4 mr-2 text-primary" />
             Run Schedule Generator
           </Command.Item>
-          <Command.Item onSelect={() => handleAction('action_sandbox')} className="covrd-command-item">
+          <Command.Item
+            onSelect={() => handleAction('action_sandbox')}
+            className="covrd-command-item"
+          >
             <RefreshCcw className="w-4 h-4 mr-2 text-warning" />
             Toggle Sandbox Mode
           </Command.Item>
           {isSandboxMode && (
-            <Command.Item onSelect={() => handleAction('action_commit_sandbox')} className="covrd-command-item">
+            <Command.Item
+              onSelect={() => handleAction('action_commit_sandbox')}
+              className="covrd-command-item"
+            >
               <RefreshCcw className="w-4 h-4 mr-2 text-success" />
               Commit Sandbox Changes
             </Command.Item>
@@ -76,7 +99,10 @@ export function CommandPalette({ onNavigate }: CommandPaletteProps) {
         </Command.Group>
 
         <Command.Group heading="Settings">
-          <Command.Item onSelect={() => handleAction('nav_settings')} className="covrd-command-item">
+          <Command.Item
+            onSelect={() => handleAction('nav_settings')}
+            className="covrd-command-item"
+          >
             <Settings className="w-4 h-4 mr-2" />
             Preferences
           </Command.Item>

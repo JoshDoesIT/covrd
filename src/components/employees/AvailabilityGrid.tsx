@@ -10,7 +10,7 @@ interface Props {
   onClose: () => void
 }
 
-/** 
+/**
  * Simple generator returning 0-23 hours.
  */
 const hours = Array.from({ length: 24 }, (_, i) => i)
@@ -104,14 +104,27 @@ export function AvailabilityGrid({ employeeId, onClose }: Props) {
   if (!employee) return null
 
   return (
-    <div 
+    <div
       className="availability-grid-container"
       onPointerUp={handlePointerUp}
       onPointerLeave={handlePointerUp}
     >
       <div className="ag-header">
         <div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.25rem', marginBottom: '0.5rem', padding: 0 }}>
+          <button
+            onClick={onClose}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.25rem',
+              marginBottom: '0.5rem',
+              padding: 0,
+            }}
+          >
             <ArrowLeft size={14} /> Back to Profile
           </button>
           <h3 className="ag-title">
@@ -121,8 +134,18 @@ export function AvailabilityGrid({ employeeId, onClose }: Props) {
           <p className="ag-subtitle">Click and drag to mark available working hours.</p>
         </div>
         <div className="ag-controls">
-          <button className="ag-btn" onClick={() => setMatrix({})}>Clear All</button>
-          <button className="ag-btn" onClick={handleSave} style={{ background: 'var(--primary)', color: 'var(--bg-base)', borderColor: 'var(--primary)' }}>
+          <button className="ag-btn" onClick={() => setMatrix({})}>
+            Clear All
+          </button>
+          <button
+            className="ag-btn"
+            onClick={handleSave}
+            style={{
+              background: 'var(--primary)',
+              color: 'var(--bg-base)',
+              borderColor: 'var(--primary)',
+            }}
+          >
             Save Matrix
           </button>
         </div>

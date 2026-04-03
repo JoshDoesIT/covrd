@@ -8,7 +8,7 @@ import './EmployeeManager.css'
 
 export function EmployeeManager() {
   const { employees, addEmployee, removeEmployee, updateEmployee } = useEmployeeStore()
-  
+
   const [editingId, setEditingId] = useState<string | null>(null)
   const [isCreating, setIsCreating] = useState(false)
   const [isManagingAvail, setIsManagingAvail] = useState(false)
@@ -16,7 +16,8 @@ export function EmployeeManager() {
 
   // Determine which employee or new employee is actively shown in the right pane
   const activeEmployee = useMemo(() => {
-    if (isCreating) return { ...createEmployee({ name: 'New Employee', role: 'Staff' }), ...formData }
+    if (isCreating)
+      return { ...createEmployee({ name: 'New Employee', role: 'Staff' }), ...formData }
     if (editingId) return { ...employees.find((e) => e.id === editingId), ...formData } as Employee
     return null
   }, [editingId, isCreating, employees, formData])
@@ -61,7 +62,7 @@ export function EmployeeManager() {
 
   const handleSave = () => {
     if (!formData.name) return alert('Name is required.')
-    
+
     if (isCreating) {
       const newEmp = createEmployee({ name: formData.name!, role: formData.role ?? 'staff' })
       addEmployee({
@@ -74,7 +75,7 @@ export function EmployeeManager() {
     } else if (editingId) {
       updateEmployee(editingId, formData)
     }
-    
+
     setIsCreating(false)
     setEditingId(null)
     setFormData({})
@@ -92,7 +93,9 @@ export function EmployeeManager() {
       <header className="em-header">
         <div>
           <h2 className="em-title">Team Roster</h2>
-          <p className="em-subtitle">Manage your staff details, target hours, and base constraints.</p>
+          <p className="em-subtitle">
+            Manage your staff details, target hours, and base constraints.
+          </p>
         </div>
         <button className="em-add-btn" onClick={handleStartCreate}>
           <Plus size={16} /> Add Employee
@@ -119,10 +122,7 @@ export function EmployeeManager() {
               >
                 <div className="ec-header">
                   <div className="ec-identity">
-                    <div
-                      className="ec-avatar"
-                      style={{ borderColor: emp.color, color: emp.color }}
-                    >
+                    <div className="ec-avatar" style={{ borderColor: emp.color, color: emp.color }}>
                       {emp.name.charAt(0).toUpperCase()}
                     </div>
                     <div>
@@ -147,10 +147,18 @@ export function EmployeeManager() {
                 </div>
 
                 <div className="ec-actions">
-                  <button className="ec-btn-icon" onClick={(e) => handleStartEdit(e, emp)} title="Edit Employee">
+                  <button
+                    className="ec-btn-icon"
+                    onClick={(e) => handleStartEdit(e, emp)}
+                    title="Edit Employee"
+                  >
                     <Edit2 size={14} />
                   </button>
-                  <button className="ec-btn-icon danger" onClick={(e) => handleDelete(e, emp.id)} title="Remove Employee">
+                  <button
+                    className="ec-btn-icon danger"
+                    onClick={(e) => handleDelete(e, emp.id)}
+                    title="Remove Employee"
+                  >
                     <Trash2 size={14} />
                   </button>
                 </div>
@@ -222,7 +230,9 @@ export function EmployeeManager() {
                     type="number"
                     className="form-input"
                     value={formData.minHoursPerWeek ?? 0}
-                    onChange={(e) => setFormData({ ...formData, minHoursPerWeek: Number(e.target.value) })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, minHoursPerWeek: Number(e.target.value) })
+                    }
                     min={0}
                     max={168}
                   />
@@ -233,22 +243,55 @@ export function EmployeeManager() {
                     type="number"
                     className="form-input"
                     value={formData.maxHoursPerWeek ?? 40}
-                    onChange={(e) => setFormData({ ...formData, maxHoursPerWeek: Number(e.target.value) })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, maxHoursPerWeek: Number(e.target.value) })
+                    }
                     min={1}
                     max={168}
                   />
                 </div>
               </div>
-              
+
               {!isCreating && (
-                <div className="form-group" style={{ marginTop: '1rem', padding: '1rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px', border: '1px solid var(--border)' }}>
-                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem', color: 'var(--text-base)' }}>
-                    <AlertCircle size={16} /> <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>Advanced Constraints</span>
+                <div
+                  className="form-group"
+                  style={{
+                    marginTop: '1rem',
+                    padding: '1rem',
+                    background: 'rgba(255,255,255,0.02)',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border)',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: '0.5rem',
+                      alignItems: 'center',
+                      marginBottom: '0.5rem',
+                      color: 'var(--text-base)',
+                    }}
+                  >
+                    <AlertCircle size={16} />{' '}
+                    <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+                      Advanced Constraints
+                    </span>
                   </div>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
-                    Access the Availability Grid and Restrictions forms via the dedicated tools in Epic 4A.
+                  <p
+                    style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}
+                  >
+                    Access the Availability Grid and Restrictions forms via the dedicated tools in
+                    Epic 4A.
                   </p>
-                  <button className="btn-secondary" style={{ width: '100%', borderColor: 'var(--primary)', color: 'var(--primary)' }} onClick={() => setIsManagingAvail(true)}>
+                  <button
+                    className="btn-secondary"
+                    style={{
+                      width: '100%',
+                      borderColor: 'var(--primary)',
+                      color: 'var(--primary)',
+                    }}
+                    onClick={() => setIsManagingAvail(true)}
+                  >
                     Open Availability Matrix
                   </button>
                 </div>
@@ -256,7 +299,9 @@ export function EmployeeManager() {
             </div>
 
             <div className="editor-footer">
-              <button className="btn-secondary" onClick={handleCancel}>Cancel</button>
+              <button className="btn-secondary" onClick={handleCancel}>
+                Cancel
+              </button>
               <button className="btn-primary" onClick={handleSave}>
                 {isCreating ? 'Create Employee' : 'Save Changes'}
               </button>

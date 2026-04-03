@@ -1,10 +1,5 @@
 import React, { useMemo } from 'react'
-import {
-  DndContext,
-  useDraggable,
-  useDroppable,
-  closestCenter
-} from '@dnd-kit/core'
+import { DndContext, useDraggable, useDroppable, closestCenter } from '@dnd-kit/core'
 import type { DragEndEvent } from '@dnd-kit/core'
 import { useScheduleStore } from '../../stores/scheduleStore'
 import { useEmployeeStore } from '../../stores/employeeStore'
@@ -12,7 +7,15 @@ import { DAYS_OF_WEEK } from '../../types/index'
 import type { Shift, Employee } from '../../types/index'
 import './WeeklyGrid.css'
 
-function DraggableShift({ shift, employee, isAssigned }: { shift: Shift; employee?: Employee; isAssigned: boolean }) {
+function DraggableShift({
+  shift,
+  employee,
+  isAssigned,
+}: {
+  shift: Shift
+  employee?: Employee
+  isAssigned: boolean
+}) {
   const assignmentId = isAssigned && employee ? `${shift.id}__${employee.id}` : shift.id
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
@@ -47,7 +50,15 @@ function DraggableShift({ shift, employee, isAssigned }: { shift: Shift; employe
   )
 }
 
-function DroppableCell({ id, day, children }: { id: string; day: string; children: React.ReactNode }) {
+function DroppableCell({
+  id,
+  day,
+  children,
+}: {
+  id: string
+  day: string
+  children: React.ReactNode
+}) {
   const { isOver, setNodeRef } = useDroppable({
     id,
     data: { day },
@@ -68,7 +79,7 @@ export function WeeklyGrid() {
   const assignmentsByShift = useMemo(() => {
     const map = new Map<string, string[]>()
     if (!activeSchedule) return map
-    activeSchedule.assignments.forEach(a => {
+    activeSchedule.assignments.forEach((a) => {
       const emps = map.get(a.shiftId) ?? []
       emps.push(a.employeeId)
       map.set(a.shiftId, emps)
@@ -76,18 +87,22 @@ export function WeeklyGrid() {
     return map
   }, [activeSchedule])
 
-  if (!activeSchedule) return null
-
   const handleDragEnd = (event: DragEndEvent) => {
+    if (!activeSchedule) return
+
     const { active, over } = event
     if (!over) return
 
     // active.id is the dragged shift piece
-    const draggedData = active.data.current as { shift: Shift; employee?: Employee; isAssigned: boolean }
-    
+    const draggedData = active.data.current as {
+      shift: Shift
+      employee?: Employee
+      isAssigned: boolean
+    }
+
     // over.id is the droppable cell e.g., "unassigned-monday" or "empId-tuesday"
     const overId = String(over.id)
-    const [targetType, _targetDay] = overId.split('-') // e.g. "unassigned" or employeeId
+    const [targetType] = overId.split('-') // e.g. "unassigned" or employeeId
 
     if (!draggedData) return
 
@@ -99,20 +114,22 @@ export function WeeklyGrid() {
     // If moving from an assigned employee to somewhere else, remove the old assignment
     if (draggedData.isAssigned && draggedData.employee) {
       newAssignments = newAssignments.filter(
-        a => !(a.shiftId === shiftId && a.employeeId === draggedData.employee!.id)
+        (a) => !(a.shiftId === shiftId && a.employeeId === draggedData.employee!.id),
       )
     }
 
     // If dropped onto an employee cell, add the new assignment
     if (targetType !== 'unassigned') {
       // Don't allow assigning the same employee to the same shift twice
-      const alreadyAssigned = newAssignments.some(a => a.shiftId === shiftId && a.employeeId === targetType)
+      const alreadyAssigned = newAssignments.some(
+        (a) => a.shiftId === shiftId && a.employeeId === targetType,
+      )
       if (!alreadyAssigned) {
         newAssignments.push({
           id: crypto.randomUUID(),
           shiftId: shiftId,
           employeeId: targetType,
-          isManual: true
+          isManual: true,
         })
       }
     }
@@ -120,20 +137,23 @@ export function WeeklyGrid() {
     setActiveSchedule({
       ...activeSchedule,
       assignments: newAssignments,
-      updatedAt: new Date().toISOString()
+      updatedAt: new Date().toISOString(),
     })
   }
 
   // Pre-calculate shift pools
   const shiftsByDay = useMemo(() => {
     const map = new Map<string, Shift[]>()
-    activeSchedule.shifts.forEach(s => {
+    if (!activeSchedule) return map
+    activeSchedule.shifts.forEach((s) => {
       const arr = map.get(s.day) ?? []
       arr.push(s)
       map.set(s.day, arr)
     })
     return map
   }, [activeSchedule])
+
+  if (!activeSchedule) return null
 
   return (
     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -159,8 +179,8 @@ export function WeeklyGrid() {
             const dayShifts = shiftsByDay.get(day) ?? []
             // render shifts that still need staff
             const neededShifts: Shift[] = []
-            
-            dayShifts.forEach(shift => {
+
+            dayShifts.forEach((shift) => {
               const assignedCount = assignmentsByShift.get(shift.id)?.length ?? 0
               if (assignedCount < shift.requiredStaff) {
                 // If it needs 3 staff but has 1, render 2 draggable tiles!
@@ -185,36 +205,44 @@ export function WeeklyGrid() {
           {employees.map((emp) => {
             // Calculate assigned hours this week for display
             const assignedShifts = activeSchedule.assignments
-              .filter(a => a.employeeId === emp.id)
-              .map(a => activeSchedule.shifts.find(s => s.id === a.shiftId))
+              .filter((a) => a.employeeId === emp.id)
+              .map((a) => activeSchedule.shifts.find((s) => s.id === a.shiftId))
               .filter(Boolean) as Shift[]
-            
+
             let totalHours = 0
-            assignedShifts.forEach(s => {
+            assignedShifts.forEach((s) => {
               const st = parseInt(s.startTime.split(':')[0], 10)
               const et = parseInt(s.endTime.split(':')[0], 10)
-              totalHours += (et > st ? et - st : 24 - st + et)
+              totalHours += et > st ? et - st : 24 - st + et
             })
 
             return (
               <React.Fragment key={emp.id}>
                 <div className="wg-row-label">
                   <span className="wg-emp-name">{emp.name}</span>
-                  <span className="wg-emp-target" style={{ color: totalHours > emp.maxHoursPerWeek ? '#ef4444' : undefined }}>
+                  <span
+                    className="wg-emp-target"
+                    style={{ color: totalHours > emp.maxHoursPerWeek ? '#ef4444' : undefined }}
+                  >
                     {totalHours}h / {emp.maxHoursPerWeek}h
                   </span>
                 </div>
 
                 {DAYS_OF_WEEK.map((day) => {
                   const empDayShifts = activeSchedule.assignments
-                    .filter(a => a.employeeId === emp.id)
-                    .map(a => activeSchedule.shifts.find(s => s.id === a.shiftId))
-                    .filter(s => s?.day === day) as Shift[]
+                    .filter((a) => a.employeeId === emp.id)
+                    .map((a) => activeSchedule.shifts.find((s) => s.id === a.shiftId))
+                    .filter((s) => s?.day === day) as Shift[]
 
                   return (
                     <DroppableCell key={`${emp.id}-${day}`} id={`${emp.id}-${day}`} day={day}>
-                      {empDayShifts.map(s => (
-                        <DraggableShift key={`assigned-${s.id}-${emp.id}`} shift={s} employee={emp} isAssigned={true} />
+                      {empDayShifts.map((s) => (
+                        <DraggableShift
+                          key={`assigned-${s.id}-${emp.id}`}
+                          shift={s}
+                          employee={emp}
+                          isAssigned={true}
+                        />
                       ))}
                     </DroppableCell>
                   )
