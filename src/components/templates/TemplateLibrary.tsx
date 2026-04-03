@@ -1,4 +1,5 @@
 import { useTemplateStore } from '../../stores/templateStore'
+import { LayoutTemplate } from 'lucide-react'
 import './TemplateLibrary.css'
 
 interface TemplateLibraryProps {
@@ -33,7 +34,10 @@ export function TemplateLibrary({ onEdit, onApply }: TemplateLibraryProps) {
   return (
     <div className="template-library">
       <div className="template-header">
-        <h2>Saved Templates</h2>
+        <h2>
+          <LayoutTemplate size={20} color="var(--color-accent)" />
+          Saved Templates
+        </h2>
         <button onClick={handleCreateNew} className="action-btn primary">
           + New Template
         </button>

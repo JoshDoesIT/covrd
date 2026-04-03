@@ -144,7 +144,7 @@
 /* Sparkle icon idle bob */
 .sm-btn-generate .lucide-sparkles {
   animation: sparkle-bob 2.5s ease-in-out infinite;
-  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.6));
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
 }
 
 @keyframes gradient-shift {

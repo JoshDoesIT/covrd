@@ -24,6 +24,9 @@
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--color-text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .template-grid {

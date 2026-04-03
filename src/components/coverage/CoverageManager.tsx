@@ -101,7 +101,10 @@ export function CoverageManager() {
     <div className="coverage-manager">
       <header className="cm-header">
         <div>
-          <h2 className="cm-title">Coverage Requirements</h2>
+          <h2 className="cm-title">
+            <Clock size={20} color="var(--color-accent)" />
+            Coverage Requirements
+          </h2>
           <p className="cm-subtitle">Define the minimum threshold of required staff per time block.</p>
         </div>
         <button className="cm-add-btn" onClick={handleStartCreate}>

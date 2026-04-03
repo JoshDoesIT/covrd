@@ -93,7 +93,10 @@ export function EmployeeManager() {
     <div className="employee-manager">
       <header className="em-header">
         <div>
-          <h2 className="em-title">Team Roster</h2>
+          <h2 className="em-title">
+            <Users size={20} color="var(--color-accent)" />
+            Team Roster
+          </h2>
           <p className="em-subtitle">
             Manage your staff details, target hours, and base constraints.
           </p>

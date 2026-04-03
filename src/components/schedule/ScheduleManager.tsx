@@ -420,7 +420,7 @@ export function ScheduleManager() {
               {isGenerating ? (
                 <RefreshCw size={16} className="lucide-spin" />
               ) : (
-                <Sparkles size={16} />
+                <Sparkles size={28} />
               )}
               {isGenerating ? 'Solving...' : 'Automagic Schedule'}
             </button>
