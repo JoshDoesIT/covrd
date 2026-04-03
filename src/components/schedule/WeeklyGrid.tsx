@@ -231,7 +231,11 @@ export function WeeklyGrid({ weekNumber = 0, startDate }: { weekNumber?: number;
             assignedShifts.forEach((s) => {
               const st = parseInt(s.startTime.split(':')[0], 10)
               const et = parseInt(s.endTime.split(':')[0], 10)
-              totalHours += et > st ? et - st : 24 - st + et
+              let duration = et > st ? et - st : 24 - st + et
+              if (s.unpaidBreakMinutes) {
+                duration -= (s.unpaidBreakMinutes / 60)
+              }
+              totalHours += duration
             })
 
             return (

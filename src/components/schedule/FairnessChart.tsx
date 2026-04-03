@@ -38,7 +38,10 @@ function computeFairnessData(
   activeSchedule.shifts.forEach((s: Shift) => {
     const sh = parseInt(s.startTime.split(':')[0], 10)
     const eh = parseInt(s.endTime.split(':')[0], 10)
-    const duration = eh > sh ? eh - sh : 24 - sh + eh
+    let duration = eh > sh ? eh - sh : 24 - sh + eh
+    if (s.unpaidBreakMinutes) {
+      duration -= (s.unpaidBreakMinutes / 60)
+    }
     shiftHours.set(s.id, duration)
   })
 
