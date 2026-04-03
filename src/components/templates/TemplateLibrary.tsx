@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { useTemplateStore } from '../../stores/templateStore'
 import './TemplateLibrary.css'
 
