@@ -32,6 +32,22 @@ function getAbsoluteDayIndex(weekNum: number, dayOfWeek: number): number {
   return weekNum * 7 + normalizedDay
 }
 
+function getClumpingModifier(assignedDays: number[], targetDay: number): number {
+  if (assignedDays.length === 0) return 0
+  
+  let minDistance = Infinity
+  for (const d of assignedDays) {
+    const dist = Math.abs(d - targetDay)
+    if (dist < minDistance) minDistance = dist
+  }
+  
+  if (minDistance === 0) return 300   // Same day (multiple shifts). Excellent!
+  if (minDistance === 1) return 200   // Consecutive day. Great clumping!
+  if (minDistance === 2) return -500  // 1-day gap (Working, Off, Working). TERRIBLE! Punish heavily.
+  if (minDistance === 3) return -100  // 2-day gap. Sub-optimal but sometimes necessary.
+  return 0 // 3+ day gap. Represents a solid block of off-days, entirely neutral/acceptable.
+}
+
 export function sortCandidatesByFairness(
   candidates: Employee[],
   hourTotals: Map<string, Map<number, number>>,
@@ -49,19 +65,16 @@ export function sortCandidatesByFairness(
     const hoursB = empWeekMapB.get(shiftToAssign.weekNumber) ?? 0
     const deficitB = b.targetHours - hoursB
 
-    // Consecutive Shift Bonus (Group Off-Days)
-    const hasConsecutiveA = (assignments.get(a.id) ?? []).some(s => 
-      Math.abs(getAbsoluteDayIndex(s.weekNumber, s.dayOfWeek) - targetDayIndex) === 1
-    )
-    
-    const hasConsecutiveB = (assignments.get(b.id) ?? []).some(s => 
-      Math.abs(getAbsoluteDayIndex(s.weekNumber, s.dayOfWeek) - targetDayIndex) === 1
-    )
+    const assignedDaysA = (assignments.get(a.id) ?? []).map(s => getAbsoluteDayIndex(s.weekNumber, s.dayOfWeek))
+    const clumpModifierA = getClumpingModifier(assignedDaysA, targetDayIndex)
 
-    // Deficit is primary metric (10pts per missing hour). Modulator adds massive 200pt (+20hr equivalent) weight 
-    // to candidates continuing a streak, drastically clumping workdays together which clumps off-days.
-    const scoreA = (deficitA * 10) + (hasConsecutiveA ? 200 : 0)
-    const scoreB = (deficitB * 10) + (hasConsecutiveB ? 200 : 0)
+    const assignedDaysB = (assignments.get(b.id) ?? []).map(s => getAbsoluteDayIndex(s.weekNumber, s.dayOfWeek))
+    const clumpModifierB = getClumpingModifier(assignedDaysB, targetDayIndex)
+
+    // Deficit is primary metric (10pts per missing hour). Modulator adds enormous weight to close gaps 
+    // and actively penalizes assignments that would create isolated fragmented off-days.
+    const scoreA = (deficitA * 10) + clumpModifierA
+    const scoreB = (deficitB * 10) + clumpModifierB
 
     // Sort descending by score
     return scoreB - scoreA
