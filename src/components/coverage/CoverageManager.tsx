@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react'
-import { Plus, Users, Edit2, Trash2, X, Clock, LayoutTemplate } from 'lucide-react'
+import { Plus, Edit2, Trash2, X, Clock, LayoutTemplate } from 'lucide-react'
 import { useCoverageStore } from '../../stores/coverageStore'
 import { createCoverageRequirement } from '../../types/factories'
 import { DAYS_OF_WEEK } from '../../types/index'
@@ -145,7 +145,8 @@ export function CoverageManager() {
 
                 <div className="rc-staff">
                   <div className="rc-staff-count" title="Required Staff">
-                    <Users size={16} color="var(--primary)" /> {req.requiredStaff}
+                    {req.requiredStaff}
+                    <span className="rc-staff-label">staff</span>
                   </div>
                   <div className="rc-actions">
                     <button className="ec-btn-icon" onClick={(e) => handleStartEdit(e, req)}>
