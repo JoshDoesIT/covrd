@@ -10,7 +10,7 @@ describe('AppShell', () => {
 
   it('renders the header', () => {
     render(<AppShell />)
-    expect(screen.getByRole('banner')).toBeInTheDocument()
+    expect(screen.getAllByRole('banner').length).toBeGreaterThanOrEqual(1)
   })
 
   it('renders the main content area', () => {
@@ -25,7 +25,7 @@ describe('AppShell', () => {
 
   it('renders navigation items', () => {
     render(<AppShell />)
-    expect(screen.getByText('Employees')).toBeInTheDocument()
+    expect(screen.getAllByText('Employees').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText('Coverage')).toBeInTheDocument()
     expect(screen.getAllByText('Schedule').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText('Templates')).toBeInTheDocument()

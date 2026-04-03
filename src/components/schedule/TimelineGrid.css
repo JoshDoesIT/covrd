@@ -1,0 +1,49 @@
+.timeline-grid {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+}
+
+.timeline-wrapper {
+  overflow-x: auto;
+  margin-top: 1rem;
+}
+
+.timeline-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.timeline-table th,
+.timeline-table td {
+  border: 1px solid var(--border-color);
+  padding: 0.75rem;
+}
+
+.timeline-table th {
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.timeline-emp-name {
+  font-weight: 500;
+  color: var(--text-base);
+  width: 150px;
+}
+
+.timeline-block {
+  background: var(--primary-color);
+  height: 24px;
+  border-radius: 4px;
+  opacity: 0.8;
+  position: relative;
+  transition: opacity 0.2s;
+}
+
+.timeline-block:hover {
+  opacity: 1;
+  cursor: pointer;
+}

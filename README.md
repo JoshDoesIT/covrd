@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <strong>Every shift. Covered.</strong> — Auto staff scheduling that respects your privacy.
+  <strong>Every Shift. Coverd.</strong> Auto staff scheduling that respects your privacy.
 </p>
 
 <p align="center">
@@ -12,31 +12,30 @@
   <img src="https://img.shields.io/badge/license-MIT-6C5CE7" alt="License: MIT">
   <img src="https://img.shields.io/badge/react-19-74B9FF" alt="React 19">
   <img src="https://img.shields.io/badge/typescript-5.9-3178C6" alt="TypeScript 5.9">
-  <img src="https://img.shields.io/badge/tests-68%20passing-00B894" alt="Tests: 68 passing">
 </p>
 
 ---
 
-Covrd is a **privacy-first, client-side-only** web application that automatically generates optimized staff work schedules. Your data never leaves your browser — no accounts, no servers, no tracking.
+Covrd is a **privacy-first, client-side-only** web application that automatically generates optimized staff work schedules. Your data never leaves your browser - no accounts, no servers, no tracking.
 
 ## Privacy Pledge
 
-- **Zero server-side data handling** — All data stays in your browser
-- **Zero analytics or tracking** — No telemetry, no cookies
-- **Zero accounts required** — No sign-up, no login
-- **Full data ownership** — Export, share, or delete your data anytime
+- **Zero server-side data handling** - All data stays in your browser
+- **Zero analytics or tracking** - No telemetry, no cookies
+- **Zero accounts required** - No sign-up, no login
+- **Full data ownership** - Export, share, or delete your data anytime
 
 ## Features
 
-- **Smart Auto-Scheduling** — CSP solver with fairness balancing
-- **Coverage Heatmap** — Instant visual staffing density
-- **Recurring Templates** — Week A/B rotations, seasonal patterns
-- **Schedule Quality Score** — 0-100 composite scoring
-- **Command Palette** — Power-user keyboard workflow (Cmd/Ctrl+K)
-- **Drag and Drop** — Manual schedule adjustments with real-time validation
-- **Offline PWA** — Works without internet after first load
-- **URL Sharing** — Share schedules via compressed links
-- **Export** — JSON, CSV, and printable views
+- **Smart Auto-Scheduling** - CSP solver with fairness balancing
+- **Coverage Heatmap** - Instant visual staffing density
+- **Recurring Templates** - Week A/B rotations, seasonal patterns
+- **Schedule Quality Score** - 0-100 composite scoring
+- **Command Palette** - Power-user keyboard workflow (Cmd/Ctrl+K)
+- **Drag and Drop** - Manual schedule adjustments with real-time validation
+- **Offline PWA** - Works without internet after first load
+- **URL Sharing** - Share schedules via compressed links
+- **Export** - JSON, CSV, and printable views
 
 ## Getting Started
 
@@ -93,4 +92,4 @@ See [SECURITY.md](SECURITY.md) for vulnerability reporting guidelines.
 
 ## License
 
-MIT — see [LICENSE](LICENSE) for details.
+MIT - see [LICENSE](LICENSE) for details.

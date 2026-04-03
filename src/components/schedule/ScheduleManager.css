@@ -1,0 +1,150 @@
+.schedule-manager {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 1.5rem;
+  padding: 1rem;
+}
+
+.sm-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sm-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-base);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sm-subtitle {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0.25rem 0 0 0;
+}
+
+.sm-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.sm-btn-generate {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, var(--primary) 0%, rgba(168, 85, 247, 1) 100%);
+  color: var(--bg-card);
+  border: none;
+  border-radius: 8px;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(168, 85, 247, 0.4);
+  transition: all 0.2s ease;
+}
+
+.sm-btn-generate:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.6);
+}
+
+.sm-btn-generate:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  background: var(--border);
+  color: var(--text-muted);
+}
+
+.sm-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  color: var(--text-base);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.625rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sm-btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sm-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Generation Overlay Overlay (Story 4.22) */
+.sm-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  gap: 1.5rem;
+}
+
+.sm-progress-container {
+  width: 300px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.sm-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), #d8b4fe);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+  width: 0%;
+}
+
+.sm-loading-text {
+  color: var(--text-base);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.sm-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 1rem;
+  color: var(--text-muted);
+}
+
+/* Base style for the grid that will be implemented next */
+.sm-grid-container {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+}

@@ -12,6 +12,11 @@ interface ScheduleState {
   saveToHistory: (schedule: Schedule) => void
   addAssignment: (assignment: Omit<ShiftAssignment, 'id'>) => void
   removeAssignment: (assignmentId: string) => void
+  isSandboxMode: boolean
+  baselineSchedule: Schedule | null
+  enableSandbox: () => void
+  commitSandbox: () => void
+  discardSandbox: () => void
   reset: () => void
 }
 
@@ -22,6 +27,8 @@ interface ScheduleState {
 export const useScheduleStore = create<ScheduleState>((set) => ({
   activeSchedule: null,
   scheduleHistory: [],
+  isSandboxMode: false,
+  baselineSchedule: null,
 
   setActiveSchedule: (schedule) => {
     set({ activeSchedule: schedule })
@@ -70,7 +77,29 @@ export const useScheduleStore = create<ScheduleState>((set) => ({
     })
   },
 
+  enableSandbox: () => {
+    set((state) => ({
+      isSandboxMode: true,
+      baselineSchedule: state.activeSchedule ? JSON.parse(JSON.stringify(state.activeSchedule)) : null,
+    }))
+  },
+
+  commitSandbox: () => {
+    set({
+      isSandboxMode: false,
+      baselineSchedule: null,
+    })
+  },
+
+  discardSandbox: () => {
+    set((state) => ({
+      isSandboxMode: false,
+      activeSchedule: state.baselineSchedule ? JSON.parse(JSON.stringify(state.baselineSchedule)) : null,
+      baselineSchedule: null,
+    }))
+  },
+
   reset: () => {
-    set({ activeSchedule: null, scheduleHistory: [] })
+    set({ activeSchedule: null, scheduleHistory: [], isSandboxMode: false, baselineSchedule: null })
   },
 }))

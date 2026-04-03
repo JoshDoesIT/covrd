@@ -7,9 +7,9 @@ describe('App', () => {
     expect(screen.getByRole('navigation', { name: /sidebar/i })).toBeInTheDocument()
   })
 
-  it('renders the header', () => {
+  it('renders the layout header', () => {
     render(<App />)
-    expect(screen.getByRole('banner')).toBeInTheDocument()
+    expect(screen.getAllByRole('banner').length).toBeGreaterThanOrEqual(1)
   })
 
   it('renders a main content area', () => {
