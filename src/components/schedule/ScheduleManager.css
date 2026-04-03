@@ -130,7 +130,7 @@
 
 /* Generation Overlay Overlay (Story 4.22) */
 .sm-overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(8px);
@@ -138,7 +138,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 50;
+  z-index: 9999;
   gap: 1.5rem;
 }
 
