@@ -26,11 +26,14 @@ export const DraggableShift = React.memo(function DraggableShift({
   const style = transform
     ? {
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-        borderColor: employee ? employee.color : 'var(--primary)',
+        borderColor: employee ? employee.color : '#ef4444',
+        backgroundColor: employee ? `${employee.color}15` : 'rgba(239, 68, 68, 0.1)',
         boxShadow: employee ? `inset 4px 0 0 ${employee.color}` : 'inset 4px 0 0 #ef4444',
+        zIndex: 50,
       }
     : {
-        borderColor: employee ? employee.color : 'var(--border)',
+        borderColor: employee ? `${employee.color}50` : 'rgba(239, 68, 68, 0.3)',
+        backgroundColor: employee ? `${employee.color}15` : 'rgba(239, 68, 68, 0.1)',
         boxShadow: employee ? `inset 4px 0 0 ${employee.color}` : 'inset 4px 0 0 #ef4444',
       }
 

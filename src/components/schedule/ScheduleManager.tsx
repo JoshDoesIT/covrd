@@ -191,23 +191,15 @@ export function ScheduleManager() {
         <div className="sm-actions">
           {activeSchedule && (
             <>
-              <div
-                className="sm-view-toggle"
-                style={{
-                  display: 'flex',
-                  gap: '0.5rem',
-                  marginRight: '1rem',
-                  alignItems: 'center',
-                }}
-              >
+              <div className="sm-view-toggle">
                 <button
-                  className={`sm-btn-ghost ${viewMode === 'matrix' ? 'active' : ''}`}
+                  className={`sm-view-btn ${viewMode === 'matrix' ? 'sm-view-btn--active' : ''}`}
                   onClick={() => setViewMode('matrix')}
                 >
                   Matrix
                 </button>
                 <button
-                  className={`sm-btn-ghost ${viewMode === 'timeline' ? 'active' : ''}`}
+                  className={`sm-view-btn ${viewMode === 'timeline' ? 'sm-view-btn--active' : ''}`}
                   onClick={() => setViewMode('timeline')}
                 >
                   Timeline

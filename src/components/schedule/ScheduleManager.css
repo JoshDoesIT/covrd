@@ -84,6 +84,39 @@
   background: rgba(255, 255, 255, 0.05);
 }
 
+/* Premium Segmented Control */
+.sm-view-toggle {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.25rem;
+  margin-right: 1rem;
+}
+
+.sm-view-btn {
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  padding: 0.35rem 1rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sm-view-btn:hover:not(.sm-view-btn--active) {
+  color: var(--text-base);
+}
+
+.sm-view-btn--active {
+  background: var(--bg-card);
+  color: var(--text-base);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
 .sm-content {
   flex: 1;
   display: flex;
