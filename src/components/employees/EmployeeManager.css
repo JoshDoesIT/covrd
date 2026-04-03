@@ -232,7 +232,8 @@
 
 /* Editor Form Panel */
 .em-editor {
-  flex: 0 0 450px;
+  flex: 1.5; /* Take up much more space to accommodate wide availability grids */
+  min-width: 600px;
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border);
   border-radius: 12px;

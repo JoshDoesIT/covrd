@@ -107,6 +107,8 @@ export interface Shift {
   requiredStaff: number
   /** Specific role required for this shift. */
   role?: string
+  /** Unpaid break duration in minutes (e.g. 30, 45, 60). Subtracted from calculated duration. */
+  unpaidBreakMinutes?: number
   /** Week offset from the start date (0 = first week). Required for multi-week. */
   weekNumber?: number
 }
@@ -125,6 +127,8 @@ export interface CoverageRequirement {
   requiredStaff: number
   /** Specific role required for this block. */
   role?: string
+  /** Unpaid break duration in minutes (e.g. 30, 45, 60). */
+  unpaidBreakMinutes?: number
 }
 
 /**

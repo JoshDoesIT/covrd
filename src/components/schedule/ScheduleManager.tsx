@@ -111,6 +111,8 @@ export function ScheduleManager() {
             endTime: r.endTime,
             requiredStaff: r.requiredStaff,
             weekNumber: w, // assign the explicit week instance
+            role: r.role,
+            unpaidBreakMinutes: r.unpaidBreakMinutes
           }),
         )
         generatedShifts.push(...weeklyOffsetShifts)
@@ -126,6 +128,8 @@ export function ScheduleManager() {
             endTime: r.endTime,
             requiredStaff: r.requiredStaff,
             weekNumber: w,
+            role: r.role,
+            unpaidBreakMinutes: r.unpaidBreakMinutes
           }),
         )
         generatedShifts.push(...weeklyOffsetShifts)
@@ -154,7 +158,11 @@ export function ScheduleManager() {
     generatedShifts.forEach((s) => {
       const startH = parseInt(s.startTime.split(':')[0], 10)
       const endH = parseInt(s.endTime.split(':')[0], 10)
-      const duration = endH > startH ? endH - startH : 24 - startH + endH
+      let duration = endH > startH ? endH - startH : 24 - startH + endH
+
+      if (s.unpaidBreakMinutes) {
+        duration -= (s.unpaidBreakMinutes / 60)
+      }
 
       // Expand requiredStaff to individual engine shifts
       for (let i = 0; i < s.requiredStaff; i++) {

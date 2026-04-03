@@ -251,6 +251,23 @@ export function CoverageManager() {
                   />
                 </div>
                 <div className="form-group">
+                  <label className="form-label">Unpaid Break</label>
+                  <select
+                    className="form-input"
+                    value={formData.unpaidBreakMinutes ?? 0}
+                    onChange={(e) => setFormData({ ...formData, unpaidBreakMinutes: Number(e.target.value) })}
+                  >
+                    <option value={0}>No Break</option>
+                    <option value={15}>15 mins</option>
+                    <option value={30}>30 mins</option>
+                    <option value={45}>45 mins</option>
+                    <option value={60}>1 hour</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
                   <label className="form-label">Required Role</label>
                   <select
                     className="form-input"

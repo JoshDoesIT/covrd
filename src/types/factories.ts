@@ -84,6 +84,7 @@ export function createCoverageRequirement(props: {
   endTime: string
   requiredStaff: number
   role?: string
+  unpaidBreakMinutes?: number
 }) {
   return {
     id: props.id ?? generateId(),
@@ -93,6 +94,7 @@ export function createCoverageRequirement(props: {
     endTime: props.endTime,
     requiredStaff: props.requiredStaff,
     role: props.role,
+    unpaidBreakMinutes: props.unpaidBreakMinutes,
   }
 }
 
@@ -106,6 +108,7 @@ export function createShift(props: {
   endTime: string
   requiredStaff: number
   role?: string
+  unpaidBreakMinutes?: number
   weekNumber?: number
 }) {
   return {
@@ -115,6 +118,7 @@ export function createShift(props: {
     endTime: props.endTime,
     requiredStaff: props.requiredStaff,
     role: props.role,
+    unpaidBreakMinutes: props.unpaidBreakMinutes,
     weekNumber: props.weekNumber,
   }
 }

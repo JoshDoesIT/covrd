@@ -117,11 +117,16 @@ export function sortCandidatesByFairness(
     const clumpModifierB = getClumpingModifier(assignedDaysB, targetDayIndex)
     const consistencyModifierB = getConsistencyModifier(assignedShiftsB, shiftToAssign)
 
-    // Deficit is primary metric (10pts per missing hour). 
+    // Deficit is primary metric. 
+    // Full-Time gets a massive x100 multiplier per missing hour to violently force 40-hour packing.
+    // Part-Time gets x10 to cleanly sweep up the remainder shifts after FT is saturated.
     // Clumping Modulator closes gaps and penalizes fragmented off-days.
     // Consistency Modulator rewards repeating schedules across different weeks.
-    const scoreA = (deficitA * 10) + clumpModifierA + consistencyModifierA
-    const scoreB = (deficitB * 10) + clumpModifierB + consistencyModifierB
+    const multiplierA = a.isFullTime ? 100 : 10
+    const multiplierB = b.isFullTime ? 100 : 10
+    
+    const scoreA = (deficitA * multiplierA) + clumpModifierA + consistencyModifierA
+    const scoreB = (deficitB * multiplierB) + clumpModifierB + consistencyModifierB
 
     // Sort descending by score
     return scoreB - scoreA
