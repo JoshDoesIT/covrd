@@ -1,8 +1,20 @@
-import { useState } from 'react'
-import { ScheduleManager } from './schedule/ScheduleManager'
+import { useState, lazy, Suspense } from 'react'
 import { CommandPalette } from './tooling/CommandPalette'
-import { TemplatesView } from './templates/TemplatesView'
 import './AppShell.css'
+
+/** Lazy-loaded views for bundle size optimization (Story 7.6). */
+const ScheduleManager = lazy(() =>
+  import('./schedule/ScheduleManager').then((m) => ({ default: m.ScheduleManager })),
+)
+const EmployeeManager = lazy(() =>
+  import('./employees/EmployeeManager').then((m) => ({ default: m.EmployeeManager })),
+)
+const CoverageManager = lazy(() =>
+  import('./coverage/CoverageManager').then((m) => ({ default: m.CoverageManager })),
+)
+const TemplatesView = lazy(() =>
+  import('./templates/TemplatesView').then((m) => ({ default: m.TemplatesView })),
+)
 
 /** Navigation items for the sidebar. */
 const NAV_ITEMS = [
@@ -45,6 +57,10 @@ export function AppShell() {
     switch (activeNav) {
       case 'schedule':
         return <ScheduleManager />
+      case 'employees':
+        return <EmployeeManager />
+      case 'coverage':
+        return <CoverageManager />
       case 'templates':
         return <TemplatesView onNavigate={setActiveNav} />
       default:
@@ -165,9 +181,17 @@ export function AppShell() {
           </div>
         </header>
 
-        {/* Content */}
+        {/* Content — Suspense boundary for lazy-loaded views */}
         <main className="shell__content" id="main-content">
-          {renderContent()}
+          <Suspense
+            fallback={
+              <div className="shell__placeholder">
+                <p className="shell__placeholder-text">Loading…</p>
+              </div>
+            }
+          >
+            {renderContent()}
+          </Suspense>
         </main>
       </div>
 

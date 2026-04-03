@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Sparkles, CalendarDays, RefreshCw, XCircle } from 'lucide-react'
+import { Sparkles, CalendarDays, RefreshCw, XCircle, Undo2, Redo2 } from 'lucide-react'
 import { useScheduleStore } from '../../stores/scheduleStore'
 import { useEmployeeStore } from '../../stores/employeeStore'
 import { useCoverageStore } from '../../stores/coverageStore'
@@ -13,6 +13,7 @@ import { CoverageHeatmap } from './CoverageHeatmap'
 import { FairnessChart } from './FairnessChart'
 import { ShareToolbar } from './ShareToolbar'
 import { readFileAsText, deserializeScheduleJSON } from '../../utils/exportSchedule'
+import { EmptyState } from '../shared/EmptyState'
 import './ScheduleManager.css'
 
 type ViewMode = 'matrix' | 'timeline'
@@ -38,6 +39,10 @@ export function ScheduleManager() {
     enableSandbox,
     commitSandbox,
     discardSandbox,
+    undo,
+    redo,
+    canUndo,
+    canRedo,
   } = useScheduleStore()
   const { employees } = useEmployeeStore()
   const { requirements } = useCoverageStore()
@@ -208,6 +213,27 @@ export function ScheduleManager() {
                   Timeline
                 </button>
               </div>
+
+              {canUndo || canRedo ? (
+                <div style={{ display: 'flex', gap: '0.25rem', marginRight: '1rem' }}>
+                  <button
+                    className="sm-btn-ghost"
+                    onClick={undo}
+                    disabled={!canUndo}
+                    title="Undo latest manual assignment change"
+                  >
+                    <Undo2 size={16} />
+                  </button>
+                  <button
+                    className="sm-btn-ghost"
+                    onClick={redo}
+                    disabled={!canRedo}
+                    title="Redo manual change"
+                  >
+                    <Redo2 size={16} />
+                  </button>
+                </div>
+              ) : null}
 
               {isSandboxMode ? (
                 <>
@@ -395,9 +421,14 @@ export function ScheduleManager() {
         ) : (
           !isGenerating &&
           !errorStatus && (
-            <div className="sm-empty">
-              <Sparkles size={40} opacity={0.5} />
-              <p>Click Automagic Schedule to map your requirements through the solver.</p>
+            <div style={{ margin: '4rem auto', width: '100%', maxWidth: 400 }}>
+              <EmptyState
+                title="No Active Schedule"
+                description="Trigger the solver engine to generate a mathematically optimized schedule based on your coverage requirements and employee constraints."
+                icon={<Sparkles size={32} opacity={0.5} />}
+                ctaLabel="Automagic Schedule"
+                onCtaClick={handleGenerate}
+              />
             </div>
           )
         )}
