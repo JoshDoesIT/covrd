@@ -87,7 +87,7 @@ function computeFairnessData(
  * Green (on target) → Yellow (under) → Red (over).
  */
 function getUtilizationColor(utilization: number): string {
-  if (utilization >= 80 && utilization <= 110) return 'var(--color-accent)' // On target
+  if (utilization >= 80 && utilization <= 110) return '#0ea5e9' // On target (cyan pop)
   if (utilization >= 60 && utilization < 80) return '#f59e0b' // Slightly under
   if (utilization > 110 && utilization <= 130) return '#f59e0b' // Slightly over
   if (utilization < 60) return '#ef4444' // Very under-scheduled
@@ -95,7 +95,7 @@ function getUtilizationColor(utilization: number): string {
 }
 
 function getFairnessColor(score: number): string {
-  if (score >= 80) return 'var(--color-accent)'
+  if (score >= 80) return '#0ea5e9'
   if (score >= 60) return '#f59e0b'
   return '#ef4444'
 }
@@ -154,7 +154,7 @@ export function FairnessChart({ activeWeekNumber }: { activeWeekNumber: number }
         </div>
       </div>
 
-      <div style={{ width: '100%', height: 280 }}>
+      <div style={{ width: '100%', flex: 1, minHeight: 280 }}>
         <ResponsiveContainer>
           <BarChart data={chartData} margin={{ top: 10, right: 20, left: 10, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
@@ -200,15 +200,15 @@ export function FairnessChart({ activeWeekNumber }: { activeWeekNumber: number }
         </ResponsiveContainer>
       </div>
 
-      <div className="fairness-legend">
-        <span className="legend-item">
-          <span className="legend-dot" style={{ background: 'var(--color-accent)' }} /> On target (80-110%)
+      <div className="fairness-legend" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+        <span className="legend-item" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+          <span className="legend-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: '#0ea5e9' }} /> On target (80-110%)
         </span>
-        <span className="legend-item">
-          <span className="legend-dot" style={{ background: '#f59e0b' }} /> Slightly off
+        <span className="legend-item" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+          <span className="legend-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b' }} /> Slightly off
         </span>
-        <span className="legend-item">
-          <span className="legend-dot" style={{ background: '#ef4444' }} /> Needs attention
+        <span className="legend-item" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+          <span className="legend-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }} /> Needs attention
         </span>
       </div>
     </div>

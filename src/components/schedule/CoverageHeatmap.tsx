@@ -79,7 +79,7 @@ function computeCoverage(
 }
 
 function getCoverageColor(fillRate: number): string {
-  if (fillRate >= 100) return 'var(--color-accent)' // Fully covered
+  if (fillRate >= 100) return '#0ea5e9' // Fully covered (cyan pop)
   if (fillRate >= 75) return '#f59e0b'  // Mostly covered
   return '#ef4444'                       // Under-covered
 }
@@ -119,17 +119,6 @@ export function CoverageHeatmap({ activeWeekNumber }: { activeWeekNumber: number
     <div className="coverage-heatmap">
       <div className="heatmap-header">
         <h3 className="heatmap-title">Coverage Analytics</h3>
-        <div className="coverage-legend" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--color-accent)' }} /> 100%+
-          </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b' }} /> 75%+
-          </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }} /> &lt;75%
-          </span>
-        </div>
         <div className="heatmap-score">
           <span className="heatmap-score-label">Fill Rate</span>
           <span
@@ -141,7 +130,7 @@ export function CoverageHeatmap({ activeWeekNumber }: { activeWeekNumber: number
         </div>
       </div>
 
-      <div style={{ width: '100%', height: 280 }}>
+      <div style={{ width: '100%', flex: 1, minHeight: 280 }}>
         <ResponsiveContainer>
           <BarChart data={data} margin={{ top: 10, right: 20, left: 10, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" vertical={false} />
@@ -180,6 +169,18 @@ export function CoverageHeatmap({ activeWeekNumber }: { activeWeekNumber: number
             </span>
           </div>
         ))}
+      </div>
+
+      <div className="coverage-legend" style={{ display: 'flex', gap: '1rem', justifyContent: 'center', fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#0ea5e9' }} /> 100%+ Coverage
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#f59e0b' }} /> 75%+ Coverage
+        </span>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+          <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#ef4444' }} /> &lt;75% Coverage
+        </span>
       </div>
     </div>
   )
