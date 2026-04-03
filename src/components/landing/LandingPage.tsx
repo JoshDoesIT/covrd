@@ -25,7 +25,7 @@ export function LandingPage({ onLaunch, onShowPrivacy }: LandingPageProps) {
           <h1 className="landing__hero-title">
             Every Shift.
             <br />
-            <span className="landing__hero-title-accent">Coverd.</span>
+            <span className="landing__hero-title-accent">Covrd.</span>
           </h1>
           <p className="landing__hero-subtitle">
             Auto staff scheduling that respects your privacy. Your data never leaves your browser.
@@ -127,7 +127,7 @@ export function LandingPage({ onLaunch, onShowPrivacy }: LandingPageProps) {
       </main>
 
       <footer className="landing__footer">
-        <p>© 2026 Covrd. Built with ♥ by JoshDoesIT.</p>
+        <p>© 2026 Covrd. Built by <a href="https://www.joshdoes.it" target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>JoshDoesIT</a>.</p>
       </footer>
     </div>
   )
