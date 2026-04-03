@@ -4,9 +4,10 @@ import './LandingPage.css'
 interface LandingPageProps {
   onLaunch: () => void
   onShowPrivacy: () => void
+  onShowAccessibility: () => void
 }
 
-export function LandingPage({ onLaunch, onShowPrivacy }: LandingPageProps) {
+export function LandingPage({ onLaunch, onShowPrivacy, onShowAccessibility }: LandingPageProps) {
   return (
     <div className="landing">
       {/* Ambient backgrounds */}
@@ -114,9 +115,13 @@ export function LandingPage({ onLaunch, onShowPrivacy }: LandingPageProps) {
             <div className="landing__privacy-capsule"><Shield size={16} color="var(--color-accent)" /> Free Open Source</div>
             <div className="landing__privacy-capsule"><Shield size={16} color="var(--color-accent)" /> Local Export</div>
           </div>
-          <div>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
             <button className="landing__link-btn" onClick={onShowPrivacy}>
-              Read Full Privacy Policy →
+              Privacy
+            </button>
+            <span style={{ color: 'var(--color-text-disabled)' }}>•</span>
+            <button className="landing__link-btn" onClick={onShowAccessibility}>
+              Accessibility
             </button>
           </div>
         </section>

@@ -78,6 +78,7 @@ export function App() {
             setIsAppLaunched(true)
           }}
           onShowPrivacy={() => setPolicyModal('privacy')}
+          onShowAccessibility={() => setPolicyModal('accessibility')}
         />
         <PolicyModal type={policyModal} onClose={() => setPolicyModal(null)} />
       </>
