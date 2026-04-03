@@ -157,11 +157,12 @@ export function ScheduleManager() {
       })
 
       // Convert engine result assignments to UI format
+      // Engine shift IDs are "${baseShiftId}-${expansionIndex}" — strip the last "-N" suffix
       const finalAssignments: ShiftAssignment[] = result.assignedShifts
         .filter((s) => s.employeeId)
         .map((a) => ({
           id: crypto.randomUUID(),
-          shiftId: a.id.split('-')[0], // Extract base shift ID from expanded suffix
+          shiftId: a.id.substring(0, a.id.lastIndexOf('-')),
           employeeId: a.employeeId!,
           isManual: false,
         }))

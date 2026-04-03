@@ -60,7 +60,8 @@ export function isEligibleForShift(
   currentHours: number,
 ): boolean {
   // Role mismatch is an immediate hard constraint failure
-  if (employee.role !== shift.role) {
+  // 'any' is a wildcard that matches all roles
+  if (shift.role !== 'any' && employee.role !== shift.role) {
     return false
   }
 

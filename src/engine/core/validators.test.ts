@@ -111,5 +111,10 @@ describe('Constraint Validators', () => {
       const supportShift: Shift = { ...mockShift, role: 'CNA' }
       expect(isEligibleForShift(mockEmployee, supportShift, [], 0)).toBe(false)
     })
+
+    it('resolves true if shift role is "any" wildcard regardless of employee role', () => {
+      const anyRoleShift: Shift = { ...mockShift, role: 'any' }
+      expect(isEligibleForShift(mockEmployee, anyRoleShift, [], 0)).toBe(true)
+    })
   })
 })
