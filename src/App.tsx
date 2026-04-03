@@ -22,7 +22,7 @@ const ONBOARDING_KEY = 'covrd-onboarding-complete'
  */
 export function App() {
   const [isAppLaunched, setIsAppLaunched] = useState(
-    () => window.location.search.includes('app') || localStorage.getItem(ONBOARDING_KEY) === 'true',
+    () => window.location.search.includes('app') || window.location.hash.includes('app')
   )
   const [showOnboarding, setShowOnboarding] = useState(
     () => localStorage.getItem(ONBOARDING_KEY) !== 'true',
@@ -73,7 +73,10 @@ export function App() {
     return (
       <>
         <LandingPage
-          onLaunch={() => setIsAppLaunched(true)}
+          onLaunch={() => {
+            window.location.hash = 'app'
+            setIsAppLaunched(true)
+          }}
           onShowPrivacy={() => setPolicyModal('privacy')}
         />
         <PolicyModal type={policyModal} onClose={() => setPolicyModal(null)} />

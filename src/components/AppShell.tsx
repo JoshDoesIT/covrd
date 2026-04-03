@@ -88,7 +88,7 @@ export function AppShell() {
         aria-label="Sidebar"
       >
         <div className="shell__sidebar-header">
-          <div className="shell__brand" style={{ display: 'flex', alignItems: 'center' }}>
+          <a href="/" className="shell__brand" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
             <img
               src="/logo-dark.png"
               alt="Covrd"
@@ -100,7 +100,7 @@ export function AppShell() {
                   'translateY(-2px)' /* Minor optical adjustment for built-in PNG whitespace */,
               }}
             />
-          </div>
+          </a>
           <button
             className="shell__sidebar-toggle"
             onClick={() => setCollapsed(!collapsed)}
