@@ -85,7 +85,7 @@ export function AppShell() {
       >
         <div className="shell__sidebar-header">
           <div className="shell__brand" style={{ display: 'flex', alignItems: 'center' }}>
-            <img src="/favicon.png" alt="Covrd" style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
+            <img src="/favicon.png" alt="Covrd" style={{ height: '44px', width: 'auto', objectFit: 'contain' }} />
           </div>
           <button
             className="shell__sidebar-toggle"

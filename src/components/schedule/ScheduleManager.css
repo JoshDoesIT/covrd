@@ -97,7 +97,7 @@
 
 .sm-view-btn {
   background: transparent;
-  color: var(--text-muted);
+  color: var(--color-text-muted);
   border: none;
   padding: 0.35rem 1rem;
   border-radius: 6px;
@@ -108,12 +108,12 @@
 }
 
 .sm-view-btn:hover:not(.sm-view-btn--active) {
-  color: var(--text-base);
+  color: var(--color-text-primary);
 }
 
 .sm-view-btn--active {
-  background: var(--bg-card);
-  color: var(--text-base);
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
@@ -121,8 +121,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   overflow: hidden;
   position: relative;
@@ -153,14 +153,14 @@
 
 .sm-progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary), #d8b4fe);
+  background: linear-gradient(90deg, var(--color-accent), #d8b4fe);
   border-radius: 3px;
   transition: width 0.3s ease;
   width: 0%;
 }
 
 .sm-loading-text {
-  color: var(--text-base);
+  color: var(--color-text-primary);
   font-weight: 500;
   letter-spacing: 0.02em;
 }
@@ -172,7 +172,7 @@
   justify-content: center;
   flex: 1;
   gap: 1rem;
-  color: var(--text-muted);
+  color: var(--color-text-muted);
 }
 
 /* Base style for the grid that will be implemented next */
