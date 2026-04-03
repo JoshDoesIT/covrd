@@ -122,22 +122,12 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
 
       <button
         className="sm-btn-ghost share-toolbar__btn"
-        onClick={handleExportCSV}
-        aria-label="Export CSV"
-        title="Export schedule as CSV"
-      >
-        <Download size={14} />
-        <span className="share-toolbar__label">Export CSV</span>
-      </button>
-
-      <button
-        className="sm-btn-ghost share-toolbar__btn"
         onClick={handleImportClick}
-        aria-label="Import"
+        aria-label="Import JSON"
         title="Import schedule from JSON"
       >
         <Upload size={14} />
-        <span className="share-toolbar__label">Import</span>
+        <span className="share-toolbar__label">Import JSON</span>
       </button>
       <input
         ref={fileInputRef}
@@ -147,6 +137,16 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
         style={{ display: 'none' }}
         aria-hidden="true"
       />
+
+      <button
+        className="sm-btn-ghost share-toolbar__btn"
+        onClick={handleExportCSV}
+        aria-label="Export CSV"
+        title="Export schedule as CSV"
+      >
+        <Download size={14} />
+        <span className="share-toolbar__label">Export CSV</span>
+      </button>
 
       <button
         className="sm-btn-ghost share-toolbar__btn"

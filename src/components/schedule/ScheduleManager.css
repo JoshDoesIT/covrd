@@ -34,26 +34,94 @@
   gap: 1rem;
 }
 
+/* --- Automagic Schedule Button — Hero CTA --- */
 .sm-btn-generate {
+  --btn-glow: rgba(108, 92, 231, 0.5);
+  --btn-glow-strong: rgba(108, 92, 231, 0.8);
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  background: linear-gradient(135deg, var(--color-accent) 0%, rgba(168, 85, 247, 1) 100%);
-  color: var(--color-bg-surface);
-  border: none;
-  border-radius: 8px;
-  padding: 0.625rem 1.25rem;
-  font-size: 0.875rem;
-  font-weight: 600;
+  gap: 0.6rem;
+  background: linear-gradient(
+    135deg,
+    var(--color-accent) 0%,
+    #a855f7 40%,
+    #6c5ce7 70%,
+    #8b5cf6 100%
+  );
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease infinite;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-xl);
+  padding: 0.7rem 1.5rem;
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.02em;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(168, 85, 247, 0.4);
-  transition: all 0.2s ease;
+  overflow: hidden;
+  box-shadow:
+    0 0 20px var(--btn-glow),
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition:
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.3s ease,
+    filter 0.2s ease;
+  z-index: 1;
+}
+
+/* Animated shimmer sweep across the button */
+.sm-btn-generate::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.15) 45%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0.15) 55%,
+    transparent 80%
+  );
+  transform: translateX(-100%);
+  animation: btn-shimmer 3s ease-in-out infinite;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Glow pulse halo behind the button */
+.sm-btn-generate::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  background: inherit;
+  border-radius: inherit;
+  filter: blur(14px);
+  opacity: 0.4;
+  z-index: -1;
+  animation: glow-pulse 3s ease-in-out infinite;
+  pointer-events: none;
 }
 
 .sm-btn-generate:hover:not(:disabled) {
-  opacity: 0.9;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.6);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow:
+    0 0 30px var(--btn-glow-strong),
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  filter: brightness(1.1);
+}
+
+.sm-btn-generate:active:not(:disabled) {
+  transform: translateY(0px) scale(0.98);
+  box-shadow:
+    0 0 12px var(--btn-glow),
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  filter: brightness(0.95);
+  transition-duration: 0.08s;
 }
 
 .sm-btn-generate:disabled {
@@ -63,6 +131,41 @@
   box-shadow: none;
   background: var(--color-border);
   color: var(--color-text-muted);
+  border-color: transparent;
+  filter: none;
+  animation: none;
+}
+
+.sm-btn-generate:disabled::before,
+.sm-btn-generate:disabled::after {
+  display: none;
+}
+
+/* Sparkle icon idle bob */
+.sm-btn-generate .lucide-sparkles {
+  animation: sparkle-bob 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.6));
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes btn-shimmer {
+  0% { transform: translateX(-120%); }
+  60%, 100% { transform: translateX(120%); }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.55; }
+}
+
+@keyframes sparkle-bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-1px) rotate(3deg); }
+  75% { transform: translateY(1px) rotate(-3deg); }
 }
 
 .sm-btn-ghost {
