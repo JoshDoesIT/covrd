@@ -82,7 +82,7 @@ export function printSchedule(
     weekTables.push(`
       <div class="week-section">
         <h2>Week ${w + 1} — ${weekRange}</h2>
-        <table>
+        <table class="schedule-grid">
           <thead>
             <tr>
               <th class="corner">Roster</th>
@@ -96,6 +96,23 @@ export function printSchedule(
       </div>
     `)
   }
+  // Build cover page stats
+  const totalShifts = schedule.shifts.length
+  const filledShifts = totalShifts - schedule.unfilledShiftIds.length
+  const fillRate = totalShifts > 0 ? Math.round((filledShifts / totalShifts) * 100) : 0
+  const dateRange = `${formatWeekRange(startDate, 0)}${totalWeeks > 1 ? ` → ${formatWeekRange(startDate, totalWeeks - 1)}` : ''}`
+
+  // Build employee roster rows for cover page
+  const rosterRows = employees.map((emp) => {
+    const empAssignments = schedule.assignments.filter((a) => a.employeeId === emp.id).length
+    return `<tr>
+      <td style="font-weight:600">${emp.name}</td>
+      <td>${emp.role}</td>
+      <td>${emp.employmentType}</td>
+      <td>${emp.maxHoursPerWeek}h</td>
+      <td>${empAssignments}</td>
+    </tr>`
+  }).join('\n')
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -121,23 +138,102 @@ export function printSchedule(
       background: #fff;
     }
 
-    .print-header {
+    /* --- Cover Page --- */
+    .cover-page {
+      page-break-after: always;
+      display: flex;
+      flex-direction: column;
+      min-height: 90vh;
+    }
+
+    .cover-title {
       text-align: center;
-      margin-bottom: 16px;
-      padding-bottom: 8px;
-      border-bottom: 2px solid #000;
+      padding: 40px 0 24px;
+      border-bottom: 3px solid #000;
+      margin-bottom: 32px;
     }
 
-    .print-header h1 {
-      font-size: 16pt;
-      margin-bottom: 2px;
+    .cover-title h1 {
+      font-size: 24pt;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
     }
 
-    .print-header p {
-      font-size: 9pt;
+    .cover-title .subtitle {
+      font-size: 11pt;
       color: #555;
     }
 
+    .cover-stats {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .cover-stat {
+      flex: 1;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      padding: 12px 16px;
+      text-align: center;
+    }
+
+    .cover-stat .value {
+      font-size: 20pt;
+      font-weight: 700;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .cover-stat .label {
+      font-size: 8pt;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #666;
+    }
+
+    .cover-section {
+      margin-bottom: 24px;
+    }
+
+    .cover-section h3 {
+      font-size: 11pt;
+      margin-bottom: 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .roster-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .roster-table th,
+    .roster-table td {
+      border: 1px solid #ddd;
+      padding: 6px 10px;
+      font-size: 9pt;
+      text-align: left;
+    }
+
+    .roster-table thead th {
+      background: #f0f0f0;
+      font-weight: 700;
+      font-size: 8pt;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .cover-footer {
+      margin-top: auto;
+      text-align: center;
+      font-size: 8pt;
+      color: #999;
+      border-top: 1px solid #ddd;
+      padding-top: 8px;
+    }
+
+    /* --- Schedule Pages --- */
     .week-section {
       margin-bottom: 24px;
     }
@@ -153,28 +249,29 @@ export function printSchedule(
       border-bottom: 1px solid #999;
     }
 
-    table {
+    table.schedule-grid {
       width: 100%;
       border-collapse: collapse;
       table-layout: fixed;
     }
 
-    thead {
+    table.schedule-grid thead {
       display: table-header-group;
     }
 
-    tbody {
+    table.schedule-grid tbody {
       display: table-row-group;
     }
 
-    th, td {
+    table.schedule-grid th,
+    table.schedule-grid td {
       border: 1px solid #333;
       padding: 6px;
       vertical-align: top;
       font-size: 9pt;
     }
 
-    thead th {
+    table.schedule-grid thead th {
       background: #e8e8e8;
       text-align: center;
       font-weight: 700;
@@ -183,7 +280,7 @@ export function printSchedule(
       letter-spacing: 0.03em;
     }
 
-    thead th.corner {
+    table.schedule-grid thead th.corner {
       text-align: left;
       width: 140px;
     }
@@ -205,12 +302,10 @@ export function printSchedule(
       font-weight: 600;
     }
 
-    tr {
+    table.schedule-grid tr {
       page-break-inside: avoid;
       break-inside: avoid;
     }
-
-
 
     .shift-pill {
       background: #f0f0f0;
@@ -221,8 +316,6 @@ export function printSchedule(
       font-size: 8pt;
       line-height: 1.3;
     }
-
-
 
     .shift-pill small {
       color: #666;
@@ -239,11 +332,56 @@ export function printSchedule(
   </style>
 </head>
 <body>
-  <div class="print-header">
-    <h1>${schedule.name}</h1>
-    <p>${schedule.assignments.length} assignments across ${totalWeeks} week${totalWeeks > 1 ? 's' : ''} &middot; Generated ${new Date(schedule.createdAt).toLocaleDateString()}</p>
+  <!-- Cover Page -->
+  <div class="cover-page">
+    <div class="cover-title">
+      <h1>${schedule.name}</h1>
+      <div class="subtitle">${dateRange}</div>
+    </div>
+
+    <div class="cover-stats">
+      <div class="cover-stat">
+        <span class="value">${employees.length}</span>
+        <span class="label">Employees</span>
+      </div>
+      <div class="cover-stat">
+        <span class="value">${totalWeeks}</span>
+        <span class="label">Week${totalWeeks > 1 ? 's' : ''}</span>
+      </div>
+      <div class="cover-stat">
+        <span class="value">${schedule.assignments.length}</span>
+        <span class="label">Assignments</span>
+      </div>
+      <div class="cover-stat">
+        <span class="value">${fillRate}%</span>
+        <span class="label">Fill Rate</span>
+      </div>
+    </div>
+
+    <div class="cover-section">
+      <h3>Employee Roster</h3>
+      <table class="roster-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Role</th>
+            <th>Type</th>
+            <th>Max Hours</th>
+            <th>Assignments</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rosterRows}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="cover-footer">
+      Generated ${new Date(schedule.createdAt).toLocaleDateString()} &middot; Quality Score: ${schedule.qualityScore ?? 'N/A'}${schedule.unfilledShiftIds.length > 0 ? ` &middot; ${schedule.unfilledShiftIds.length} unfilled shift${schedule.unfilledShiftIds.length > 1 ? 's' : ''}` : ''}
+    </div>
   </div>
 
+  <!-- Schedule Grids -->
   ${weekTables.join('\n')}
 
   <div class="print-footer">
