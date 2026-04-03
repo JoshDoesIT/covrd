@@ -1,5 +1,4 @@
 import type { EngineEmployee as Employee, EngineShift as Shift } from '../types'
-import { isOverlapping } from './time'
 
 /**
  * Checks if an employee is available to work on a specific day.
@@ -34,19 +33,13 @@ export function wouldExceedMaxHours(
 }
 
 /**
- * Checks if the proposed shift overlaps with any of the employee's existing shifts.
+ * Checks if the proposed shift is on a day the employee is already working.
+ * We do not allow double shifts (two shifts on a single day).
  */
-export function hasOverlappingShift(proposedShift: Shift, existingShifts: Shift[]): boolean {
-  // Only check shifts on the same day AND same week
-  const sameDayShifts = existingShifts.filter((s) => s.dayOfWeek === proposedShift.dayOfWeek && s.weekNumber === proposedShift.weekNumber)
-
-  for (const existing of sameDayShifts) {
-    if (isOverlapping(proposedShift, existing)) {
-      return true
-    }
-  }
-
-  return false
+export function hasShiftOnSameDay(proposedShift: Shift, existingShifts: Shift[]): boolean {
+  return existingShifts.some(
+    (s) => s.dayOfWeek === proposedShift.dayOfWeek && s.weekNumber === proposedShift.weekNumber
+  )
 }
 
 /**
@@ -76,7 +69,7 @@ export function isEligibleForShift(
   }
 
   // Already scheduled at this exact time
-  if (hasOverlappingShift(shift, existingShifts)) {
+  if (hasShiftOnSameDay(shift, existingShifts)) {
     return false
   }
 
