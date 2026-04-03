@@ -2,11 +2,15 @@ import { useState, useRef } from 'react'
 import { Download, Upload, Printer, Link2, QrCode } from 'lucide-react'
 import type { ShareableState } from '../../stores/urlState'
 import { generateShareUrl, generateOptimizedQrUrl } from '../../stores/urlState'
+import { useScheduleStore } from '../../stores/scheduleStore'
+import { useEmployeeStore } from '../../stores/employeeStore'
+import { useSettingsStore } from '../../stores/settingsStore'
 import {
   serializeScheduleJSON,
   serializeScheduleCSV,
   downloadFile,
 } from '../../utils/exportSchedule'
+import { printSchedule } from '../../utils/printSchedule'
 import { Toast } from '../tooling/Toast'
 import './ShareToolbar.css'
 
@@ -30,6 +34,9 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
   const [showQr, setShowQr] = useState(false)
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const { activeSchedule } = useScheduleStore()
+  const { employees } = useEmployeeStore()
+  const { timeFormat } = useSettingsStore()
 
   const handleExportJSON = () => {
     const json = serializeScheduleJSON(state)
@@ -57,7 +64,11 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
   }
 
   const handlePrint = () => {
-    window.print()
+    if (activeSchedule) {
+      printSchedule(activeSchedule, employees, timeFormat)
+    } else {
+      window.print()
+    }
   }
 
   const handleShareLink = async () => {
