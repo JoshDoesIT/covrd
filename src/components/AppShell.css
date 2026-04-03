@@ -203,6 +203,38 @@
   }
 }
 
+.shell__policy-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-2);
+  overflow: hidden;
+}
+
+.shell__policy-link {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  font-family: var(--font-body);
+  cursor: pointer;
+  padding: 0;
+  transition: color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.shell__policy-link:hover {
+  color: var(--color-text-secondary);
+  text-decoration: underline;
+}
+
+.shell__policy-dot {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  opacity: 0.4;
+  user-select: none;
+}
+
 /* --- Main Area --- */
 .shell__main-area {
   flex: 1;

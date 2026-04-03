@@ -1,15 +1,22 @@
-/** CommandPalette styles — aligned to Covrd design system tokens **/
+/**
+ * CommandPalette styles — targeting cmdk v1 Radix Dialog structure.
+ *
+ * cmdk v1 renders via a Radix Portal with two elements:
+ *   1. [cmdk-overlay] — backdrop (gets overlayClassName)
+ *   2. [cmdk-dialog]  — content (gets contentClassName)
+ */
 
-/* Backdrop overlay */
-.covrd-command-dialog[cmdk-dialog]::before {
-  content: '';
+/* Overlay / backdrop — covers the entire screen */
+.covrd-command-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.6);
-  z-index: -1;
+  z-index: 998;
+  animation: cmdkFadeIn 0.15s ease-out;
 }
 
-.covrd-command-dialog[cmdk-dialog] {
+/* Dialog content container */
+.covrd-command-dialog {
   position: fixed;
   top: 20%;
   left: 50%;
@@ -22,10 +29,19 @@
   box-shadow:
     0 24px 48px rgba(0, 0, 0, 0.5),
     0 0 0 1px rgba(108, 92, 231, 0.1);
-  z-index: var(--z-command-palette);
+  z-index: 999;
   overflow: hidden;
   font-family: var(--font-body);
   animation: cmdkSlideIn 0.15s ease-out;
+}
+
+@keyframes cmdkFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes cmdkSlideIn {
@@ -95,12 +111,12 @@
   font-weight: var(--weight-medium);
 }
 
-.covrd-command-item[cmdk-item][data-selected='true'] {
+.covrd-command-item[data-selected='true'] {
   background: var(--color-accent-muted);
   color: var(--color-text-primary);
 }
 
-.covrd-command-item[cmdk-item][data-selected='true'] svg {
+.covrd-command-item[data-selected='true'] svg {
   color: var(--color-accent);
   filter: drop-shadow(0 0 4px var(--color-accent-glow));
 }

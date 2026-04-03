@@ -111,9 +111,11 @@ export function WeeklyGrid({ weekNumber = 0 }: { weekNumber?: number }) {
       isAssigned: boolean
     }
 
-    // over.id is the droppable cell e.g., "unassigned-monday" or "empId-tuesday"
+    // over.id is the droppable cell e.g., "unassigned-monday" or "demo-emp-1-tuesday"
+    // Employee IDs contain hyphens, so we split on the LAST hyphen to separate empId from day
     const overId = String(over.id)
-    const [targetType] = overId.split('-') // e.g. "unassigned" or employeeId
+    const lastDash = overId.lastIndexOf('-')
+    const targetEmployeeId = overId.substring(0, lastDash) // "unassigned" or full employee ID
 
     if (!draggedData) return
 
@@ -130,16 +132,16 @@ export function WeeklyGrid({ weekNumber = 0 }: { weekNumber?: number }) {
     }
 
     // If dropped onto an employee cell, add the new assignment
-    if (targetType !== 'unassigned') {
+    if (targetEmployeeId !== 'unassigned') {
       // Don't allow assigning the same employee to the same shift twice
       const alreadyAssigned = newAssignments.some(
-        (a) => a.shiftId === shiftId && a.employeeId === targetType,
+        (a) => a.shiftId === shiftId && a.employeeId === targetEmployeeId,
       )
       if (!alreadyAssigned) {
         newAssignments.push({
           id: crypto.randomUUID(),
           shiftId: shiftId,
-          employeeId: targetType,
+          employeeId: targetEmployeeId,
           isManual: true,
         })
       }

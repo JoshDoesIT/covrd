@@ -30,6 +30,10 @@ interface CommandPaletteProps {
  *
  * Provides navigation, scheduling actions, demo data loading,
  * data purge, and privacy audit commands.
+ *
+ * Uses cmdk v1 which wraps Radix UI Dialog internally.
+ * - `overlayClassName` targets the backdrop overlay `[cmdk-overlay]`
+ * - `contentClassName` targets the dialog content `[cmdk-dialog]`
  */
 export function CommandPalette({ onNavigate, open, setOpen }: CommandPaletteProps) {
   const [showPurge, setShowPurge] = useState(false)
@@ -76,7 +80,8 @@ export function CommandPalette({ onNavigate, open, setOpen }: CommandPaletteProp
         open={open}
         onOpenChange={setOpen}
         label="Global Command Menu"
-        className="covrd-command-dialog"
+        overlayClassName="covrd-command-overlay"
+        contentClassName="covrd-command-dialog"
       >
         <Command.Input placeholder="Type a command or search..." className="covrd-command-input" />
         <Command.List className="covrd-command-list">
@@ -87,21 +92,21 @@ export function CommandPalette({ onNavigate, open, setOpen }: CommandPaletteProp
               onSelect={() => handleAction('nav_employees')}
               className="covrd-command-item"
             >
-              <Users className="w-4 h-4 mr-2" />
+              <Users size={18} />
               Go to Employee Roster
             </Command.Item>
             <Command.Item
               onSelect={() => handleAction('nav_coverage')}
               className="covrd-command-item"
             >
-              <Briefcase className="w-4 h-4 mr-2" />
+              <Briefcase size={18} />
               Go to Coverage Rules
             </Command.Item>
             <Command.Item
               onSelect={() => handleAction('nav_schedule')}
               className="covrd-command-item"
             >
-              <Calendar className="w-4 h-4 mr-2" />
+              <Calendar size={18} />
               Go to Schedule Builder
             </Command.Item>
           </Command.Group>
@@ -111,14 +116,14 @@ export function CommandPalette({ onNavigate, open, setOpen }: CommandPaletteProp
               onSelect={() => handleAction('nav_schedule')}
               className="covrd-command-item"
             >
-              <Activity className="w-4 h-4 mr-2 text-primary" />
+              <Activity size={18} />
               Run Schedule Generator
             </Command.Item>
             <Command.Item
               onSelect={() => handleAction('action_sandbox')}
               className="covrd-command-item"
             >
-              <RefreshCcw className="w-4 h-4 mr-2 text-warning" />
+              <RefreshCcw size={18} />
               Toggle Sandbox Mode
             </Command.Item>
             {isSandboxMode && (
@@ -126,7 +131,7 @@ export function CommandPalette({ onNavigate, open, setOpen }: CommandPaletteProp
                 onSelect={() => handleAction('action_commit_sandbox')}
                 className="covrd-command-item"
               >
-                <RefreshCcw className="w-4 h-4 mr-2 text-success" />
+                <RefreshCcw size={18} />
                 Commit Sandbox Changes
               </Command.Item>
             )}
@@ -134,7 +139,7 @@ export function CommandPalette({ onNavigate, open, setOpen }: CommandPaletteProp
               onSelect={() => handleAction('action_load_demo')}
               className="covrd-command-item"
             >
-              <Zap className="w-4 h-4 mr-2" />
+              <Zap size={18} />
               Load Demo Data
             </Command.Item>
           </Command.Group>
@@ -144,21 +149,21 @@ export function CommandPalette({ onNavigate, open, setOpen }: CommandPaletteProp
               onSelect={() => handleAction('action_privacy_audit')}
               className="covrd-command-item"
             >
-              <Shield className="w-4 h-4 mr-2" />
+              <Shield size={18} />
               Run Privacy Audit
             </Command.Item>
             <Command.Item
               onSelect={() => handleAction('action_purge')}
               className="covrd-command-item"
             >
-              <Trash2 className="w-4 h-4 mr-2" color="var(--color-danger)" />
+              <Trash2 size={18} color="var(--color-danger)" />
               Purge All Data
             </Command.Item>
             <Command.Item
               onSelect={() => handleAction('nav_settings')}
               className="covrd-command-item"
             >
-              <Settings className="w-4 h-4 mr-2" />
+              <Settings size={18} />
               Preferences
             </Command.Item>
           </Command.Group>
