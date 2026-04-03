@@ -30,7 +30,9 @@ export function App() {
       const sharedState = hydrateFromHash()
       if (sharedState) {
         sharedState.employees.forEach((e) => useEmployeeStore.getState().addEmployee(e))
-        sharedState.coverageRequirements.forEach((r) => useCoverageStore.getState().addRequirement(r))
+        sharedState.coverageRequirements.forEach((r) =>
+          useCoverageStore.getState().addRequirement(r),
+        )
         useScheduleStore.getState().setActiveSchedule(sharedState.schedule)
         window.history.replaceState(null, '', window.location.pathname)
       } else {

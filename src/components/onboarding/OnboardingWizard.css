@@ -14,8 +14,12 @@
 }
 
 @keyframes onbFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .onboarding__card {
@@ -25,13 +29,21 @@
   padding: var(--space-10);
   max-width: 520px;
   width: 90%;
-  box-shadow: var(--shadow-xl), 0 0 60px rgba(108, 92, 231, 0.08);
+  box-shadow:
+    var(--shadow-xl),
+    0 0 60px rgba(108, 92, 231, 0.08);
   animation: onbSlideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @keyframes onbSlideUp {
-  from { transform: translateY(30px) scale(0.97); opacity: 0; }
-  to { transform: translateY(0) scale(1); opacity: 1; }
+  from {
+    transform: translateY(30px) scale(0.97);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
 }
 
 .onboarding__progress {

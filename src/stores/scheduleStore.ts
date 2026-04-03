@@ -44,7 +44,7 @@ export const useScheduleStore = create<ScheduleState>((set) => ({
   setPendingTemplateId: (id) => set({ pendingTemplateId: id }),
 
   hydrate: (schedules) => {
-    // If there's a schedule, set the most recent as active. 
+    // If there's a schedule, set the most recent as active.
     // In a full app you might track 'active' explicitly via a flag, but latest works for demo.
     const active = schedules.length > 0 ? schedules[schedules.length - 1] : null
     set({ activeSchedule: active })
@@ -112,7 +112,7 @@ export const useScheduleStore = create<ScheduleState>((set) => ({
       if (!state.activeSchedule) return state
       const prev = undoManager.undo()
       if (!prev) return state
-      
+
       covrdDb.schedules.put(prev).catch(console.error)
       return {
         activeSchedule: prev,
@@ -165,6 +165,12 @@ export const useScheduleStore = create<ScheduleState>((set) => ({
 
   reset: () => {
     undoManager.clear()
-    set({ activeSchedule: null, isSandboxMode: false, baselineSchedule: null, canUndo: false, canRedo: false })
+    set({
+      activeSchedule: null,
+      isSandboxMode: false,
+      baselineSchedule: null,
+      canUndo: false,
+      canRedo: false,
+    })
   },
 }))

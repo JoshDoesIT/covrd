@@ -5,14 +5,8 @@ const CACHE_NAME = 'covrd-v1'
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll([
-        '/',
-        '/index.html',
-        '/icon-192.png',
-        '/icon-512.png',
-        '/manifest.json'
-      ])
-    })
+      return cache.addAll(['/', '/index.html', '/icon-192.png', '/icon-512.png', '/manifest.json'])
+    }),
   )
 })
 
@@ -24,7 +18,7 @@ self.addEventListener('fetch', (event) => {
         return response
       }
       return fetch(event.request)
-    })
+    }),
   )
 })
 
@@ -36,8 +30,8 @@ self.addEventListener('activate', (event) => {
           if (name !== CACHE_NAME) {
             return caches.delete(name)
           }
-        })
+        }),
       )
-    })
+    }),
   )
 })

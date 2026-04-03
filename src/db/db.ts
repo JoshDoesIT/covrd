@@ -32,12 +32,16 @@ class CovrdDatabase extends Dexie {
    * Used by the Data Purge feature (Story 7.8).
    */
   async purgeAll(): Promise<void> {
-    await this.transaction('rw', [this.employees, this.coverageRequirements, this.schedules, this.templates], async () => {
-      await this.employees.clear()
-      await this.coverageRequirements.clear()
-      await this.schedules.clear()
-      await this.templates.clear()
-    })
+    await this.transaction(
+      'rw',
+      [this.employees, this.coverageRequirements, this.schedules, this.templates],
+      async () => {
+        await this.employees.clear()
+        await this.coverageRequirements.clear()
+        await this.schedules.clear()
+        await this.templates.clear()
+      },
+    )
   }
 }
 

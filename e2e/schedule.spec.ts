@@ -11,7 +11,7 @@ test.describe('Covrd Core Workflows', () => {
 
   test('Has visible command palette and app shell', async ({ page }) => {
     await expect(page.locator('.shell__brand-mark')).toHaveText('Covrd')
-    
+
     // Command Palette should open with Mod+K
     await page.keyboard.press('Meta+k')
     // Fallback if Meta+K doesn't instantly trigger in headless

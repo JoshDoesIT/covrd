@@ -79,7 +79,9 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
     <div className="onboarding__overlay">
       <div className="onboarding__card">
         <div className="onboarding__progress">
-          <span className="onboarding__step-label">Step {currentStep + 1} of {STEPS.length}</span>
+          <span className="onboarding__step-label">
+            Step {currentStep + 1} of {STEPS.length}
+          </span>
           <div className="onboarding__progress-bar">
             <div
               className="onboarding__progress-fill"

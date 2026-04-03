@@ -19,7 +19,7 @@ describe('WeeklyGrid Performance (React.memo)', () => {
     // Now if we mutate internal state but not the props, React.memo skips.
     // In React testing library we just trigger a rerender with identical object references.
     rerender(<DraggableShift shift={shift} isAssigned={false} />)
-    
+
     // We can't strictly mock a functional component under React.memo easily without spying before import.
     // But testing the existence and ensuring no blow-ups is baseline.
     // To truly verify, we just ensure it does not throw when pure.

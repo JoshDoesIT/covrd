@@ -23,7 +23,13 @@ describe('OnboardingWizard', () => {
   test('can skip the wizard', async () => {
     const user = userEvent.setup()
     let completed = false
-    render(<OnboardingWizard onComplete={() => { completed = true }} />)
+    render(
+      <OnboardingWizard
+        onComplete={() => {
+          completed = true
+        }}
+      />,
+    )
     await user.click(screen.getByRole('button', { name: /skip/i }))
     expect(completed).toBe(true)
   })
@@ -44,7 +50,13 @@ describe('OnboardingWizard', () => {
   test('calls onComplete on final step', async () => {
     const user = userEvent.setup()
     let completed = false
-    render(<OnboardingWizard onComplete={() => { completed = true }} />)
+    render(
+      <OnboardingWizard
+        onComplete={() => {
+          completed = true
+        }}
+      />,
+    )
     // Step 1 -> 2
     await user.click(screen.getByRole('button', { name: /get started/i }))
     // Step 2 -> 3

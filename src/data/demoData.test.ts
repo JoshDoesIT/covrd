@@ -1,10 +1,5 @@
 import { describe, test, expect } from 'vitest'
-import {
-  DEMO_EMPLOYEES,
-  DEMO_COVERAGE_REQUIREMENTS,
-  DEMO_SCHEDULE,
-  loadDemoData,
-} from './demoData'
+import { DEMO_EMPLOYEES, DEMO_COVERAGE_REQUIREMENTS, DEMO_SCHEDULE, loadDemoData } from './demoData'
 
 describe('Demo Data', () => {
   test('provides at least 5 demo employees', () => {

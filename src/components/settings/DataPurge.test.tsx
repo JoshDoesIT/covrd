@@ -30,7 +30,13 @@ describe('DataPurge', () => {
   test('cancel button calls onClose', async () => {
     const user = userEvent.setup()
     let closed = false
-    render(<DataPurge onClose={() => { closed = true }} />)
+    render(
+      <DataPurge
+        onClose={() => {
+          closed = true
+        }}
+      />,
+    )
     await user.click(screen.getByRole('button', { name: /cancel/i }))
     expect(closed).toBe(true)
   })

@@ -1,4 +1,11 @@
-import type { Employee, CoverageRequirement, Schedule, DayOfWeek, Shift, ShiftAssignment } from '../types/index'
+import type {
+  Employee,
+  CoverageRequirement,
+  Schedule,
+  DayOfWeek,
+  Shift,
+  ShiftAssignment,
+} from '../types/index'
 
 /**
  * Demo Data — Pre-loaded example data for first-time users.
@@ -8,7 +15,15 @@ import type { Employee, CoverageRequirement, Schedule, DayOfWeek, Shift, ShiftAs
  * All IDs are deterministic for reproducibility.
  */
 
-const DAYS: DayOfWeek[] = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+const DAYS: DayOfWeek[] = [
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday',
+]
 
 /** 6 demo employees with varied roles, types, and availability. */
 export const DEMO_EMPLOYEES: Employee[] = [
@@ -37,7 +52,9 @@ export const DEMO_EMPLOYEES: Employee[] = [
     employmentType: 'full-time',
     availability: DAYS.map((day) => ({
       day,
-      blocks: ['saturday', 'sunday'].includes(day) ? [] : [{ startTime: '06:00', endTime: '22:00' }],
+      blocks: ['saturday', 'sunday'].includes(day)
+        ? []
+        : [{ startTime: '06:00', endTime: '22:00' }],
     })),
     maxHoursPerWeek: 40,
     minHoursPerWeek: 30,
@@ -175,40 +192,155 @@ const DEMO_SHIFTS: Shift[] = DEMO_COVERAGE_REQUIREMENTS.map((r) => ({
 /** Pre-built assignments pairing employees to shifts. */
 const DEMO_ASSIGNMENTS: ShiftAssignment[] = [
   // Monday AM: Alex + Jordan
-  { id: 'demo-asgn-1', shiftId: 'demo-shift-demo-cov-monday-am', employeeId: 'demo-emp-1', isManual: false },
-  { id: 'demo-asgn-2', shiftId: 'demo-shift-demo-cov-monday-am', employeeId: 'demo-emp-2', isManual: false },
+  {
+    id: 'demo-asgn-1',
+    shiftId: 'demo-shift-demo-cov-monday-am',
+    employeeId: 'demo-emp-1',
+    isManual: false,
+  },
+  {
+    id: 'demo-asgn-2',
+    shiftId: 'demo-shift-demo-cov-monday-am',
+    employeeId: 'demo-emp-2',
+    isManual: false,
+  },
   // Monday PM: Sam + Taylor
-  { id: 'demo-asgn-3', shiftId: 'demo-shift-demo-cov-monday-pm', employeeId: 'demo-emp-3', isManual: false },
-  { id: 'demo-asgn-4', shiftId: 'demo-shift-demo-cov-monday-pm', employeeId: 'demo-emp-6', isManual: false },
+  {
+    id: 'demo-asgn-3',
+    shiftId: 'demo-shift-demo-cov-monday-pm',
+    employeeId: 'demo-emp-3',
+    isManual: false,
+  },
+  {
+    id: 'demo-asgn-4',
+    shiftId: 'demo-shift-demo-cov-monday-pm',
+    employeeId: 'demo-emp-6',
+    isManual: false,
+  },
   // Tuesday AM: Alex + Casey
-  { id: 'demo-asgn-5', shiftId: 'demo-shift-demo-cov-tuesday-am', employeeId: 'demo-emp-1', isManual: false },
-  { id: 'demo-asgn-6', shiftId: 'demo-shift-demo-cov-tuesday-am', employeeId: 'demo-emp-2', isManual: false },
+  {
+    id: 'demo-asgn-5',
+    shiftId: 'demo-shift-demo-cov-tuesday-am',
+    employeeId: 'demo-emp-1',
+    isManual: false,
+  },
+  {
+    id: 'demo-asgn-6',
+    shiftId: 'demo-shift-demo-cov-tuesday-am',
+    employeeId: 'demo-emp-2',
+    isManual: false,
+  },
   // Tuesday PM: Sam + Morgan
-  { id: 'demo-asgn-7', shiftId: 'demo-shift-demo-cov-tuesday-pm', employeeId: 'demo-emp-3', isManual: false },
-  { id: 'demo-asgn-8', shiftId: 'demo-shift-demo-cov-tuesday-pm', employeeId: 'demo-emp-5', isManual: false },
+  {
+    id: 'demo-asgn-7',
+    shiftId: 'demo-shift-demo-cov-tuesday-pm',
+    employeeId: 'demo-emp-3',
+    isManual: false,
+  },
+  {
+    id: 'demo-asgn-8',
+    shiftId: 'demo-shift-demo-cov-tuesday-pm',
+    employeeId: 'demo-emp-5',
+    isManual: false,
+  },
   // Wednesday AM: Alex + Jordan
-  { id: 'demo-asgn-9', shiftId: 'demo-shift-demo-cov-wednesday-am', employeeId: 'demo-emp-1', isManual: false },
-  { id: 'demo-asgn-10', shiftId: 'demo-shift-demo-cov-wednesday-am', employeeId: 'demo-emp-4', isManual: false },
+  {
+    id: 'demo-asgn-9',
+    shiftId: 'demo-shift-demo-cov-wednesday-am',
+    employeeId: 'demo-emp-1',
+    isManual: false,
+  },
+  {
+    id: 'demo-asgn-10',
+    shiftId: 'demo-shift-demo-cov-wednesday-am',
+    employeeId: 'demo-emp-4',
+    isManual: false,
+  },
   // Wednesday PM: Sam + Alex
-  { id: 'demo-asgn-11', shiftId: 'demo-shift-demo-cov-wednesday-pm', employeeId: 'demo-emp-3', isManual: false },
-  { id: 'demo-asgn-12', shiftId: 'demo-shift-demo-cov-wednesday-pm', employeeId: 'demo-emp-1', isManual: false },
+  {
+    id: 'demo-asgn-11',
+    shiftId: 'demo-shift-demo-cov-wednesday-pm',
+    employeeId: 'demo-emp-3',
+    isManual: false,
+  },
+  {
+    id: 'demo-asgn-12',
+    shiftId: 'demo-shift-demo-cov-wednesday-pm',
+    employeeId: 'demo-emp-1',
+    isManual: false,
+  },
   // Thursday AM: Jordan + Casey
-  { id: 'demo-asgn-13', shiftId: 'demo-shift-demo-cov-thursday-am', employeeId: 'demo-emp-2', isManual: false },
-  { id: 'demo-asgn-14', shiftId: 'demo-shift-demo-cov-thursday-am', employeeId: 'demo-emp-1', isManual: false },
+  {
+    id: 'demo-asgn-13',
+    shiftId: 'demo-shift-demo-cov-thursday-am',
+    employeeId: 'demo-emp-2',
+    isManual: false,
+  },
+  {
+    id: 'demo-asgn-14',
+    shiftId: 'demo-shift-demo-cov-thursday-am',
+    employeeId: 'demo-emp-1',
+    isManual: false,
+  },
   // Thursday PM: Sam + Morgan
-  { id: 'demo-asgn-15', shiftId: 'demo-shift-demo-cov-thursday-pm', employeeId: 'demo-emp-3', isManual: false },
-  { id: 'demo-asgn-16', shiftId: 'demo-shift-demo-cov-thursday-pm', employeeId: 'demo-emp-5', isManual: false },
+  {
+    id: 'demo-asgn-15',
+    shiftId: 'demo-shift-demo-cov-thursday-pm',
+    employeeId: 'demo-emp-3',
+    isManual: false,
+  },
+  {
+    id: 'demo-asgn-16',
+    shiftId: 'demo-shift-demo-cov-thursday-pm',
+    employeeId: 'demo-emp-5',
+    isManual: false,
+  },
   // Friday AM: Alex + Jordan
-  { id: 'demo-asgn-17', shiftId: 'demo-shift-demo-cov-friday-am', employeeId: 'demo-emp-1', isManual: false },
-  { id: 'demo-asgn-18', shiftId: 'demo-shift-demo-cov-friday-am', employeeId: 'demo-emp-4', isManual: false },
+  {
+    id: 'demo-asgn-17',
+    shiftId: 'demo-shift-demo-cov-friday-am',
+    employeeId: 'demo-emp-1',
+    isManual: false,
+  },
+  {
+    id: 'demo-asgn-18',
+    shiftId: 'demo-shift-demo-cov-friday-am',
+    employeeId: 'demo-emp-4',
+    isManual: false,
+  },
   // Friday PM: Sam + Taylor
-  { id: 'demo-asgn-19', shiftId: 'demo-shift-demo-cov-friday-pm', employeeId: 'demo-emp-3', isManual: false },
-  { id: 'demo-asgn-20', shiftId: 'demo-shift-demo-cov-friday-pm', employeeId: 'demo-emp-6', isManual: false },
+  {
+    id: 'demo-asgn-19',
+    shiftId: 'demo-shift-demo-cov-friday-pm',
+    employeeId: 'demo-emp-3',
+    isManual: false,
+  },
+  {
+    id: 'demo-asgn-20',
+    shiftId: 'demo-shift-demo-cov-friday-pm',
+    employeeId: 'demo-emp-6',
+    isManual: false,
+  },
   // Saturday: Casey + Morgan
-  { id: 'demo-asgn-21', shiftId: 'demo-shift-demo-cov-saturday', employeeId: 'demo-emp-4', isManual: false },
-  { id: 'demo-asgn-22', shiftId: 'demo-shift-demo-cov-saturday', employeeId: 'demo-emp-5', isManual: false },
+  {
+    id: 'demo-asgn-21',
+    shiftId: 'demo-shift-demo-cov-saturday',
+    employeeId: 'demo-emp-4',
+    isManual: false,
+  },
+  {
+    id: 'demo-asgn-22',
+    shiftId: 'demo-shift-demo-cov-saturday',
+    employeeId: 'demo-emp-5',
+    isManual: false,
+  },
   // Sunday: Taylor
-  { id: 'demo-asgn-23', shiftId: 'demo-shift-demo-cov-sunday', employeeId: 'demo-emp-6', isManual: false },
+  {
+    id: 'demo-asgn-23',
+    shiftId: 'demo-shift-demo-cov-sunday',
+    employeeId: 'demo-emp-6',
+    isManual: false,
+  },
 ]
 
 /** Pre-built demo schedule. */
