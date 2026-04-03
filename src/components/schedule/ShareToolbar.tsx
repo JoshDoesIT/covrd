@@ -72,23 +72,39 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
 
   const handleQrCode = async () => {
     try {
+      setToastMessage('Generating optimized QR code...')
+      
       const QRCodeModule = await import('qrcode')
       const QRCode = QRCodeModule.default || QRCodeModule
       const url = generateShareUrl(state)
       
-      // Use lowest error correction ('L') to maximize data capacity (up to ~2953 bytes)
-      const dataUrl = await QRCode.toDataURL(url, { 
+      let finalUrl = url
+      try {
+        // Attempt to shorten the long state URL via is.gd (Free, CORS-friendly, no-auth)
+        // This ensures the QR code is physically scannable and doesn't exceed 2.9KB limits
+        const res = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(url)}`)
+        const data = await res.json()
+        if (data.shorturl) {
+          finalUrl = data.shorturl
+        }
+      } catch (e) {
+        console.warn('URL shortener failed or offline. Falling back to native size.', e)
+      }
+
+      // Use lowest error correction ('L') to maximize remaining capacity for fallbacks
+      const dataUrl = await QRCode.toDataURL(finalUrl, { 
         width: 256, 
         margin: 2,
         errorCorrectionLevel: 'L' 
       })
       
+      setToastMessage(null) // Clear loading toast
       setQrDataUrl(dataUrl)
       setShowQr(true)
     } catch (error: any) {
       console.error('QR Code Generation Error:', error)
       if (error?.message?.includes('too big')) {
-        setToastMessage('Schedule too large for QR. Use Share Link or Export instead.')
+        setToastMessage('Schedule still too massive for QR. Use Share Link or Export instead.')
       } else {
         setToastMessage('Failed to generate QR code')
       }
