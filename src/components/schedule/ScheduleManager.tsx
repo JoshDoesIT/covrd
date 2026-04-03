@@ -63,6 +63,14 @@ export function ScheduleManager() {
       return
     }
 
+    // Warn if replacing an existing schedule
+    if (activeSchedule && activeSchedule.assignments.length > 0) {
+      const confirmed = confirm(
+        'This will replace your current schedule with a newly generated one. Continue?',
+      )
+      if (!confirmed) return
+    }
+
     // Clear pending template flag once we begin
     useScheduleStore.getState().setPendingTemplateId(null)
 
@@ -183,7 +191,7 @@ export function ScheduleManager() {
       <header className="sm-header">
         <div>
           <h2 className="sm-title">
-            <CalendarDays size={20} color="var(--primary)" />
+            <CalendarDays size={20} color="var(--color-accent)" />
             Schedule Builder
           </h2>
           <p className="sm-subtitle">Interactive visualization and solver dispatch.</p>
@@ -288,7 +296,7 @@ export function ScheduleManager() {
           <div className="sm-overlay">
             <Sparkles
               size={48}
-              color="var(--primary)"
+              color="var(--color-accent)"
               className="lucide-spin"
               style={{ animationDuration: '3s' }}
             />
@@ -323,19 +331,21 @@ export function ScheduleManager() {
               style={{
                 padding: '1rem',
                 background: 'rgba(255,255,255,0.02)',
-                borderBottom: '1px solid var(--border)',
+                borderBottom: '1px solid var(--color-border)',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
               }}
             >
               <div>
-                <h3 style={{ color: 'var(--text-base)', margin: 0 }}>{activeSchedule.name}</h3>
+                <h3 style={{ color: 'var(--color-text-primary)', margin: 0 }}>
+                  {activeSchedule.name}
+                </h3>
                 <p
                   style={{
                     margin: '0.25rem 0 0 0',
                     fontSize: '0.8rem',
-                    color: 'var(--text-muted)',
+                    color: 'var(--color-text-muted)',
                   }}
                 >
                   Generated {activeSchedule.assignments.length} assignments.
@@ -386,7 +396,7 @@ export function ScheduleManager() {
                     ) || 1,
                 }).map((_, i) => (
                   <div key={i} className="weekly-block">
-                    <h4 style={{ margin: '0 0 1rem 0', color: 'var(--text-muted)' }}>
+                    <h4 style={{ margin: '0 0 1rem 0', color: 'var(--color-text-muted)' }}>
                       Week {i + 1}
                     </h4>
                     <WeeklyGrid weekNumber={i} />

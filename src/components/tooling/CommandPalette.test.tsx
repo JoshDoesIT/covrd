@@ -3,8 +3,8 @@ import { CommandPalette } from './CommandPalette'
 import { expect, vi } from 'vitest'
 
 describe('CommandPalette', () => {
-  it('does not render when open is false initially', () => {
-    render(<CommandPalette onNavigate={vi.fn()} />)
+  it('does not render when open is false', () => {
+    render(<CommandPalette onNavigate={vi.fn()} open={false} setOpen={vi.fn()} />)
     const dialog = screen.queryByRole('dialog')
     expect(dialog).not.toBeInTheDocument()
   })

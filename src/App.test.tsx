@@ -23,6 +23,6 @@ describe('App', () => {
 
   it('displays the Covrd brand', async () => {
     render(<App />)
-    expect(await screen.findByText(/Covr/)).toBeInTheDocument()
+    expect(await screen.findByAltText('Covrd')).toBeInTheDocument()
   })
 })

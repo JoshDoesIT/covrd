@@ -306,6 +306,33 @@
 }
 
 /* --- Responsive --- */
+@media (max-width: 1024px) {
+  .shell__sidebar {
+    width: var(--sidebar-collapsed-width);
+  }
+
+  .shell__sidebar .shell__brand-mark,
+  .shell__sidebar .shell__nav-label,
+  .shell__sidebar .shell__privacy-label {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+    position: absolute;
+  }
+
+  .shell__sidebar .shell__sidebar-header {
+    justify-content: center;
+  }
+
+  .shell__main-area {
+    margin-left: var(--sidebar-collapsed-width);
+  }
+
+  .shell__policy-links {
+    display: none;
+  }
+}
+
 @media (max-width: 768px) {
   .shell__sidebar {
     width: var(--sidebar-collapsed-width);
@@ -334,5 +361,9 @@
 
   .shell__content {
     padding: var(--space-4);
+  }
+
+  .shell__cmd-hint {
+    display: none;
   }
 }

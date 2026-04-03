@@ -11,7 +11,11 @@ export function LandingPage({ onLaunch, onShowPrivacy }: LandingPageProps) {
     <div className="landing">
       <header className="landing__header">
         <div className="landing__logo" style={{ display: 'flex', alignItems: 'center' }}>
-          <img src="/favicon.png" alt="Covrd Logo" style={{ height: '56px', width: 'auto', objectFit: 'contain' }} />
+          <img
+            src="/favicon.png"
+            alt="Covrd Logo"
+            style={{ height: '56px', width: 'auto', objectFit: 'contain' }}
+          />
         </div>
       </header>
 

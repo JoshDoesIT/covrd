@@ -277,7 +277,6 @@ a:hover {
 /* --- Print Styles (Story 6.4) --- */
 @media print {
   * {
-    color-adjust: exact;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }

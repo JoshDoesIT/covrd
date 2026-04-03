@@ -77,13 +77,15 @@
   gap: 0.5rem;
   min-height: 100px;
   background: var(--color-bg-surface);
-  transition: background-color 0.2s ease, border-color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease;
 }
 
 /* Alternate column striping for better readability */
-.wg-cell:nth-child(8n+2),
-.wg-cell:nth-child(8n+4),
-.wg-cell:nth-child(8n+6),
+.wg-cell:nth-child(8n + 2),
+.wg-cell:nth-child(8n + 4),
+.wg-cell:nth-child(8n + 6),
 .wg-cell:nth-child(8n) {
   background: rgba(255, 255, 255, 0.015);
 }
@@ -111,24 +113,25 @@
   position: relative;
   transition:
     box-shadow 0.2s ease,
-    transform 0.2s ease,
     border-color 0.2s ease;
   user-select: none;
   touch-action: none;
   overflow: hidden;
 }
 
-.wg-shift:hover {
+.wg-shift:not([data-dragging='true']):hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.wg-shift:active {
+.wg-shift[data-dragging='true'] {
+  transition: none;
+  opacity: 0.7;
   cursor: grabbing;
 }
 
-.wg-shift[data-dragging='true'] {
-  opacity: 0.5;
+.wg-shift:active {
+  cursor: grabbing;
 }
 
 .wg-shift[style*='transform'] {
