@@ -41,7 +41,7 @@ function getClumpingModifier(assignedDays: number[], targetDay: number): number 
     if (dist < minDistance) minDistance = dist
   }
   
-  if (minDistance === 0) return 300   // Same day (multiple shifts). Excellent!
+  if (minDistance === 0) return -1000 // Same day (double shift). BRUTAL penalty to avoid 14 hour days.
   if (minDistance === 1) return 200   // Consecutive day. Great clumping!
   if (minDistance === 2) return -500  // 1-day gap (Working, Off, Working). TERRIBLE! Punish heavily.
   if (minDistance === 3) return -100  // 2-day gap. Sub-optimal but sometimes necessary.
