@@ -164,7 +164,7 @@ export function ScheduleManager() {
           weekNumber: s.weekNumber ?? 0,
           start: s.startTime,
           end: s.endTime,
-          role: 'any',
+          role: s.role || 'any',
           durationHours: duration,
           isAssigned: false,
         })

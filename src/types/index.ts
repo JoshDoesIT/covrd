@@ -105,6 +105,8 @@ export interface Shift {
   endTime: string
   /** Number of employees needed for this shift. */
   requiredStaff: number
+  /** Specific role required for this shift. */
+  role?: string
   /** Week offset from the start date (0 = first week). Required for multi-week. */
   weekNumber?: number
 }
@@ -121,6 +123,8 @@ export interface CoverageRequirement {
   endTime: string
   /** Minimum staff required during this block. */
   requiredStaff: number
+  /** Specific role required for this block. */
+  role?: string
 }
 
 /**

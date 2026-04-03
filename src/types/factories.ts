@@ -76,34 +76,46 @@ export function createEmployee(
 /**
  * Create a new CoverageRequirement.
  */
-export function createCoverageRequirement(
-  fields: Pick<CoverageRequirement, 'name' | 'day' | 'startTime' | 'endTime' | 'requiredStaff'> &
-    Partial<Pick<CoverageRequirement, 'id'>>,
-): CoverageRequirement {
+export function createCoverageRequirement(props: {
+  id?: string
+  name: string
+  day: DayOfWeek
+  startTime: string
+  endTime: string
+  requiredStaff: number
+  role?: string
+}) {
   return {
-    id: fields.id ?? generateId(),
-    name: fields.name,
-    day: fields.day,
-    startTime: fields.startTime,
-    endTime: fields.endTime,
-    requiredStaff: fields.requiredStaff,
+    id: props.id ?? generateId(),
+    name: props.name,
+    day: props.day,
+    startTime: props.startTime,
+    endTime: props.endTime,
+    requiredStaff: props.requiredStaff,
+    role: props.role,
   }
 }
 
 /**
  * Create a new Shift.
  */
-export function createShift(
-  fields: Pick<Shift, 'day' | 'startTime' | 'endTime' | 'requiredStaff'> &
-    Partial<Pick<Shift, 'id' | 'weekNumber'>>,
-): Shift {
+export function createShift(props: {
+  id?: string
+  day: DayOfWeek
+  startTime: string
+  endTime: string
+  requiredStaff: number
+  role?: string
+  weekNumber?: number
+}) {
   return {
-    id: fields.id ?? generateId(),
-    day: fields.day,
-    startTime: fields.startTime,
-    endTime: fields.endTime,
-    requiredStaff: fields.requiredStaff,
-    weekNumber: fields.weekNumber,
+    id: props.id ?? generateId(),
+    day: props.day,
+    startTime: props.startTime,
+    endTime: props.endTime,
+    requiredStaff: props.requiredStaff,
+    role: props.role,
+    weekNumber: props.weekNumber,
   }
 }
 

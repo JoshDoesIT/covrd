@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { Plus, Edit2, Trash2, X, Clock, LayoutTemplate } from 'lucide-react'
+import { useEmployeeStore } from '../../stores/employeeStore'
 import { useCoverageStore } from '../../stores/coverageStore'
 import { useSettingsStore } from '../../stores/settingsStore'
 import { createCoverageRequirement } from '../../types/factories'
@@ -11,7 +12,14 @@ import './CoverageManager.css'
 
 export function CoverageManager() {
   const { requirements, addRequirement, updateRequirement, removeRequirement, getRequirementsForDay } = useCoverageStore()
+  const { employees } = useEmployeeStore()
   const { timeFormat } = useSettingsStore()
+
+  // Extract unique roles from current active employees
+  const availableRoles = useMemo(() => {
+    const roles = new Set(employees.map(e => e.role).filter(Boolean))
+    return Array.from(roles).sort()
+  }, [employees])
   const [activeDay, setActiveDay] = useState<DayOfWeek>('monday')
   
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -35,6 +43,7 @@ export function CoverageManager() {
       startTime: '09:00',
       endTime: '17:00',
       requiredStaff: 2,
+      role: '',
     })
   }
 
@@ -48,6 +57,7 @@ export function CoverageManager() {
       startTime: req.startTime,
       endTime: req.endTime,
       requiredStaff: req.requiredStaff,
+      role: req.role,
     })
   }
 
@@ -68,7 +78,8 @@ export function CoverageManager() {
         day: formData.day ?? activeDay,
         startTime: formData.startTime ?? '09:00',
         endTime: formData.endTime ?? '17:00',
-        requiredStaff: formData.requiredStaff ?? 1
+        requiredStaff: formData.requiredStaff ?? 1,
+        role: formData.role || undefined,
       })
       addRequirement(newReq)
     } else if (editingId) {
@@ -142,6 +153,11 @@ export function CoverageManager() {
                   <h3 className="rc-name">{req.name}</h3>
                   <div className="rc-time">
                     <Clock size={12} /> {formatTime(req.startTime, timeFormat)} &rarr; {formatTime(req.endTime, timeFormat)}
+                    {req.role && (
+                      <span style={{ marginLeft: '0.5rem', padding: '0.1rem 0.4rem', background: 'var(--color-accent)', color: '#fff', borderRadius: '4px', fontSize: '0.7rem', fontWeight: 600 }}>
+                        {req.role}
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -221,16 +237,31 @@ export function CoverageManager() {
                 </div>
               </div>
 
-              <div className="form-group">
-                <label className="form-label">Required Headcount</label>
-                <input
-                  type="number"
-                  className="form-input"
-                  value={formData.requiredStaff ?? 1}
-                  onChange={(e) => setFormData({ ...formData, requiredStaff: Number(e.target.value) })}
-                  min={1}
-                  max={100}
-                />
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Required Headcount</label>
+                  <input
+                    type="number"
+                    className="form-input"
+                    value={formData.requiredStaff ?? 1}
+                    onChange={(e) => setFormData({ ...formData, requiredStaff: Number(e.target.value) })}
+                    min={1}
+                    max={100}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Required Role</label>
+                  <select
+                    className="form-input"
+                    value={formData.role ?? ''}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  >
+                    <option value="">Any Role</option>
+                    {availableRoles.map(role => (
+                      <option key={role} value={role}>{role}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
 
