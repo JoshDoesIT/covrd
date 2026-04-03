@@ -32,25 +32,45 @@ function getAbsoluteDayIndex(weekNum: number, dayOfWeek: number): number {
   return weekNum * 7 + normalizedDay
 }
 
+function countClusters(days: number[]): number {
+  if (days.length === 0) return 0
+  
+  const sorted = [...new Set(days)].sort((a,b) => a - b)
+  let clusters = 1
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i] - sorted[i-1] > 1) {
+      clusters++
+    }
+  }
+  return clusters
+}
+
 function getClumpingModifier(assignedDays: number[], targetDay: number): number {
   if (assignedDays.length === 0) return 0
+
+  // Hard penalty for double shifts on the same day
+  if (assignedDays.includes(targetDay)) return -2000
   
-  let minDistance = Infinity
-  for (const d of assignedDays) {
-    const dist = Math.abs(d - targetDay)
-    if (dist < minDistance) minDistance = dist
+  const currentClusters = countClusters(assignedDays)
+  const proposedClusters = countClusters([...assignedDays, targetDay])
+  
+  if (proposedClusters < currentClusters) {
+    // Bridged a gap! Perfect!
+    return 1000
   }
   
-  if (minDistance === 0) return -1000 // Double shift. Brutal penalty.
-  if (minDistance === 1) return 400   // Consecutive day. Massive bonus to ALWAYS extend the chain!
+  if (proposedClusters === currentClusters) {
+    // Extending an existing block on the edge. Excellent!
+    return 500
+  }
   
-  // Create a cascading penalty for breaking the chain.
-  // 1-day gaps (dist=2) are the absolute worst as they create isolated single days off.
-  // Large gaps (dist=5) are less bad mathematically because it means they just got a 4-day block off.
-  if (minDistance === 2) return -500
-  if (minDistance === 3) return -300
-  if (minDistance === 4) return -100
-  return 0 
+  if (proposedClusters > currentClusters) {
+    // Starting a brand new disjointed block. This causes fragmented "on-off-on" days!
+    // Massive penalty so the solver only does this if literally no one else can extend a block.
+    return -1000
+  }
+  
+  return 0
 }
 
 export function sortCandidatesByFairness(
