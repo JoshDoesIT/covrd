@@ -133,9 +133,27 @@ export function EmployeeManager() {
                       <p className="ec-role">{emp.role}</p>
                     </div>
                   </div>
-                  <span className="ec-badge" data-type={emp.employmentType}>
-                    {emp.employmentType}
-                  </span>
+                  <div className="ec-header-right">
+                    <span className="ec-badge" data-type={emp.employmentType}>
+                      {emp.employmentType}
+                    </span>
+                    <div className="ec-actions">
+                      <button
+                        className="ec-btn-icon"
+                        onClick={(e) => handleStartEdit(e, emp)}
+                        title="Edit Employee"
+                      >
+                        <Edit2 size={14} />
+                      </button>
+                      <button
+                        className="ec-btn-icon danger"
+                        onClick={(e) => handleDelete(e, emp.id)}
+                        title="Remove Employee"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+                  </div>
                 </div>
 
                 <div className="ec-stats">
@@ -149,22 +167,6 @@ export function EmployeeManager() {
                   </div>
                 </div>
 
-                <div className="ec-actions">
-                  <button
-                    className="ec-btn-icon"
-                    onClick={(e) => handleStartEdit(e, emp)}
-                    title="Edit Employee"
-                  >
-                    <Edit2 size={14} />
-                  </button>
-                  <button
-                    className="ec-btn-icon danger"
-                    onClick={(e) => handleDelete(e, emp.id)}
-                    title="Remove Employee"
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
               </div>
             ))
           )}
