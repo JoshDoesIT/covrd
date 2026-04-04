@@ -65,11 +65,14 @@ export function AppShell() {
   })
 
   const setActiveNav = (id: string) => {
-    if (typeof window !== 'undefined') {
-      window.location.hash = id
-    }
     setActiveNavState(id)
   }
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hash !== '#' + activeNav) {
+      window.history.replaceState(null, '', '#' + activeNav)
+    }
+  }, [activeNav])
 
   useEffect(() => {
     const onHashChange = () => {

@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
-import { Download, Upload, Printer, Link2, QrCode } from 'lucide-react'
+import { Download, Upload, Printer, Link2 } from 'lucide-react'
 import type { ShareableState } from '../../stores/urlState'
-import { generateShareUrl, generateOptimizedQrUrl } from '../../stores/urlState'
+import { generateShareUrl } from '../../stores/urlState'
 import { useScheduleStore } from '../../stores/scheduleStore'
 import { useEmployeeStore } from '../../stores/employeeStore'
 import { useSettingsStore } from '../../stores/settingsStore'
@@ -31,8 +31,6 @@ interface ShareToolbarProps {
  */
 export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
   const [toastMessage, setToastMessage] = useState<string | null>(null)
-  const [showQr, setShowQr] = useState(false)
-  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { activeSchedule } = useScheduleStore()
   const { employees } = useEmployeeStore()
@@ -81,32 +79,6 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
     }
   }
 
-  const handleQrCode = async () => {
-    try {
-      const QRCodeModule = await import('qrcode')
-      const QRCode = QRCodeModule.default || QRCodeModule
-      // Use the newly engineered optimized URL that natively strips 85% of JSON bulk
-      // guaranteeing it easily fits well below the 2.9KB physical QR code limit natively!
-      const optimizedUrl = generateOptimizedQrUrl(state)
-
-      // Use lowest error correction ('L') to maximize capacity
-      const dataUrl = await QRCode.toDataURL(optimizedUrl, {
-        width: 256,
-        margin: 2,
-        errorCorrectionLevel: 'L',
-      })
-
-      setQrDataUrl(dataUrl)
-      setShowQr(true)
-    } catch (error: unknown) {
-      console.error('QR Code Generation Error:', error)
-      if (error instanceof Error && error.message.includes('too big')) {
-        setToastMessage('Schedule still too massive for QR. Use Share Link or Export instead.')
-      } else {
-        setToastMessage('Failed to generate QR code')
-      }
-    }
-  }
 
   return (
     <div className="share-toolbar">
@@ -168,27 +140,6 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
         <span className="share-toolbar__label">Share Link</span>
       </button>
 
-      <button
-        className="sm-btn-ghost share-toolbar__btn"
-        onClick={handleQrCode}
-        aria-label="QR Code"
-        title="Generate QR code"
-      >
-        <QrCode size={14} />
-        <span className="share-toolbar__label">QR Code</span>
-      </button>
-
-      {showQr && qrDataUrl && (
-        <div className="share-toolbar__qr-overlay" onClick={() => setShowQr(false)}>
-          <div className="share-toolbar__qr-modal" onClick={(e) => e.stopPropagation()}>
-            <h3 className="share-toolbar__qr-title">Scan to open schedule</h3>
-            <img src={qrDataUrl} alt="QR code for schedule URL" className="share-toolbar__qr-img" />
-            <button className="sm-btn-ghost" onClick={() => setShowQr(false)}>
-              Close
-            </button>
-          </div>
-        </div>
-      )}
 
       {toastMessage && <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} />}
     </div>
