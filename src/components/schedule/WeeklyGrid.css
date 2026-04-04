@@ -152,3 +152,33 @@
   color: var(--color-text-muted);
   text-transform: uppercase;
 }
+
+@media (max-width: 768px) {
+  .wg-grid {
+    grid-template-columns: 140px repeat(7, 1fr);
+    min-width: 900px;
+  }
+
+  .wg-header-cell {
+    padding: 0.5rem 0.25rem;
+    font-size: 0.65rem;
+  }
+
+  .wg-row-label {
+    padding: 0.5rem;
+  }
+
+  .wg-emp-name {
+    font-size: 0.8rem;
+  }
+
+  .wg-cell {
+    min-height: 70px;
+    padding: 0.35rem;
+  }
+
+  .wg-shift {
+    padding: 0.4rem 0.5rem;
+    font-size: 0.75rem;
+  }
+}

@@ -428,3 +428,108 @@
     min-height: 60px;
   }
 }
+
+@media (max-width: 768px) {
+  .coverage-manager {
+    padding: 0.5rem;
+    gap: 1rem;
+  }
+
+  .cm-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .cm-header > div:last-child {
+    width: 100%;
+  }
+
+  .cm-header .action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .cm-calendar-header {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.75rem;
+  }
+
+  .cm-calendar-header > div:last-child {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .cm-calendar-col-header {
+    font-size: 0.65rem;
+    padding: 0.5rem 0.25rem;
+    letter-spacing: 0;
+  }
+
+  .cm-calendar-cell {
+    padding: 0.35rem;
+    min-height: 48px;
+  }
+
+  .cm-cell-date {
+    font-size: 0.75rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .cm-req-count {
+    font-size: 0.6rem;
+    padding: 0.15rem 0.25rem;
+  }
+
+  /* Show only the star icon, hide the text label */
+  .cm-holiday-marker {
+    font-size: 0;
+    padding: 0.15rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cm-holiday-marker .cm-holiday-text {
+    display: none;
+  }
+
+  .cm-content {
+    gap: 1rem;
+  }
+
+  .cm-roster {
+    flex: none;
+    max-height: 50vh;
+  }
+
+  .cm-roster.editing-mode {
+    flex: none;
+    max-height: none;
+  }
+
+  .cm-roster-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .editor-body {
+    padding: 1rem;
+  }
+
+  .editor-footer {
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+  }
+
+  .editor-footer .btn-primary,
+  .editor-footer .btn-secondary {
+    width: 100%;
+    text-align: center;
+  }
+}

@@ -362,6 +362,7 @@
   padding: var(--space-6);
   max-width: var(--content-max-width);
   width: 100%;
+  box-sizing: border-box;
 }
 
 .shell__placeholder {
@@ -452,10 +453,12 @@
   .shell__main-area {
     margin-left: 0;
     margin-bottom: 60px; /* Space for bottom nav */
+    min-width: 0;
   }
 
   .shell__content {
     padding: var(--space-4);
+    overflow-x: hidden;
   }
 
   .shell__cmd-hint {

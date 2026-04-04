@@ -87,3 +87,32 @@
   border-radius: 50%;
   flex-shrink: 0;
 }
+
+@media (max-width: 768px) {
+  .fairness-chart {
+    overflow: hidden;
+    max-width: 100%;
+  }
+
+  .fairness-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .fairness-scores {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .fairness-score-pill {
+    flex: 1;
+    min-width: 80px;
+    height: auto;
+    padding: 0.4rem 0.5rem;
+  }
+
+  .fairness-legend {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+}

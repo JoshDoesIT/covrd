@@ -150,3 +150,22 @@
 .timeline-cell.wg-cell-is-over {
   background-color: rgba(255, 255, 255, 0.05);
 }
+
+@media (max-width: 768px) {
+  .timeline-grid {
+    padding: 0.75rem;
+  }
+
+  .timeline-emp-col {
+    width: 100px;
+  }
+
+  .timeline-day-col {
+    min-width: 100px;
+  }
+
+  .timeline-emp-name {
+    font-size: 0.8rem;
+    padding-left: 0.5rem !important;
+  }
+}

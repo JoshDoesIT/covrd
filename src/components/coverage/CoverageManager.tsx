@@ -186,7 +186,7 @@ export function CoverageManager() {
     }
 
     if (sourceWeekReqs.length === 0) {
-        alert('Please draft at least one shift to stamp it across remaining weeks. No recent patterns found.')
+        alert('Please add at least one shift to stamp it across remaining weeks. No recent patterns found.')
         return
     }
 
@@ -332,7 +332,7 @@ export function CoverageManager() {
                   {isHoliday && (
                     <div className="cm-holiday-marker" title={holidays[dateStr].join(', ')} style={{ marginTop: '0.25rem' }}>
                       <Star size={10} style={{ marginRight: '4px', display: 'inline-block', verticalAlign: 'middle' }} />
-                      <span style={{ verticalAlign: 'middle' }}>{holidays[dateStr][0]}</span>
+                      <span className="cm-holiday-text" style={{ verticalAlign: 'middle' }}>{holidays[dateStr][0]}</span>
                     </div>
                   )}
                 </div>
@@ -345,7 +345,7 @@ export function CoverageManager() {
         {activeDate && (
           <div className={`cm-roster ${isCreating || editingId ? 'editing-mode' : ''}`}>
              <div className="cm-roster-header">
-                <h3>Draft Shifts for {activeDate}</h3>
+                <h3>Add Shifts for {activeDate}</h3>
                 {!isCreating && !editingId && (
                   <button className="cm-add-btn" onClick={handleStartCreate}>
                     <Plus size={16} /> Add 
@@ -480,7 +480,7 @@ export function CoverageManager() {
                   <div className="editor-footer">
                     <button className="btn-secondary" onClick={handleCancel}>Cancel</button>
                     <button className="btn-primary" onClick={handleSave}>
-                      {isCreating ? 'Draft Shift' : 'Save Shift'}
+                      {isCreating ? 'Add Shift' : 'Save Shift'}
                     </button>
                   </div>
                 </div>

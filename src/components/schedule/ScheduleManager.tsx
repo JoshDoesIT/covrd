@@ -275,32 +275,34 @@ export function ScheduleManager() {
                 </div>
               ) : null}
 
-              {isSandboxMode ? (
-                <>
-                  <button
-                    className="sm-btn-ghost"
-                    style={{ color: '#ef4444' }}
-                    onClick={discardSandbox}
-                  >
-                    Discard Sandbox
+              <div className="sm-secondary-actions">
+                {isSandboxMode ? (
+                  <>
+                    <button
+                      className="sm-btn-ghost"
+                      style={{ color: '#ef4444' }}
+                      onClick={discardSandbox}
+                    >
+                      Discard Sandbox
+                    </button>
+                    <button
+                      className="sm-btn-ghost"
+                      style={{ color: '#10b981' }}
+                      onClick={commitSandbox}
+                    >
+                      Commit sandbox
+                    </button>
+                  </>
+                ) : (
+                  <button className="sm-btn-ghost" onClick={enableSandbox} title="What-If Sandbox">
+                    Sandbox Mode
                   </button>
-                  <button
-                    className="sm-btn-ghost"
-                    style={{ color: '#10b981' }}
-                    onClick={commitSandbox}
-                  >
-                    Commit sandbox
-                  </button>
-                </>
-              ) : (
-                <button className="sm-btn-ghost" onClick={enableSandbox} title="What-If Sandbox">
-                  Sandbox Mode
-                </button>
-              )}
+                )}
 
-              <button className="sm-btn-ghost" onClick={clearActiveSchedule}>
-                Clear View
-              </button>
+                <button className="sm-btn-ghost" onClick={clearActiveSchedule}>
+                  Clear View
+                </button>
+              </div>
 
               <ShareToolbar
                 state={{
@@ -322,7 +324,7 @@ export function ScheduleManager() {
             </>
           )}
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div className="sm-generate-zone">
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
               <label
                 htmlFor="sm-start-date"
@@ -506,17 +508,8 @@ export function ScheduleManager() {
         )}
 
         {activeSchedule ? (
-          <div className="sm-grid-container" style={{ display: 'flex', flexDirection: 'column' }}>
-            <div
-              style={{
-                padding: '1rem',
-                background: 'rgba(255,255,255,0.02)',
-                borderBottom: '1px solid var(--color-border)',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
+          <div className="sm-grid-container sm-grid-layout">
+            <div className="sm-info-bar">
               <div>
                 <h3 style={{ color: 'var(--color-text-primary)', margin: 0 }}>
                   {activeSchedule.name.startsWith('Auto Generated')
@@ -539,7 +532,7 @@ export function ScheduleManager() {
                 </p>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div className="sm-week-nav">
                 <h4 style={{ margin: 0, color: 'var(--color-primary)', whiteSpace: 'nowrap' }}>
                   Week {activeWeekNumber + 1}{' '}
                   <span
@@ -623,15 +616,7 @@ export function ScheduleManager() {
               </div>
             </div>
 
-            <div
-              className="schedule-analytics"
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '2rem',
-                padding: '2rem',
-              }}
-            >
+            <div className="schedule-analytics">
               <CoverageHeatmap activeWeekNumber={activeWeekNumber} />
               <FairnessChart activeWeekNumber={activeWeekNumber} />
             </div>
