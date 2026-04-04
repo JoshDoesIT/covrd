@@ -13,11 +13,6 @@
   width: 100%;
 }
 
-.share-toolbar__row--top .share-toolbar__btn {
-  width: 100%;
-  justify-content: center;
-}
-
 .share-toolbar__btn {
   padding: 0.4rem 0.6rem !important;
   font-size: 0.8rem !important;

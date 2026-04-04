@@ -94,10 +94,7 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
             Share Link
           </span>
         </button>
-      </div>
 
-      {/* Middle Row */}
-      <div className="share-toolbar__row">
         <button
           className="sm-btn-ghost share-toolbar__btn"
           onClick={handleImportClick}
@@ -125,7 +122,10 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
           <Download size={14} />
           <span className="share-toolbar__label">Export JSON</span>
         </button>
+      </div>
 
+      {/* Bottom Row */}
+      <div className="share-toolbar__row">
         <button
           className="sm-btn-ghost share-toolbar__btn"
           onClick={handleExportCSV}
@@ -135,10 +135,7 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
           <Download size={14} />
           <span className="share-toolbar__label">Export CSV</span>
         </button>
-      </div>
 
-      {/* Bottom Row */}
-      <div className="share-toolbar__row">
         <button
           className="sm-btn-ghost share-toolbar__btn"
           onClick={handlePrint}
