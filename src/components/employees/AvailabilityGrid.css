@@ -61,9 +61,9 @@
 
 .ag-grid {
   display: grid;
-  grid-template-columns: 80px repeat(7, 1fr);
-  grid-template-rows: 40px repeat(24, 40px);
-  min-width: 600px;
+  grid-template-columns: 70px repeat(7, 1fr);
+  grid-template-rows: 32px repeat(24, 28px);
+  min-width: 500px;
 }
 
 .ag-cell {
@@ -126,4 +126,20 @@
 
 .ag-block[data-selected='true']:hover {
   background: rgba(147, 51, 234, 0.3);
+}
+
+@media (max-width: 768px) {
+  .ag-grid {
+    grid-template-columns: 50px repeat(7, 1fr);
+    grid-template-rows: 28px repeat(24, 24px);
+    min-width: 400px;
+  }
+
+  .ag-header-col {
+    font-size: 0.65rem;
+  }
+
+  .ag-header-row {
+    font-size: 0.65rem;
+  }
 }
