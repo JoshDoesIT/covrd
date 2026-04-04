@@ -24,16 +24,26 @@ export function EmployeeManager() {
 
   // Determine which employee or new employee is actively shown in the right pane
   const activeEmployee = useMemo(() => {
-    if (isCreating)
-      return { ...createEmployee({ name: 'New Employee', role: 'Staff' }), ...formData }
     if (editingId) return { ...employees.find((e) => e.id === editingId), ...formData } as Employee
     return null
-  }, [editingId, isCreating, employees, formData])
+  }, [editingId, employees, formData])
 
   const handleStartCreate = () => {
-    setEditingId(null)
+    // Create the employee in the store immediately so it gets a real ID.
+    // This lets the AvailabilityGrid work identically to edit mode.
+    const newEmp = createEmployee({ name: '', role: 'staff' })
+    const empWithDefaults = {
+      ...newEmp,
+      role: 'staff',
+      employmentType: 'full-time' as const,
+      maxHoursPerWeek: 40,
+      minHoursPerWeek: 0,
+    }
+    addEmployee(empWithDefaults)
+
     setIsCreating(true)
     setIsManagingAvail(false)
+    setEditingId(empWithDefaults.id)
     setFormData({
       name: '',
       role: 'staff',
@@ -78,16 +88,7 @@ export function EmployeeManager() {
       return
     }
 
-    if (isCreating) {
-      const newEmp = createEmployee({ name: formData.name!, role: formData.role ?? 'staff' })
-      addEmployee({
-        ...newEmp,
-        role: formData.role ?? 'staff',
-        employmentType: formData.employmentType ?? 'full-time',
-        maxHoursPerWeek: formData.maxHoursPerWeek ?? 40,
-        minHoursPerWeek: formData.minHoursPerWeek ?? 0,
-      })
-    } else if (editingId) {
+    if (editingId) {
       updateEmployee(editingId, formData)
     }
 
@@ -97,6 +98,10 @@ export function EmployeeManager() {
   }
 
   const handleCancel = () => {
+    // If we were creating a new employee, remove the temp record from the store
+    if (isCreating && editingId) {
+      removeEmployee(editingId)
+    }
     setIsCreating(false)
     setEditingId(null)
     setIsManagingAvail(false)
@@ -122,7 +127,7 @@ export function EmployeeManager() {
 
       <div className="em-content">
         <div className="em-roster">
-          {employees.length === 0 ? (
+          {employees.filter((e) => !(isCreating && e.id === editingId)).length === 0 ? (
             <div style={{ margin: '2rem 1rem' }}>
               <EmptyState
                 title="No employees configured yet"
@@ -133,7 +138,7 @@ export function EmployeeManager() {
               />
             </div>
           ) : (
-            employees.map((emp) => (
+            employees.filter((e) => !(isCreating && e.id === editingId)).map((emp) => (
               <div
                 key={emp.id}
                 className="employee-card"
@@ -308,23 +313,20 @@ export function EmployeeManager() {
                   <p
                     style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}
                   >
-                    {isCreating
-                      ? 'Save this employee first, then edit their profile to configure availability and scheduling restrictions.'
-                      : 'Set which days and hours this employee is available, plus any scheduling restrictions.'}
+                    Set which days and hours this employee is available, plus any scheduling
+                    restrictions.
                   </p>
-                  {!isCreating && (
-                    <button
-                      className="btn-secondary"
-                      style={{
-                        width: '100%',
-                        borderColor: 'var(--primary)',
-                        color: 'var(--primary)',
-                      }}
-                      onClick={() => setIsManagingAvail(true)}
-                    >
-                      Open Availability Matrix
-                    </button>
-                  )}
+                  <button
+                    className="btn-secondary"
+                    style={{
+                      width: '100%',
+                      borderColor: 'var(--primary)',
+                      color: 'var(--primary)',
+                    }}
+                    onClick={() => setIsManagingAvail(true)}
+                  >
+                    Open Availability Matrix
+                  </button>
               </div>
             </div>
 
