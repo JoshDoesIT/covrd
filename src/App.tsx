@@ -22,7 +22,7 @@ const ONBOARDING_KEY = 'covrd-onboarding-complete'
  */
 export function App() {
   const [isAppLaunched, setIsAppLaunched] = useState(
-    () => window.location.search.includes('app') || window.location.hash.includes('app'),
+    () => window.location.search.includes('app') || window.location.hash.includes('app') || !!hydrateFromHash(),
   )
   const [showOnboarding, setShowOnboarding] = useState(
     () => localStorage.getItem(ONBOARDING_KEY) !== 'true',
@@ -59,7 +59,9 @@ export function App() {
       const sharedState = hydrateFromHash()
       if (sharedState) {
         await applySharedState(sharedState)
-        window.history.replaceState(null, '', window.location.pathname)
+        setIsAppLaunched(true)
+        // Note: No toast message here so we don't bombard them on raw page load, but we redirect the hash neatly
+        window.history.replaceState(null, '', window.location.pathname + '#schedule')
       } else {
         // Otherwise, hydrate from local IndexedDB
         const [employees, reqs, baselines, schedules] = await Promise.all([
@@ -84,12 +86,25 @@ export function App() {
     window.addEventListener('launch-tutorial', onLaunchTutorial)
 
     // Listen for dynamically pasted share links (so users don't have to refresh)
-    const onGlobalHashChange = async () => {
+    const onGlobalHashChange = async (e: HashChangeEvent) => {
       const sharedState = hydrateFromHash()
       if (sharedState) {
         await applySharedState(sharedState)
+        setIsAppLaunched(true)
         setToastMessage('Successfully loaded data!')
-        window.history.replaceState(null, '', window.location.pathname)
+
+        let targetHash = '#schedule'
+        if (e.oldURL) {
+          try {
+            const oldUrlObj = new URL(e.oldURL)
+            if (oldUrlObj.hash && !oldUrlObj.hash.startsWith('#eJ')) {
+              targetHash = oldUrlObj.hash
+            }
+          } catch (err) {
+            // ignore parsing failures
+          }
+        }
+        window.history.replaceState(null, '', window.location.pathname + targetHash)
       }
     }
     window.addEventListener('hashchange', onGlobalHashChange)
