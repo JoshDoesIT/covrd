@@ -343,7 +343,7 @@ export function EmployeeManager() {
           <button
             className="btn-primary danger"
             onClick={confirmDelete}
-            style={{ background: 'var(--color-error)' }}
+            style={{ background: 'var(--color-danger)', color: 'white' }}
           >
             Yes, Remove Employee
           </button>
