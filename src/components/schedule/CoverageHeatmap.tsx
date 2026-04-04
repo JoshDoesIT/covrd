@@ -73,10 +73,17 @@ function computeCoverage(
     'saturday',
   ]
   const requiredByDay = new Map<DayOfWeek, number>()
+
+  const scheduleStartMillis = new Date(`${schedule.startDate}T00:00:00`).getTime()
+  const scheduleEndMillis = new Date(`${schedule.endDate}T23:59:59`).getTime()
+
   coverageReqs.forEach((req) => {
     const dObj = new Date(`${req.date}T00:00:00`)
-    const dayName = DAY_ORDER_INDEX[dObj.getDay()]
-    requiredByDay.set(dayName, (requiredByDay.get(dayName) ?? 0) + req.requiredStaff)
+    const t = dObj.getTime()
+    if (t >= scheduleStartMillis && t <= scheduleEndMillis) {
+      const dayName = DAY_ORDER_INDEX[dObj.getDay()]
+      requiredByDay.set(dayName, (requiredByDay.get(dayName) ?? 0) + req.requiredStaff)
+    }
   })
 
   return DAY_ORDER.map((day) => {

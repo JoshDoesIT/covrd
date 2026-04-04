@@ -21,46 +21,11 @@
 
 .share-toolbar__label {
   display: none;
+  white-space: nowrap;
 }
 
 @media (min-width: 1024px) {
   .share-toolbar__label {
     display: inline;
   }
-}
-
-/* QR Modal Overlay */
-.share-toolbar__qr-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(6px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 200;
-}
-
-.share-toolbar__qr-modal {
-  background: var(--color-bg-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 16px;
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.25rem;
-  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.5);
-}
-
-.share-toolbar__qr-title {
-  color: var(--color-text-primary);
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.share-toolbar__qr-img {
-  border-radius: 8px;
-  image-rendering: pixelated;
 }
