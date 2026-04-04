@@ -22,7 +22,7 @@ covrd is designed to help you instantly generate fair and optimized schedules fo
 Building your schedule involves three main steps:
 
 1. **Team Roster**: Start by adding your employees, establishing their weekly target hours, and mapping out their availability.
-2. **Coverage Requirements**: Next, navigate to the Coverage Canvas. Here, you define exactly how many people are needed during a given time block on specific dates across the month (for example, two people needed on April 6th from 9:00 AM to 5:00 PM).
+2. **Coverage Requirements**: Next, navigate to the Coverage Canvas. Start by defining **Baseline Templates** — recurring weekly defaults that specify how many people are needed during a given time block on each day of the week (for example, two staff every Monday from 9:00 AM to 5:00 PM). For specific dates that need different staffing, add **Calendar Exceptions** to override the template.
 3. **Schedule Builder**: When you click 'Automagic Schedule', the engine processes the inputs to instantly fill the required shifts for your chosen time period.
 
 ### Tips for Success
@@ -44,9 +44,11 @@ The Coverage Canvas gives you a high-level monthly view to visualize and define 
 
 To begin mapping your staffing needs, simply click on any date cell within the month grid. This action opens a prompt where you can define specific shifts, the required staff count, and targeted roles (like "Barista" or "Manager"). The grid instantly displays your drafted shift counts, dynamically accounting for local and national holidays.
 
-## Stamping a Pattern
+## Baseline Templates vs. Calendar Exceptions
 
-You likely do not want to draft every single shift manually for the entire month. For this reason, I built the "Stamp Weekly Pattern" utility. First, you draft a full week of required shifts anywhere in the current month. Once you have a perfect week configured, click the **Stamp Weekly Pattern** button at the top of the canvas. The engine will instantly grab that fully assembled week and accurately copy it across to every other remaining week in the month.
+You likely do not want to draft every single shift manually for every date. For this reason, I built the **Baseline Template** system. A Baseline Template defines your recurring weekly coverage defaults — for example, "Every Monday, 2 staff from 9:00 AM to 5:00 PM." Once configured, the engine automatically applies these templates to every matching day across the entire scheduling window without any extra effort from you.
+
+When a specific date needs different coverage (a holiday, a special event, or a day off), you can add a **Calendar Exception** by clicking that date on the Coverage Canvas and drafting a custom requirement. Calendar Exceptions always override the Baseline Template for that specific date, giving you full control over one-off adjustments without disturbing your weekly defaults.
 `,
   },
   {

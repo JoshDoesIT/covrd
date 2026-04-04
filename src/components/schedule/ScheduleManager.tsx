@@ -242,24 +242,25 @@ export function ScheduleManager() {
           </h2>
           <p className="sm-subtitle">Generate staff schedules.</p>
         </div>
+        {activeSchedule && (
+          <div className="sm-view-toggle">
+            <button
+              className={`sm-view-btn ${viewMode === 'matrix' ? 'sm-view-btn--active' : ''}`}
+              onClick={() => setViewMode('matrix')}
+            >
+              Matrix
+            </button>
+            <button
+              className={`sm-view-btn ${viewMode === 'timeline' ? 'sm-view-btn--active' : ''}`}
+              onClick={() => setViewMode('timeline')}
+            >
+              Timeline
+            </button>
+          </div>
+        )}
         <div className="sm-actions">
           {activeSchedule && (
             <>
-              <div className="sm-view-toggle">
-                <button
-                  className={`sm-view-btn ${viewMode === 'matrix' ? 'sm-view-btn--active' : ''}`}
-                  onClick={() => setViewMode('matrix')}
-                >
-                  Matrix
-                </button>
-                <button
-                  className={`sm-view-btn ${viewMode === 'timeline' ? 'sm-view-btn--active' : ''}`}
-                  onClick={() => setViewMode('timeline')}
-                >
-                  Timeline
-                </button>
-              </div>
-
               {canUndo || canRedo ? (
                 <div style={{ display: 'flex', gap: '0.25rem', marginRight: '1rem' }}>
                   <button
@@ -353,7 +354,7 @@ export function ScheduleManager() {
           )}
 
           <div className="sm-generate-zone">
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <label
                 htmlFor="sm-start-date"
                 style={{

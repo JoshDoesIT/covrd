@@ -46,6 +46,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  white-space: nowrap;
 }
 
 .sm-subtitle {
@@ -249,6 +250,7 @@
   border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 0.25rem;
+  margin-left: 0.75rem;
   margin-right: 1rem;
 }
 
@@ -409,23 +411,30 @@
   }
 
   .sm-header {
-    flex-direction: column;
-    align-items: stretch;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
     gap: 0.75rem;
     overflow: hidden;
   }
 
   .sm-header > div:first-child {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    width: 100%;
+    flex: 0 0 auto;
+  }
+
+  .sm-title {
+    font-size: 1rem;
+  }
+
+  .sm-subtitle {
+    display: none;
   }
 
   .sm-actions {
     flex-direction: column;
     align-items: stretch;
+    width: 100%;
     max-width: 100%;
     overflow: hidden;
   }

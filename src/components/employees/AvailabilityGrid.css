@@ -140,8 +140,15 @@
   .ag-header > div:first-child {
     display: flex;
     flex-direction: column;
-    align-items: center;
     text-align: center;
+  }
+
+  .ag-title {
+    justify-content: center;
+  }
+
+  .ag-subtitle {
+    margin-top: 0.5rem;
   }
 
   .ag-controls {

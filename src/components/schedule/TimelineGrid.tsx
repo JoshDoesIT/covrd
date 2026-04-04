@@ -191,7 +191,7 @@ export function TimelineGrid({
     return (
       <div className="timeline-grid empty-state">
         <p>No active schedule blocks generated yet.</p>
-        <span className="sr-only">Timeline Gantt View</span>
+        <span className="sr-only">Timeline View</span>
       </div>
     )
   }
@@ -207,7 +207,7 @@ export function TimelineGrid({
     <DndContext collisionDetection={pointerWithin} onDragEnd={handleDragEnd}>
       <div className="timeline-grid">
         <div className="timeline-header">
-          <h3 className="sr-only">Timeline Gantt View</h3>
+          <h3 className="sr-only">Timeline View</h3>
         </div>
 
         <div className="timeline-wrapper">
@@ -268,6 +268,41 @@ export function TimelineGrid({
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile-friendly card layout — visible only at ≤768px via CSS */}
+        <div className="timeline-mobile">
+          {DAYS_OF_WEEK.map((day) => {
+            const dayLabel = startDate
+              ? formatDayHeader(startDate, weekNumber, day)
+              : day.charAt(0).toUpperCase() + day.slice(1)
+
+            // Gather all shifts for this day across all employees
+            const dayShifts: { employee: Employee; shift: Shift }[] = []
+            employees.forEach((emp) => {
+              const shifts = timelineData[emp.id]?.[day] ?? []
+              shifts.forEach((shift) => dayShifts.push({ employee: emp, shift }))
+            })
+
+            return (
+              <div key={day} className="timeline-mobile-day">
+                <div className="timeline-mobile-day-header">{dayLabel}</div>
+                {dayShifts.length === 0 ? (
+                  <div className="timeline-mobile-empty">No shifts</div>
+                ) : (
+                  dayShifts.map(({ employee: emp, shift }) => (
+                    <div key={shift.id} className="timeline-mobile-shift">
+                      <div className="timeline-mobile-dot" style={{ backgroundColor: emp.color }} />
+                      <span className="timeline-mobile-name">{emp.name}</span>
+                      <span className="timeline-mobile-time">
+                        {formatTime(shift.startTime, '12h')} – {formatTime(shift.endTime, '12h')}
+                      </span>
+                    </div>
+                  ))
+                )}
+              </div>
+            )
+          })}
         </div>
       </div>
     </DndContext>

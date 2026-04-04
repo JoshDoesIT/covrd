@@ -132,4 +132,54 @@ describe('Constraint Satisfaction Problem Solver', () => {
     expect(result.unfilledShifts).toHaveLength(1)
     expect(result.unfilledShifts[0].id).toBe('impossible-shift')
   })
+
+  it('fills shifts across all 4 weeks for a single employee with per-week capacity', () => {
+    // Reproduce the reported bug: 1 employee, available every day, 40h max.
+    // 7 shifts/week × 8h each = 56h/week, but only 40h allowed → 5 shifts max/week.
+    // The solver should still fill 5 shifts per week × 4 weeks = 20 total.
+    const employee: Employee = {
+      id: 'emp-solo',
+      name: 'Solo',
+      role: 'any',
+      maxHours: 40,
+      minHours: 0,
+      targetHours: 40,
+      isFullTime: true,
+      availability: [],
+      createdAt: 0,
+      updatedAt: 0,
+    }
+
+    const shifts: Shift[] = []
+    for (let week = 0; week < 4; week++) {
+      for (let day = 0; day < 7; day++) {
+        shifts.push({
+          id: `w${week}-d${day}`,
+          dayOfWeek: day,
+          weekNumber: week,
+          start: '09:00',
+          end: '17:00',
+          role: 'any',
+          durationHours: 8,
+          isAssigned: false,
+        })
+      }
+    }
+
+    const result = solveSchedule([employee], shifts)
+
+    // Should assign 5 shifts per week (40h / 8h = 5) across all 4 weeks
+    expect(result.assignedShifts.length).toBe(20)
+
+    // Verify assignments exist in every week, not just week 0
+    const weeksSeen = new Set(result.assignedShifts.map((s) => s.weekNumber))
+    expect(weeksSeen.size).toBe(4)
+    expect(weeksSeen).toContain(0)
+    expect(weeksSeen).toContain(1)
+    expect(weeksSeen).toContain(2)
+    expect(weeksSeen).toContain(3)
+
+    // 28 total shifts - 20 assigned = 8 unfilled (2 per week due to maxHours)
+    expect(result.unfilledShifts.length).toBe(8)
+  })
 })

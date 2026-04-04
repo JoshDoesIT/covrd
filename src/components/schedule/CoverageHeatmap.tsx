@@ -44,7 +44,7 @@ interface DayCoverage {
  */
 function computeCoverage(
   schedule: Schedule | null,
-  coverageReqs: CoverageRequirement[],
+  getRequirementsForDate: (date: string) => CoverageRequirement[],
   activeWeekNumber: number,
 ): DayCoverage[] {
   if (!schedule) return []
@@ -63,32 +63,15 @@ function computeCoverage(
     shiftsByDay.set(s.day, (shiftsByDay.get(s.day) ?? 0) + assignedCount)
   })
 
-  // Sum required staff per day from coverage requirements
-  const DAY_ORDER_INDEX: DayOfWeek[] = [
-    'sunday',
-    'monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday',
-  ]
+  // Sum required staff per day using the resolver (supports both baseline templates and calendar exceptions)
   const requiredByDay = new Map<DayOfWeek, number>()
 
-  const startOfWeek = getShiftDate(schedule.startDate, activeWeekNumber, 'monday')
-  const endOfWeek = getShiftDate(schedule.startDate, activeWeekNumber, 'sunday')
-  endOfWeek.setHours(23, 59, 59, 999)
-
-  const weekStartMillis = startOfWeek.getTime()
-  const weekEndMillis = endOfWeek.getTime()
-
-  coverageReqs.forEach((req) => {
-    const dObj = new Date(`${req.date}T00:00:00`)
-    const t = dObj.getTime()
-    if (t >= weekStartMillis && t <= weekEndMillis) {
-      const dayName = DAY_ORDER_INDEX[dObj.getDay()]
-      requiredByDay.set(dayName, (requiredByDay.get(dayName) ?? 0) + req.requiredStaff)
-    }
+  DAY_ORDER.forEach((day) => {
+    const dateObj = getShiftDate(schedule.startDate, activeWeekNumber, day)
+    const dateStr = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, '0')}-${String(dateObj.getDate()).padStart(2, '0')}`
+    const reqs = getRequirementsForDate(dateStr)
+    const total = reqs.reduce((sum, r) => sum + r.requiredStaff, 0)
+    requiredByDay.set(day, total)
   })
 
   return DAY_ORDER.map((day) => {
@@ -113,11 +96,11 @@ function getCoverageColor(fillRate: number): string {
  */
 export function CoverageHeatmap({ activeWeekNumber }: { activeWeekNumber: number }) {
   const { activeSchedule } = useScheduleStore()
-  const { requirements } = useCoverageStore()
+  const { getRequirementsForDate } = useCoverageStore()
 
   const data = useMemo(
-    () => computeCoverage(activeSchedule, requirements, activeWeekNumber),
-    [activeSchedule, requirements, activeWeekNumber],
+    () => computeCoverage(activeSchedule, getRequirementsForDate, activeWeekNumber),
+    [activeSchedule, getRequirementsForDate, activeWeekNumber],
   )
 
   const overallFillRate = useMemo(() => {
