@@ -211,7 +211,9 @@ export function AppShell() {
         {/* Header */}
         <header className="shell__header" role="banner">
           <div className="shell__header-left">
-            <img src="/logo-dark.png" alt="Covrd" className="shell__mobile-logo" />
+            <a href="/" style={{ display: 'flex' }}>
+              <img src="/logo-dark.png" alt="Covrd" className="shell__mobile-logo" />
+            </a>
             <h1 className="shell__page-title">
               {NAV_ITEMS.find((n) => n.id === activeNav)?.label ?? 'Covrd'}
             </h1>
