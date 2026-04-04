@@ -308,20 +308,23 @@ export function EmployeeManager() {
                   <p
                     style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}
                   >
-                    Set which days and hours this employee is available, plus any scheduling
-                    restrictions.
+                    {isCreating
+                      ? 'Save this employee first, then edit their profile to configure availability and scheduling restrictions.'
+                      : 'Set which days and hours this employee is available, plus any scheduling restrictions.'}
                   </p>
-                  <button
-                    className="btn-secondary"
-                    style={{
-                      width: '100%',
-                      borderColor: 'var(--primary)',
-                      color: 'var(--primary)',
-                    }}
-                    onClick={() => setIsManagingAvail(true)}
-                  >
-                    Open Availability Matrix
-                  </button>
+                  {!isCreating && (
+                    <button
+                      className="btn-secondary"
+                      style={{
+                        width: '100%',
+                        borderColor: 'var(--primary)',
+                        color: 'var(--primary)',
+                      }}
+                      onClick={() => setIsManagingAvail(true)}
+                    >
+                      Open Availability Matrix
+                    </button>
+                  )}
               </div>
             </div>
 
