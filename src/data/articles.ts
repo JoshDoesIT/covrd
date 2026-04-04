@@ -9,13 +9,13 @@ export interface Article {
 export const ARTICLES: Article[] = [
   {
     id: 'getting-started-covrd',
-    title: 'Getting Started with Covrd',
+    title: 'Getting Started with covrd',
     category: 'User Guide',
     tags: ['basics', 'onboarding', 'setup'],
     content: `
-# Welcome to Covrd!
+# Welcome to covrd!
 
-Covrd is designed to help you instantly generate fair and optimized schedules for your team across multiple weeks by utilizing the Automagic Schedule Builder. I decided to build the scheduling engine this way because manual scheduling often leads to unintentional bias and compliance violations. By automatically balancing weekly hours and availability boundaries, you can ensure that all constraints are mathematically met.
+covrd is designed to help you instantly generate fair and optimized schedules for your team across multiple weeks by utilizing the Automagic Schedule Builder. I decided to build the scheduling engine this way because manual scheduling often leads to unintentional bias and compliance violations. By automatically balancing weekly hours and availability boundaries, you can ensure that all constraints are mathematically met.
 
 ## The Core Process
 
@@ -61,11 +61,11 @@ Staff rotation should not result in random chaos for your team. Following fair s
 
 ## 1. Avoid Clopening Shifts
 
-First, I recommend avoiding "clopening" shifts. A clopening occurs when an employee is scheduled for the closing shift at night and the immediate opening shift the following morning. This violates safe rest periods and leads to rapid burnout. To prevent this, the Covrd solver engine is built to inherently reject assignments that do not allow for adequate rest between shifts.
+First, I recommend avoiding "clopening" shifts. A clopening occurs when an employee is scheduled for the closing shift at night and the immediate opening shift the following morning. This violates safe rest periods and leads to rapid burnout. To prevent this, the covrd solver engine is built to inherently reject assignments that do not allow for adequate rest between shifts.
 
 ## 2. Fair Weekend Distribution
 
-Second, fair weekend distribution is critical. Almost everyone dislikes working every single weekend. For this reason, it is important to ensure the pain of less desirable shifts is distributed evenly across your roster, rather than consistently penalizing your newest hires. You can accomplish this in Covrd by creatively drafting gaps on the Coverage Canvas, intentionally omitting certain weekend coverages to force alternating weekends between distinct teams.
+Second, fair weekend distribution is critical. Almost everyone dislikes working every single weekend. For this reason, it is important to ensure the pain of less desirable shifts is distributed evenly across your roster, rather than consistently penalizing your newest hires. You can accomplish this in covrd by creatively drafting gaps on the Coverage Canvas, intentionally omitting certain weekend coverages to force alternating weekends between distinct teams.
 
 ## 3. Predictable Notice
 
@@ -80,7 +80,7 @@ Finally, predictable notice is essential. You should aim to release schedules at
     content: `
 # Compliance Basics
 
-While labor compliance laws vary heavily by jurisdiction, there are general principles regarding meal breaks and overtime that you should ensure your Covrd setup accounts for.
+While labor compliance laws vary heavily by jurisdiction, there are general principles regarding meal breaks and overtime that you should ensure your covrd setup accounts for.
 
 ## Meal and Rest Breaks
 
@@ -88,7 +88,7 @@ In many regions, shifts that approach six or eight hours legally require an unpa
 
 ## Maximum Hours and Overtime
 
-Additionally, unmonitored overtime can quickly crush your labor budget. By properly configuring each employee's **Max Hours** inside the Team Roster, Covrd's solver engine is mathematically restricted from ever scheduling an individual into overtime. Instead, the engine will automatically prioritize scheduling staff members who still have remaining hour allocations for the week.
+Additionally, unmonitored overtime can quickly crush your labor budget. By properly configuring each employee's **Max Hours** inside the Team Roster, covrd's solver engine is mathematically restricted from ever scheduling an individual into overtime. Instead, the engine will automatically prioritize scheduling staff members who still have remaining hour allocations for the week.
 `,
   },
 ]

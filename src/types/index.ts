@@ -1,5 +1,5 @@
 /**
- * Covrd — Core Data Types
+ * covrd — Core Data Types
  *
  * All types for the scheduling domain model.
  * These are pure TypeScript types with no runtime behavior.

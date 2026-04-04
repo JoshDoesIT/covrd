@@ -1,10 +1,10 @@
-# Contributing to Covrd
+# Contributing to covrd
 
-Thank you for your interest in contributing to Covrd! This document outlines our development workflow and conventions.
+Thank you for your interest in contributing to covrd! This document outlines our development workflow and conventions.
 
 ## Development Philosophy
 
-Covrd follows **Spec-Driven Development (SDD)** and **Test-Driven Development (TDD)**:
+covrd follows **Spec-Driven Development (SDD)** and **Test-Driven Development (TDD)**:
 
 1. Every feature starts with a specification (GitHub Issue)
 2. Every implementation starts with a failing test
@@ -14,8 +14,8 @@ Covrd follows **Spec-Driven Development (SDD)** and **Test-Driven Development (T
 
 ```bash
 # Clone the repository
-git clone https://github.com/JoshDoesIT/Covrd.git
-cd Covrd
+git clone https://github.com/JoshDoesIT/covrd.git
+cd covrd
 
 # Install dependencies
 npm install
@@ -93,7 +93,7 @@ npm run build       # Production build
 
 ## Privacy Principles
 
-Covrd is a privacy-first application. When contributing:
+covrd is a privacy-first application. When contributing:
 
 - **Never add server-side data handling** — All data must stay client-side
 - **Never add analytics or tracking** — Zero telemetry policy

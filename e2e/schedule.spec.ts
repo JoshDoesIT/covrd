@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-test.describe('Covrd Core Workflows', () => {
+test.describe('covrd Core Workflows', () => {
   test.beforeEach(async ({ page }) => {
     // Inject localStorage state before page loads so Onboarding never mounts
     await page.addInitScript(() => {
@@ -10,7 +10,7 @@ test.describe('Covrd Core Workflows', () => {
   })
 
   test('Has visible command palette and app shell', async ({ page }) => {
-    await expect(page.locator('.shell__brand-mark')).toHaveText('Covrd')
+    await expect(page.locator('.shell__brand-mark')).toHaveText('covrd')
 
     // Command Palette should open with Mod+K
     await page.keyboard.press('Meta+k')

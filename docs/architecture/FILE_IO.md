@@ -1,6 +1,6 @@
 # File Serialization & I/O
 
-Covrd enforces a privacy-first model, which means all data exchange must happen locally. Our file I/O utility layer is responsible for parsing and hydrating URL compression parameters, generating standalone export JSONs, and dumping grid data to comma-separated values (CSV) for print logic.
+covrd enforces a privacy-first model, which means all data exchange must happen locally. Our file I/O utility layer is responsible for parsing and hydrating URL compression parameters, generating standalone export JSONs, and dumping grid data to comma-separated values (CSV) for print logic.
 
 ## Rationale & Abstraction
 

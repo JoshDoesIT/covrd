@@ -1,12 +1,12 @@
-# Covrd Brand Guide
+# covrd Brand Guide
 
 ## Brand Overview
 
-**Covrd** is a privacy-first, client-side-only staff scheduling application. The brand communicates quiet confidence, technical precision, and trustworthiness.
+**covrd** is a privacy-first, client-side-only staff scheduling application. The brand communicates quiet confidence, technical precision, and trustworthiness.
 
 **Tagline:** Every shift, covrd.
 
-**Positioning:** Covrd is not another clunky scheduling tool. It is a private, intelligent, and elegant utility that respects both the manager's time and their team's data.
+**Positioning:** covrd is not another clunky scheduling tool. It is a private, intelligent, and elegant utility that respects both the manager's time and their team's data.
 
 ---
 
@@ -14,7 +14,7 @@
 
 ### Spelling
 
-The name is **Covrd** — always capitalized, with the "e" dropped. The missing letter signals efficiency: no bloat, no waste.
+The name is **covrd** — always capitalized, with the "e" dropped. The missing letter signals efficiency: no bloat, no waste.
 
 ### Wordmark
 
@@ -27,7 +27,7 @@ Covr[d]
 
 **Usage rules:**
 
-- Always use the full wordmark "Covrd" — never abbreviate further
+- Always use the full wordmark "covrd" — never abbreviate further
 - The accent "d" is required in all branding contexts
 - Minimum clear space around the wordmark: equal to the height of the "d"
 

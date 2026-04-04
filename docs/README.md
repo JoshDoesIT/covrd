@@ -1,6 +1,6 @@
-# Covrd Developer Guide
+# covrd Developer Guide
 
-Welcome to the Covrd developer documentation. Covrd is a privacy-first, client-side-only web application designed to automatically generate optimized staff work schedules.
+Welcome to the covrd developer documentation. covrd is a privacy-first, client-side-only web application designed to automatically generate optimized staff work schedules.
 
 Because we process sensitive scheduling data without a backend, we rely heavily on local state management and a custom in-browser Constraint Satisfaction Problem (CSP) solver. I ended up deciding to structure the documentation in this `/docs` directory to ensure all technical context is stored right alongside our codebase. This makes onboarding easier and helps us avoid regressions manually when maintaining complex logic.
 
@@ -21,8 +21,8 @@ To get started with local development, follow the standard Node.js workflow. We 
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/JoshDoesIT/Covrd.git
-cd Covrd
+git clone https://github.com/JoshDoesIT/covrd.git
+cd covrd
 
 # 2. Install application dependencies
 npm install

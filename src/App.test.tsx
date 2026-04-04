@@ -21,9 +21,9 @@ describe('App', () => {
     expect(await screen.findByRole('main')).toBeInTheDocument()
   })
 
-  it('displays the Covrd brand', async () => {
+  it('displays the covrd brand', async () => {
     render(<App />)
-    const logos = await screen.findAllByAltText('Covrd')
+    const logos = await screen.findAllByAltText('covrd')
     expect(logos.length).toBeGreaterThanOrEqual(1)
   })
 })

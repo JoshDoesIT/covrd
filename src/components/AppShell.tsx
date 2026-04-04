@@ -124,7 +124,7 @@ export function AppShell() {
           >
             <img
               src="/logo-dark.png"
-              alt="Covrd"
+              alt="covrd"
               style={{
                 height: '64px' /* Larger height to fill the new 72px header */,
                 width: 'auto',
@@ -212,10 +212,10 @@ export function AppShell() {
         <header className="shell__header" role="banner">
           <div className="shell__header-left">
             <a href="/" style={{ display: 'flex' }}>
-              <img src="/logo-dark.png" alt="Covrd" className="shell__mobile-logo" />
+              <img src="/logo-dark.png" alt="covrd" className="shell__mobile-logo" />
             </a>
             <h1 className="shell__page-title">
-              {NAV_ITEMS.find((n) => n.id === activeNav)?.label ?? 'Covrd'}
+              {NAV_ITEMS.find((n) => n.id === activeNav)?.label ?? 'covrd'}
             </h1>
           </div>
           <div className="shell__header-right">

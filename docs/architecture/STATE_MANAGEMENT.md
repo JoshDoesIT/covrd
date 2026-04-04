@@ -1,6 +1,6 @@
 # State Management Architecture
 
-Covrd requires robust client-side state management since we strictly prohibit server telemetry or external data tracking. I decided to utilize **Zustand** due to its un-opinionated reactivity and simple hook integration within React 19.
+covrd requires robust client-side state management since we strictly prohibit server telemetry or external data tracking. I decided to utilize **Zustand** due to its un-opinionated reactivity and simple hook integration within React 19.
 
 Our two primary stores are `scheduleStore` and `employeeStore`. They serve as our authoritative source of truth at runtime.
 

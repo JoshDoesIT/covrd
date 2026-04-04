@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/brand/logo-dark.png" alt="Covrd" width="400">
+  <img src="docs/brand/logo-dark.png" alt="covrd" width="400">
 </p>
 
 <p align="center">
@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/JoshDoesIT/Covrd/actions/workflows/ci.yml"><img src="https://github.com/JoshDoesIT/Covrd/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/JoshDoesIT/covrd/actions/workflows/ci.yml"><img src="https://github.com/JoshDoesIT/covrd/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <img src="https://img.shields.io/badge/privacy-client--side%20only-00B894" alt="Privacy: Client-Side Only">
   <img src="https://img.shields.io/badge/license-MIT-6C5CE7" alt="License: MIT">
   <img src="https://img.shields.io/badge/react-19-74B9FF" alt="React 19">
@@ -16,14 +16,11 @@
 
 ---
 
-Covrd is a **privacy-first, client-side-only** web application that automatically generates optimized staff work schedules. Your data never leaves your browser - no accounts, no servers, no tracking.
+covrd is a **privacy-first, client-side-only** web application that automatically generates optimized staff work schedules. Your data never leaves your browser - no accounts, no servers, no tracking.
 
 <p align="center">
-  <img src="docs/brand/screenshots/app_desktop.png" alt="Covrd Desktop Interface" width="100%">
-</p>
-
-<p align="center">
-  <img src="docs/brand/screenshots/app_mobile.png" alt="Covrd Mobile Interface" width="40%">
+  <img src="docs/brand/screenshots/app_desktop.png" alt="covrd Desktop Interface" width="67%">
+  <img src="docs/brand/screenshots/app_mobile.png" alt="covrd Mobile Interface" width="28%">
 </p>
 
 ## Privacy Pledge
@@ -49,8 +46,8 @@ Covrd is a **privacy-first, client-side-only** web application that automaticall
 
 ```bash
 # Clone the repository
-git clone https://github.com/JoshDoesIT/Covrd.git
-cd Covrd
+git clone https://github.com/JoshDoesIT/covrd.git
+cd covrd
 
 # Install dependencies
 npm install

@@ -1,6 +1,6 @@
-# Extending the Covrd UI
+# Extending the covrd UI
 
-Covrd uses an uncompromising vanilla CSS styling aesthetic mixed with robust functional componentry powered by React 19. The UI elements prioritize glassmorphism, dynamic responsiveness, and premium visual interfaces.
+covrd uses an uncompromising vanilla CSS styling aesthetic mixed with robust functional componentry powered by React 19. The UI elements prioritize glassmorphism, dynamic responsiveness, and premium visual interfaces.
 
 This guide provides practical examples for extending the application safely.
 

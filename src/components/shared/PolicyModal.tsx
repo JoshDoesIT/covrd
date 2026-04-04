@@ -23,13 +23,13 @@ export function PolicyModal({ type, onClose }: PolicyModalProps) {
               <strong>Last Updated: April 3, 2026</strong>
             </p>
             <p>
-              Covrd is built with a fundamental principle: <strong>your data is yours.</strong> This
+              covrd is built with a fundamental principle: <strong>your data is yours.</strong> This
               policy explains how we achieve that.
             </p>
 
             <h3>1. Zero Server-Side Data Handling</h3>
             <p>
-              Covrd is a 100% client-side application. We do not have servers, databases, or any
+              covrd is a 100% client-side application. We do not have servers, databases, or any
               backend infrastructure that processes or stores your schedules, templates, or employee
               data. Everything stays on your device.
             </p>
@@ -37,11 +37,11 @@ export function PolicyModal({ type, onClose }: PolicyModalProps) {
             <h3>2. No Accounts or Authentication</h3>
             <p>
               Because your data never leaves your device, we do not require you to create an
-              account, provide an email address, or log in to use Covrd.
+              account, provide an email address, or log in to use covrd.
             </p>
 
             <h3>3. Local Data Storage</h3>
-            <p>All information entered into Covrd is stored entirely locally on your device:</p>
+            <p>All information entered into covrd is stored entirely locally on your device:</p>
             <ul>
               <li>
                 <strong>IndexedDB:</strong> Saves employees, schedules, and templates.
@@ -63,13 +63,13 @@ export function PolicyModal({ type, onClose }: PolicyModalProps) {
 
             <h3>5. No Cookies</h3>
             <p>
-              Covrd uses zero cookies. We do not track you or process data on a server, so there is
+              covrd uses zero cookies. We do not track you or process data on a server, so there is
               no cookie banner.
             </p>
 
             <h3>6. External Requests</h3>
             <p>
-              To ensure design consistency, Covrd loads web fonts from Google Fonts CDN. This is the
+              To ensure design consistency, covrd loads web fonts from Google Fonts CDN. This is the
               only external network request the app makes.
             </p>
 
@@ -85,12 +85,12 @@ export function PolicyModal({ type, onClose }: PolicyModalProps) {
               <strong>Last Updated: April 3, 2026</strong>
             </p>
             <p>
-              Covrd is committed to ensuring digital accessibility for people with disabilities. We
+              covrd is committed to ensuring digital accessibility for people with disabilities. We
               strive to conform to <strong>WCAG 2.1 Level AA</strong>.
             </p>
 
             <h3>Features</h3>
-            <p>We maintain accessibility across Covrd through the following features:</p>
+            <p>We maintain accessibility across covrd through the following features:</p>
             <ul>
               <li>
                 <strong>High Contrast Mode:</strong> Default dark mode meets or exceeds AA text
@@ -109,21 +109,21 @@ export function PolicyModal({ type, onClose }: PolicyModalProps) {
                 `@prefers-reduced-motion` CSS media query, eliminating unnecessary animations.
               </li>
               <li>
-                <strong>Responsive Design:</strong> Covrd scales appropriately from mobile screens
+                <strong>Responsive Design:</strong> covrd scales appropriately from mobile screens
                 up to ultra-wide monitors.
               </li>
             </ul>
 
             <h3>Continuous Assessment</h3>
             <p>
-              Covrd components are regularly assessed structurally using <strong>axe-core</strong>{' '}
+              covrd components are regularly assessed structurally using <strong>axe-core</strong>{' '}
               development tools. Known limitations typically revolve around complex drag-and-drop
               operations, for which keyboard-navigable alternatives are actively explored.
             </p>
 
             <h3>Feedback</h3>
             <p>
-              We welcome your feedback on the accessibility of Covrd. Please let us know if you
+              We welcome your feedback on the accessibility of covrd. Please let us know if you
               encounter accessibility barriers by opening an issue on our GitHub repository.
             </p>
           </>
