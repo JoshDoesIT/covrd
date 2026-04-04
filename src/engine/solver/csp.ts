@@ -35,9 +35,14 @@ export function solveSchedule(employees: Employee[], targetShifts: Shift[]): Sol
   // Pre-filter shifts that are permanently impossible (0 candidates with empty schedule).
   // If we don't, they trigger a depth-0 domain wipeout causing the solver to assign absolutely nothing.
   const fillableShifts: Shift[] = []
-  
+
   for (const shift of unassignedShifts) {
-    const baseEligible = getEligibleCandidates(employees, shift, existingAssignments, currentHourTotals)
+    const baseEligible = getEligibleCandidates(
+      employees,
+      shift,
+      existingAssignments,
+      currentHourTotals,
+    )
     if (baseEligible.length > 0) {
       fillableShifts.push(shift)
     }
