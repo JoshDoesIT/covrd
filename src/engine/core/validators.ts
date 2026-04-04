@@ -1,4 +1,5 @@
 import type { EngineEmployee as Employee, EngineShift as Shift } from '../types'
+import { timeToMinutes } from './time'
 
 /**
  * Checks if an employee is available to work on a specific day.
@@ -14,7 +15,32 @@ export function isAvailableForShift(employee: Employee, shift: Shift): boolean {
     return true // Assume available if day not configured
   }
 
-  return dayRecord.isAvailable
+  if (!dayRecord.isAvailable) {
+    return false
+  }
+
+  if (dayRecord.preferences && dayRecord.preferences.length > 0) {
+    const shiftStart = timeToMinutes(shift.start)
+    let shiftEnd = timeToMinutes(shift.end)
+    if (shiftEnd <= shiftStart) {
+      shiftEnd += 1440
+    }
+
+    const isContained = dayRecord.preferences.some((pref) => {
+      const prefStart = timeToMinutes(pref.start)
+      let prefEnd = timeToMinutes(pref.end)
+      if (prefEnd <= prefStart) {
+        prefEnd += 1440
+      }
+      return shiftStart >= prefStart && shiftEnd <= prefEnd
+    })
+
+    if (!isContained) {
+      return false
+    }
+  }
+
+  return true
 }
 
 /**

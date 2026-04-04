@@ -49,6 +49,50 @@ describe('Constraint Validators', () => {
       const thursdayShift: Shift = { ...mockShift, dayOfWeek: 4 }
       expect(isAvailableForShift(mockEmployee, thursdayShift)).toBe(true)
     })
+
+    describe('time block constraints', () => {
+      it('returns true if shift falls completely within a preferred time block', () => {
+        const wedShift: Shift = { ...mockShift, dayOfWeek: 3, start: '10:00', end: '16:00' }
+        expect(isAvailableForShift(mockEmployee, wedShift)).toBe(true)
+      })
+
+      it('returns false if shift starts before the preferred time block', () => {
+        const wedShiftEarly: Shift = { ...mockShift, dayOfWeek: 3, start: '08:00', end: '16:00' }
+        expect(isAvailableForShift(mockEmployee, wedShiftEarly)).toBe(false)
+      })
+
+      it('returns false if shift ends after the preferred time block', () => {
+        const wedShiftLate: Shift = { ...mockShift, dayOfWeek: 3, start: '10:00', end: '18:00' }
+        expect(isAvailableForShift(mockEmployee, wedShiftLate)).toBe(false)
+      })
+
+      it('returns false if shift is completely outside the preferred time block', () => {
+        const wedShiftOutside: Shift = { ...mockShift, dayOfWeek: 3, start: '18:00', end: '22:00' }
+        expect(isAvailableForShift(mockEmployee, wedShiftOutside)).toBe(false)
+      })
+
+      it('returns true if shift wraps overnight and fits into an overnight availability block', () => {
+        const nightEmp: Employee = {
+          ...mockEmployee,
+          availability: [
+            { dayOfWeek: 5, isAvailable: true, preferences: [{ start: '22:00', end: '06:00' }] },
+          ],
+        }
+        const nightShift: Shift = { ...mockShift, dayOfWeek: 5, start: '23:00', end: '05:00' }
+        expect(isAvailableForShift(nightEmp, nightShift)).toBe(true)
+      })
+
+      it('returns false if overnight shift falls outside an overnight availability block', () => {
+        const nightEmp: Employee = {
+          ...mockEmployee,
+          availability: [
+            { dayOfWeek: 5, isAvailable: true, preferences: [{ start: '22:00', end: '06:00' }] },
+          ],
+        }
+        const nightShiftBad: Shift = { ...mockShift, dayOfWeek: 5, start: '21:00', end: '05:00' }
+        expect(isAvailableForShift(nightEmp, nightShiftBad)).toBe(false)
+      })
+    })
   })
 
   describe('wouldExceedMaxHours', () => {

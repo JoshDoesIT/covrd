@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Core scheduling engine occasionally ignoring advanced availability time blocks when scheduling shifts
+
 ### Added
 
 - Core features (Epic 1-7)
