@@ -124,12 +124,9 @@ function backtrack(
     const eligible = getEligibleCandidates(employees, shift, assignments, hourTotals)
     if (eligible.length === 0) {
       // Domain wipeout! A shift cannot be filled given current assignments.
-      // E.g. no employees have the required role or availability left.
-      // To provide a 'best effort' partial schedule instead of failing completely,
-      // we gracefully accept this shift as unfillable in the current branch
-      // and continue filling out the rest of the schedule.
-      const remaining = unassignedShifts.filter((s) => s.id !== shift.id)
-      return backtrack(remaining, employees, assignments, hourTotals, ctx)
+      // We must backtrack to try different assignments. If it's globally impossible,
+      // it will backtrack up to the timeout limit and return the best partial schedule.
+      return false
     }
     domains.set(shift.id, eligible)
   }
