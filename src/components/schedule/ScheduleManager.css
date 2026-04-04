@@ -4,6 +4,7 @@
   height: 100%;
   gap: 1.5rem;
   padding: 1rem;
+  min-width: 0;
 }
 
 .sm-header {
@@ -57,6 +58,12 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+.sm-secondary-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 /* --- Automagic Schedule Button — Hero CTA --- */
@@ -269,6 +276,7 @@
 
 .sm-content {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   background: var(--color-bg-surface);
@@ -333,6 +341,40 @@
   -webkit-overflow-scrolling: touch; /* Added for mobile UX */
 }
 
+/* --- Extracted layout classes (previously inline styles) --- */
+.sm-grid-layout {
+  display: flex;
+  flex-direction: column;
+}
+
+.sm-info-bar {
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sm-week-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.schedule-analytics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.sm-generate-zone {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /* --- Responsive --- */
 @media (max-width: 1024px) {
   .sm-header {
@@ -356,9 +398,112 @@
   .schedule-manager {
     padding: 0.5rem;
     gap: 1rem;
+    overflow: hidden;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .sm-content {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .sm-header {
+    overflow: hidden;
+  }
+
+  .sm-actions {
+    flex-direction: column;
+    align-items: stretch;
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .sm-secondary-actions {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .sm-secondary-actions .sm-btn-ghost {
+    flex: 1;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .sm-view-toggle {
+    width: 100%;
+    justify-content: center;
+    margin-right: 0;
+    box-sizing: border-box;
+  }
+
+  .sm-btn-generate {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
+    /* Tame the glow effect so it doesn't bleed off-screen */
+    box-shadow:
+      0 0 10px var(--btn-glow),
+      0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .sm-btn-generate::after {
+    display: none;
+  }
+
+  .sm-btn-ghost {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+    box-sizing: border-box;
+    max-width: 100%;
+  }
+
+  /* Stack the date picker + generate button vertically */
+  .sm-generate-zone {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  /* ShareToolbar: spread icons evenly across full width on mobile */
+  .share-toolbar {
+    width: 100%;
+  }
+
+  .share-toolbar__row {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .share-toolbar__row .sm-btn-ghost {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .sm-info-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem;
+  }
+
+  .sm-week-nav {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .sm-week-nav h4 {
+    font-size: 0.9rem;
   }
 
   .schedule-analytics {
-    grid-template-columns: 1fr !important;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
   }
 }

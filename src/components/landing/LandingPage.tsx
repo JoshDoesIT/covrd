@@ -40,9 +40,9 @@ export function LandingPage({ onLaunch, onShowPrivacy, onShowAccessibility }: La
         <section className="landing__hero">
           <div className="landing__hero-pill">Privacy-first. Client-side only.</div>
           <h1 className="landing__hero-title">
-            Every Shift.
+            Every shift<span className="landing__hero-comma">,</span>
             <br />
-            <span className="landing__hero-title-accent">Covrd.</span>
+            <img src="/logo-dark.png" alt="Covrd" className="landing__hero-title-logo" />.
           </h1>
           <p className="landing__hero-subtitle">
             Auto staff scheduling that respects your privacy. Your data never leaves your browser.

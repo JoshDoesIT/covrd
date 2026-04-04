@@ -20,12 +20,7 @@
 }
 
 .share-toolbar__label {
-  display: none;
   white-space: nowrap;
 }
 
-@media (min-width: 1024px) {
-  .share-toolbar__label {
-    display: inline;
-  }
-}
+/* On tablet between icon-only and full desktop, labels may be hidden if needed */

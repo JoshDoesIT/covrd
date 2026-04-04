@@ -205,6 +205,20 @@
   background-clip: text;
 }
 
+.landing__hero-comma {
+  font-size: 0.9em;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.landing__hero-title-logo {
+  height: 0.9em;
+  width: auto;
+  display: inline-block;
+  vertical-align: baseline;
+  transform: translateY(0.12em);
+}
+
 .landing__hero-subtitle {
   font-size: var(--text-lg);
   color: var(--color-text-secondary);
