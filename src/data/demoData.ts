@@ -47,7 +47,8 @@ export const DEMO_EMPLOYEES: Employee[] = [
     employmentType: 'full-time',
     availability: DAYS.map((day) => ({
       day,
-      blocks: day === 'sunday' ? [] : [{ startTime: '07:00', endTime: '17:00' }],
+      // Alex can work any time, but takes Sundays off.
+      blocks: day === 'sunday' ? [] : [{ startTime: '06:00', endTime: '18:00' }],
     })),
     maxHoursPerWeek: 40,
     minHoursPerWeek: 32,
@@ -65,9 +66,10 @@ export const DEMO_EMPLOYEES: Employee[] = [
     employmentType: 'full-time',
     availability: DAYS.map((day) => ({
       day,
+      // Jordan can work any time, but takes weekends off.
       blocks: ['saturday', 'sunday'].includes(day)
         ? []
-        : [{ startTime: '06:00', endTime: '22:00' }],
+        : [{ startTime: '06:00', endTime: '23:00' }],
     })),
     maxHoursPerWeek: 40,
     minHoursPerWeek: 30,
@@ -85,7 +87,8 @@ export const DEMO_EMPLOYEES: Employee[] = [
     employmentType: 'full-time',
     availability: DAYS.map((day) => ({
       day,
-      blocks: day === 'monday' ? [] : [{ startTime: '10:00', endTime: '22:00' }],
+      // Sam can work PM and weekends
+      blocks: day === 'monday' ? [] : [{ startTime: '08:00', endTime: '23:00' }],
     })),
     maxHoursPerWeek: 40,
     minHoursPerWeek: 30,
@@ -103,7 +106,8 @@ export const DEMO_EMPLOYEES: Employee[] = [
     employmentType: 'part-time',
     availability: ['monday', 'wednesday', 'friday', 'saturday'].map((day) => ({
       day: day as DayOfWeek,
-      blocks: [{ startTime: '08:00', endTime: '16:00' }],
+      // Casey works mornings and weekends
+      blocks: [{ startTime: '06:00', endTime: '18:00' }],
     })),
     maxHoursPerWeek: 24,
     minHoursPerWeek: 12,
@@ -121,7 +125,8 @@ export const DEMO_EMPLOYEES: Employee[] = [
     employmentType: 'part-time',
     availability: ['tuesday', 'thursday', 'saturday', 'sunday'].map((day) => ({
       day: day as DayOfWeek,
-      blocks: [{ startTime: '10:00', endTime: '20:00' }],
+      // Morgan works anytime on their days
+      blocks: [{ startTime: '06:00', endTime: '22:00' }],
     })),
     maxHoursPerWeek: 20,
     minHoursPerWeek: 8,
@@ -139,7 +144,8 @@ export const DEMO_EMPLOYEES: Employee[] = [
     employmentType: 'part-time',
     availability: DAYS.filter((d) => d !== 'wednesday').map((day) => ({
       day,
-      blocks: [{ startTime: '14:00', endTime: '22:00' }],
+      // Taylor works PM and weekends
+      blocks: [{ startTime: '12:00', endTime: '23:00' }],
     })),
     maxHoursPerWeek: 24,
     minHoursPerWeek: 10,
