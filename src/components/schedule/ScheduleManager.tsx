@@ -14,7 +14,7 @@ import { useEmployeeStore } from '../../stores/employeeStore'
 import { useCoverageStore } from '../../stores/coverageStore'
 import { generateScheduleAsync } from '../../engine/worker/client'
 import { createSchedule, createShift } from '../../types/factories'
-import type { Shift, ShiftAssignment, DayOfWeek } from '../../types/index'
+import type { Shift, ShiftAssignment, DayOfWeek, Employee, CoverageRequirement, BaselineRequirement } from '../../types/index'
 import { WeeklyGrid } from './WeeklyGrid'
 import { TimelineGrid } from './TimelineGrid'
 import { CoverageHeatmap } from './CoverageHeatmap'
@@ -321,12 +321,12 @@ export function ScheduleManager() {
                     useCoverageStore.getState().reset()
                     useScheduleStore.getState().hydrate([])
                     
-                    imported.employees.forEach((e: any) => useEmployeeStore.getState().addEmployee(e))
-                    imported.coverageRequirements.forEach((r: any) =>
+                    imported.employees.forEach((e: Employee) => useEmployeeStore.getState().addEmployee(e))
+                    imported.coverageRequirements.forEach((r: CoverageRequirement) =>
                       useCoverageStore.getState().addRequirement(r),
                     )
                     if (imported.baselineRequirements) {
-                      imported.baselineRequirements.forEach((b: any) =>
+                      imported.baselineRequirements.forEach((b: BaselineRequirement) =>
                         useCoverageStore.getState().addBaselineRequirement(b),
                       )
                     }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { AppShell } from './components/AppShell'
 import { OnboardingWizard } from './components/onboarding/OnboardingWizard'
-import { hydrateFromHash } from './stores/urlState'
+import { hydrateFromHash, type ShareableState } from './stores/urlState'
 import { useScheduleStore } from './stores/scheduleStore'
 import { useEmployeeStore } from './stores/employeeStore'
 import { useCoverageStore } from './stores/coverageStore'
@@ -9,8 +9,7 @@ import { covrdDb } from './db/db'
 import { LandingPage } from './components/landing/LandingPage'
 import { PolicyModal } from './components/shared/PolicyModal'
 import { Toast } from './components/tooling/Toast'
-
-/** LocalStorage key for tracking onboarding completion. */
+import type { Employee, CoverageRequirement } from './types/index'
 const ONBOARDING_KEY = 'covrd-onboarding-complete'
 
 /**
@@ -31,7 +30,7 @@ export function App() {
   const [policyModal, setPolicyModal] = useState<'privacy' | 'accessibility' | null>(null)
   const [toastMessage, setToastMessage] = useState<string | null>(null)
 
-  const applySharedState = async (sharedState: any) => {
+  const applySharedState = async (sharedState: ShareableState) => {
     // 1. Wipe existing state completely
     await covrdDb.purgeAll()
 
@@ -41,12 +40,12 @@ export function App() {
     useScheduleStore.getState().hydrate([]) // Clear any previous schedules
 
     // 3. Import data into Zustand (this will natively rewrite to IDB via store methods)
-    sharedState.employees.forEach((e: any) => useEmployeeStore.getState().addEmployee(e))
-    sharedState.coverageRequirements.forEach((r: any) =>
+    sharedState.employees.forEach((e: Employee) => useEmployeeStore.getState().addEmployee(e))
+    sharedState.coverageRequirements.forEach((r: CoverageRequirement) =>
       useCoverageStore.getState().addRequirement(r),
     )
     if (sharedState.baselineRequirements) {
-      sharedState.baselineRequirements.forEach((b: any) =>
+      sharedState.baselineRequirements.forEach((b) =>
         useCoverageStore.getState().addBaselineRequirement(b),
       )
     }
@@ -100,7 +99,7 @@ export function App() {
             if (oldUrlObj.hash && !oldUrlObj.hash.startsWith('#eJ')) {
               targetHash = oldUrlObj.hash
             }
-          } catch (err) {
+          } catch {
             // ignore parsing failures
           }
         }
