@@ -304,7 +304,7 @@ export function ScheduleManager() {
                 state={{
                   employees,
                   coverageRequirements: requirements,
-
+                  baselineRequirements: baselineRequirements,
                   schedule: activeSchedule,
                 }}
                 onImport={async (file) => {

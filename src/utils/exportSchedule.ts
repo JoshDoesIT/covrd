@@ -19,6 +19,7 @@ export function serializeScheduleJSON(state: ShareableState): string {
     exportedAt: new Date().toISOString(),
     employees: state.employees,
     coverageRequirements: state.coverageRequirements,
+    baselineRequirements: state.baselineRequirements,
     schedule: state.schedule,
   })
 }
@@ -47,6 +48,7 @@ export function deserializeScheduleJSON(json: string): ShareableState {
   return {
     employees: parsed.employees,
     coverageRequirements: parsed.coverageRequirements,
+    baselineRequirements: parsed.baselineRequirements || [],
     schedule: parsed.schedule,
   }
 }
