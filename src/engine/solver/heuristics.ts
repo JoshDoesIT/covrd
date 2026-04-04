@@ -28,12 +28,13 @@ export function sortShiftsByMRV(shifts: Shift[], candidateCounts: Map<string, nu
       return normDayA - normDayB
     }
 
-    if (a.start !== b.start) {
-      return a.start.localeCompare(b.start)
-    }
+    if (a.start !== b.start) return a.start.localeCompare(b.start)
 
     // Tie-breaker 2: Longer shifts are generally harder to place
-    return b.durationHours - a.durationHours
+    if (a.durationHours !== b.durationHours) return b.durationHours - a.durationHours
+    
+    // Deterministic final tie-breaker prevents fragile cross-browser search space deviations
+    return a.id.localeCompare(b.id)
   })
 }
 
@@ -139,7 +140,12 @@ export function sortCandidatesByFairness(
     const scoreA = deficitA * 10 + clumpModifierA + consistencyModifierA
     const scoreB = deficitB * 10 + clumpModifierB + consistencyModifierB
 
-    // Sort descending by score
-    return scoreB - scoreA
+    if (scoreA !== scoreB) {
+      // Higher score means they SHOULD be assigned first (descending)
+      return scoreB - scoreA
+    }
+
+    // Deterministic tie-breaker prevents fragile cross-browser search space deviations
+    return a.id.localeCompare(b.id)
   })
 }
