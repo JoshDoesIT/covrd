@@ -9,6 +9,7 @@ import type { CoverageRequirement, BaselineRequirement } from '../../types/index
 import { formatTime } from '../../utils/formatTime'
 import { EmptyState } from '../shared/EmptyState'
 import { Modal } from '../shared/Modal'
+import { Toast } from '../tooling/Toast'
 import './CoverageManager.css'
 
 function getDaysInMonth(year: number, month: number) {
@@ -41,6 +42,7 @@ export function CoverageManager() {
   const [isCreating, setIsCreating] = useState(false)
   const [formData, setFormData] = useState<Partial<CoverageRequirement | BaselineRequirement>>({})
   const [reqToDelete, setReqToDelete] = useState<string | null>(null)
+  const [toastMessage, setToastMessage] = useState<{ text: string, type: 'default' | 'success'} | null>(null)
 
   const hd = useMemo(() => new Holidays(holidayCountry || 'US'), [holidayCountry])
   const currentYear = currentDate.getFullYear()
@@ -117,7 +119,10 @@ export function CoverageManager() {
 
   const handleSave = () => {
     if (viewMode === 'baseline') {
-      if (activeBaselineDay === null) return alert('Day is required.')
+      if (activeBaselineDay === null) {
+        setToastMessage({ text: 'Day is required.', type: 'default' })
+        return
+      }
       if (isCreating) {
         addBaselineRequirement(createBaselineRequirement({
           dayOfWeek: activeBaselineDay,
@@ -131,7 +136,10 @@ export function CoverageManager() {
         updateBaselineRequirement(editingId, formData)
       }
     } else {
-      if (!activeDate) return alert('Date is required.')
+      if (!activeDate) {
+        setToastMessage({ text: 'Date is required.', type: 'default' })
+        return
+      }
       if (isCreating) {
         addRequirement(createCoverageRequirement({
           date: activeDate,
@@ -499,6 +507,14 @@ export function CoverageManager() {
           </button>
         </div>
       </Modal>
+
+      {toastMessage && (
+        <Toast
+          message={toastMessage.text}
+          type={toastMessage.type}
+          onDismiss={() => setToastMessage(null)}
+        />
+      )}
     </div>
   )
 }

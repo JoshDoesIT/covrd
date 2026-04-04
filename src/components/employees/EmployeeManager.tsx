@@ -5,6 +5,8 @@ import { createEmployee } from '../../types/factories'
 import type { Employee } from '../../types/index'
 import { AvailabilityGrid } from './AvailabilityGrid'
 import { EmptyState } from '../shared/EmptyState'
+import { Modal } from '../shared/Modal'
+import { Toast } from '../tooling/Toast'
 import './EmployeeManager.css'
 
 export function EmployeeManager() {
@@ -14,6 +16,8 @@ export function EmployeeManager() {
   const [isCreating, setIsCreating] = useState(false)
   const [isManagingAvail, setIsManagingAvail] = useState(false)
   const [formData, setFormData] = useState<Partial<Employee>>({})
+  const [empToDelete, setEmpToDelete] = useState<string | null>(null)
+  const [toastMessage, setToastMessage] = useState<{ text: string, type: 'default' | 'success'} | null>(null)
 
   // Determine which employee or new employee is actively shown in the right pane
   const activeEmployee = useMemo(() => {
@@ -50,19 +54,26 @@ export function EmployeeManager() {
     })
   }
 
-  const handleDelete = (e: React.MouseEvent, empId: string) => {
+  const handleDeletePrompt = (e: React.MouseEvent, empId: string) => {
     e.stopPropagation()
-    if (confirm('Are you sure you want to remove this employee?')) {
-      removeEmployee(empId)
-      if (editingId === empId) {
-        setEditingId(null)
-        setIsManagingAvail(false)
-      }
+    setEmpToDelete(empId)
+  }
+
+  const confirmDelete = () => {
+    if (!empToDelete) return
+    removeEmployee(empToDelete)
+    if (editingId === empToDelete) {
+      setEditingId(null)
+      setIsManagingAvail(false)
     }
+    setEmpToDelete(null)
   }
 
   const handleSave = () => {
-    if (!formData.name) return alert('Name is required.')
+    if (!formData.name) {
+      setToastMessage({ text: 'Name is required.', type: 'default' })
+      return
+    }
 
     if (isCreating) {
       const newEmp = createEmployee({ name: formData.name!, role: formData.role ?? 'staff' })
@@ -150,7 +161,7 @@ export function EmployeeManager() {
                       </button>
                       <button
                         className="ec-btn-icon danger"
-                        onClick={(e) => handleDelete(e, emp.id)}
+                        onClick={(e) => handleDeletePrompt(e, emp.id)}
                         title="Remove Employee"
                       >
                         <Trash2 size={14} />
@@ -316,6 +327,36 @@ export function EmployeeManager() {
           </div>
         ) : null}
       </div>
+
+      <Modal
+        isOpen={!!empToDelete}
+        onClose={() => setEmpToDelete(null)}
+        title="Delete Employee"
+      >
+        <p style={{ marginBottom: '1.5rem', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
+          Are you sure you want to completely remove this employee from the roster? This will impact any generated schedules they are mapped to.
+        </p>
+        <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+          <button className="btn-secondary" onClick={() => setEmpToDelete(null)}>
+            Cancel
+          </button>
+          <button
+            className="btn-primary danger"
+            onClick={confirmDelete}
+            style={{ background: 'var(--color-error)' }}
+          >
+            Yes, Remove Employee
+          </button>
+        </div>
+      </Modal>
+
+      {toastMessage && (
+        <Toast
+          message={toastMessage.text}
+          type={toastMessage.type}
+          onDismiss={() => setToastMessage(null)}
+        />
+      )}
     </div>
   )
 }
