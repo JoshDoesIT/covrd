@@ -1,8 +1,8 @@
-import { chromium, devices } from 'playwright'
+import { chromium } from 'playwright'
 import path from 'path'
 import fs from 'fs'
 
-const url = 'http://localhost:5174/?app'
+const url = 'http://localhost:5174/?app#schedule'
 const outDir = path.resolve('docs/brand/screenshots')
 
 async function capture() {
@@ -11,103 +11,73 @@ async function capture() {
   }
   const browser = await chromium.launch({ headless: true })
 
-  // 1. Desktop
+  // ==========================================
+  // 1. Capture Raw Desktop (1920x1080)
+  // ==========================================
+  const desktopWidth = 1920
+  const desktopHeight = 1080
+
   const desktopContext = await browser.newContext({
-    viewport: { width: 1440, height: 900 },
+    viewport: { width: desktopWidth, height: desktopHeight },
     deviceScaleFactor: 2,
   })
-  // Bypass Onboarding by setting localStorage before page load
   await desktopContext.addInitScript(() => {
     localStorage.setItem('covrd-onboarding-complete', 'true')
   })
-  
+
   const desktopPage = await desktopContext.newPage()
   await desktopPage.goto(url, { waitUntil: 'load' })
-  await desktopPage.waitForTimeout(1000) 
+  await desktopPage.evaluate(async () => {
+    await document.fonts.ready
+  })
+  await desktopPage.addStyleTag({
+    content: '::-webkit-scrollbar { display: none !important; } body { overflow-x: hidden; }',
+  })
 
-  // Command Palette: Load demo data
   await desktopPage.keyboard.press('Control+k')
   await desktopPage.waitForSelector('.covrd-command-input', { state: 'visible', timeout: 5000 })
   await desktopPage.keyboard.type('demo', { delay: 50 })
   await desktopPage.waitForTimeout(500)
   await desktopPage.keyboard.press('Enter')
-  await desktopPage.waitForTimeout(1500) // Wait for data to load
-  
-  // Command Palette: Navigate to schedule
-  await desktopPage.keyboard.press('Control+k')
-  await desktopPage.waitForSelector('.covrd-command-input', { state: 'visible', timeout: 5000 })
-  await desktopPage.keyboard.type('schedule builder', { delay: 50 })
-  await desktopPage.waitForTimeout(500)
-  await desktopPage.keyboard.press('Enter')
-  await desktopPage.waitForTimeout(1500) // Allow render
+  await desktopPage.waitForTimeout(1000)
 
-  // Ensure style
   await desktopPage.evaluate(() => {
-    const originalBody = document.body.innerHTML
-    document.body.innerHTML = ''
-    document.body.style.background = 'linear-gradient(135deg, #1A1B26, #24283B)'
-    document.body.style.margin = '0'
-    document.body.style.display = 'flex'
-    document.body.style.alignItems = 'center'
-    document.body.style.justifyContent = 'center'
-    document.body.style.padding = '60px'
-    document.body.style.minHeight = '100vh'
-    document.body.style.boxSizing = 'border-box'
-    const frame = document.createElement('div')
-    // A classic 16:9 inner frame
-    frame.style.width = '1200px'
-    frame.style.height = '750px'
-    frame.style.background = '#0F111A'
-    frame.style.borderRadius = '16px'
-    frame.style.overflow = 'hidden'
-    frame.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255,255,255,0.1)'
-    frame.style.display = 'flex'
-    frame.style.flexDirection = 'column'
-    
-    const toolbar = document.createElement('div')
-    toolbar.style.height = '32px'
-    toolbar.style.background = '#1A1B26'
-    toolbar.style.display = 'flex'
-    toolbar.style.alignItems = 'center'
-    toolbar.style.padding = '0 16px'
-    toolbar.style.gap = '8px'
-    toolbar.style.boxShadow = 'inset 0 -1px 0 rgba(255,255,255,0.05)'
-    ;['#FF5F56', '#FFBD2E', '#27C93F'].forEach((color) => {
-      const dot = document.createElement('div')
-      dot.style.width = '12px'
-      dot.style.height = '12px'
-      dot.style.borderRadius = '50%'
-      dot.style.background = color
-      toolbar.appendChild(dot)
-    })
-    
-    const content = document.createElement('div')
-    content.style.position = 'relative'
-    content.style.flex = '1'
-    content.style.overflow = 'hidden'
-    content.innerHTML = originalBody
-    frame.appendChild(toolbar)
-    frame.appendChild(content)
-    document.body.appendChild(frame)
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur()
+    }
   })
-  
-  await desktopPage.screenshot({ path: path.join(outDir, 'app_desktop.png') })
+  await desktopPage.setViewportSize({ width: desktopWidth, height: desktopHeight })
+  await desktopPage.waitForTimeout(2000)
+
+  const rawDesktopPath = path.join(outDir, 'raw_desktop.png')
+  await desktopPage.screenshot({ path: rawDesktopPath, fullPage: false })
   await desktopContext.close()
 
-  // 2. Mobile
+  // ==========================================
+  // 2. Capture Raw Mobile (400x850 Responsive CSS)
+  // ==========================================
+  // Using a standard browser context resized to mobile width instead of iPhone emulator
+  // This bypasses all OS-level virtual keyboard shrinking and native iOS auto-zoom panning bugs
+  const mobileWidth = 400
+  const mobileHeight = 850
+
   const mobileContext = await browser.newContext({
-    ...devices['iPhone 13 Pro'],
+    viewport: { width: mobileWidth, height: mobileHeight },
     deviceScaleFactor: 3,
   })
   await mobileContext.addInitScript(() => {
     localStorage.setItem('covrd-onboarding-complete', 'true')
   })
-  
+
   const mobilePage = await mobileContext.newPage()
   await mobilePage.goto(url, { waitUntil: 'load' })
-  await mobilePage.waitForTimeout(1000)
+  await mobilePage.evaluate(async () => {
+    await document.fonts.ready
+  })
+  await mobilePage.addStyleTag({
+    content: '::-webkit-scrollbar { display: none !important; } body { overflow-x: hidden; }',
+  })
 
-  // Command Palette: Load demo data
   await mobilePage.keyboard.press('Control+k')
   await mobilePage.waitForSelector('.covrd-command-input', { state: 'visible', timeout: 5000 })
   await mobilePage.keyboard.type('demo', { delay: 50 })
@@ -115,66 +85,78 @@ async function capture() {
   await mobilePage.keyboard.press('Enter')
   await mobilePage.waitForTimeout(1500)
 
-  // Command Palette: Schedule builder 
-  await mobilePage.keyboard.press('Control+k')
-  await mobilePage.waitForSelector('.covrd-command-input', { state: 'visible', timeout: 5000 })
-  await mobilePage.keyboard.type('schedule builder', { delay: 50 })
-  await mobilePage.waitForTimeout(500)
-  await mobilePage.keyboard.press('Enter')
-  await mobilePage.waitForTimeout(1500)
-
-  // Ensure style
   await mobilePage.evaluate(() => {
-    const originalBody = document.body.innerHTML
-    document.body.innerHTML = ''
-    document.body.style.background = 'linear-gradient(135deg, #1A1B26, #24283B)'
-    document.body.style.margin = '0'
-    document.body.style.display = 'flex'
-    document.body.style.alignItems = 'center'
-    document.body.style.justifyContent = 'center'
-    document.body.style.padding = '40px'
-    document.body.style.minHeight = '100vh'
-    document.body.style.boxSizing = 'border-box'
-    
-    const frame = document.createElement('div')
-    frame.style.width = '390px'
-    frame.style.height = '844px'
-    frame.style.background = '#0F111A'
-    frame.style.borderRadius = '40px'
-    frame.style.overflow = 'hidden'
-    frame.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 2px #333, inset 0 0 0 6px #000'
-    frame.style.display = 'flex'
-    frame.style.flexDirection = 'column'
-    frame.style.position = 'relative'
-    
-    // Notch
-    const notch = document.createElement('div')
-    notch.style.position = 'absolute'
-    notch.style.top = '6px'
-    notch.style.left = '50%'
-    notch.style.transform = 'translateX(-50%)'
-    notch.style.width = '150px'
-    notch.style.height = '30px'
-    notch.style.background = '#000'
-    notch.style.borderBottomLeftRadius = '16px'
-    notch.style.borderBottomRightRadius = '16px'
-    notch.style.zIndex = '9999'
-    
-    const content = document.createElement('div')
-    content.style.position = 'relative'
-    content.style.flex = '1'
-    content.style.overflow = 'hidden'
-    content.style.paddingTop = '12px'
-    content.innerHTML = originalBody
-    frame.appendChild(notch)
-    frame.appendChild(content)
-    document.body.appendChild(frame)
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur()
+    }
+    // Hard reset any horizontal pan shifts caused by active inputs focusing
+    document.querySelectorAll('*').forEach((el) => {
+      if (el.scrollLeft > 0) el.scrollLeft = 0
+    })
+    window.scrollTo(0, 0)
   })
-  
-  await mobilePage.screenshot({ path: path.join(outDir, 'app_mobile.png') })
+
+  await mobilePage.waitForTimeout(2000)
+
+  const rawMobilePath = path.join(outDir, 'raw_mobile.png')
+  await mobilePage.screenshot({ path: rawMobilePath, fullPage: false })
   await mobileContext.close()
 
+  // ==========================================
+  // 3. Composite Desktop
+  // ==========================================
+  const compositeContext = await browser.newContext({
+    viewport: { width: 2000, height: 1200 },
+    deviceScaleFactor: 2,
+  })
+  const compPage = await compositeContext.newPage()
+  const desktopImgBase64 = fs.readFileSync(rawDesktopPath, 'base64')
+
+  await compPage.setContent(`
+    <!DOCTYPE html>
+    <html>
+      <body style="background: linear-gradient(135deg, #1A1B26, #24283B); margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 60px; box-sizing: border-box;">
+        <div style="width: 1920px; height: 1112px; background: #0F111A; border-radius: 16px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255,255,255,0.1); display: flex; flex-direction: column;">
+          <div style="height: 32px; background: #1A1B26; display: flex; align-items: center; padding: 0 16px; gap: 8px; box-shadow: inset 0 -1px 0 rgba(255,255,255,0.05); flex-shrink: 0;">
+            <div style="width: 12px; height: 12px; border-radius: 50%; background: #FF5F56;"></div>
+            <div style="width: 12px; height: 12px; border-radius: 50%; background: #FFBD2E;"></div>
+            <div style="width: 12px; height: 12px; border-radius: 50%; background: #27C93F;"></div>
+          </div>
+          <div style="position: relative; flex: 1; overflow: hidden; background: #0F111A;">
+            <img src="data:image/png;base64,${desktopImgBase64}" style="width: 100%; height: 100%; display: block; object-fit: contain;" />
+          </div>
+        </div>
+      </body>
+    </html>
+  `)
+  await compPage.waitForLoadState('networkidle')
+  await compPage.screenshot({ path: path.join(outDir, 'app_desktop.png') })
+
+  // ==========================================
+  // 4. Composite Mobile
+  // ==========================================
+  await compPage.setViewportSize({ width: 600, height: 1000 })
+  const mobileImgBase64 = fs.readFileSync(rawMobilePath, 'base64')
+
+  await compPage.setContent(`
+    <!DOCTYPE html>
+    <html>
+      <body style="background: linear-gradient(135deg, #1A1B26, #24283B); margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 40px; box-sizing: border-box;">
+        <div style="width: 400px; height: 850px; background: #0F111A; border-radius: 40px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 2px #333, inset 0 0 0 6px #000; display: flex; flex-direction: column; position: relative;">
+          <div style="position: absolute; top: -1px; left: 50%; transform: translateX(-50%); width: 140px; height: 28px; background: #000; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; z-index: 9999;"></div>
+          <div style="position: relative; flex: 1; overflow: hidden; background: #0F111A;">
+            <img src="data:image/png;base64,${mobileImgBase64}" style="width: 100%; height: 100%; display: block; object-fit: contain;" />
+          </div>
+        </div>
+      </body>
+    </html>
+  `)
+  await compPage.waitForLoadState('networkidle')
+  await compPage.screenshot({ path: path.join(outDir, 'app_mobile.png') })
+
+  await compositeContext.close()
   await browser.close()
+
   console.log('Done screenshots')
 }
 

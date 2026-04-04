@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <strong>Every Shift. Coverd.</strong> Auto staff scheduling that respects your privacy.
+  <strong>Every shift, covrd.</strong> Auto staff scheduling that respects your privacy.
 </p>
 
 <p align="center">
