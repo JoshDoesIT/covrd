@@ -84,25 +84,13 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
       {/* Top Row */}
       <div className="share-toolbar__row share-toolbar__row--top">
         <button
-          className="sm-btn-ghost share-toolbar__btn share-toolbar__btn--block"
-          onClick={handleShareLink}
-          aria-label="Share Link"
-          title="Copy share link to clipboard"
-        >
-          <Link2 size={14} />
-          <span className="share-toolbar__label" style={{ display: 'inline' }}>
-            Share Link
-          </span>
-        </button>
-
-        <button
           className="sm-btn-ghost share-toolbar__btn"
           onClick={handleImportClick}
           aria-label="Import JSON"
           title="Import schedule from JSON"
         >
           <Upload size={14} />
-          <span className="share-toolbar__label">Import</span>
+          <span className="share-toolbar__label">Import JSON</span>
         </button>
         <input
           ref={fileInputRef}
@@ -144,6 +132,16 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
         >
           <Printer size={14} />
           <span className="share-toolbar__label">Print</span>
+        </button>
+
+        <button
+          className="sm-btn-ghost share-toolbar__btn"
+          onClick={handleShareLink}
+          aria-label="Share Link"
+          title="Copy share link to clipboard"
+        >
+          <Link2 size={14} />
+          <span className="share-toolbar__label">Share Link</span>
         </button>
       </div>
 
