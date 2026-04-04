@@ -268,13 +268,15 @@ export function EmployeeManager() {
                     value={formData.minHoursPerWeek ?? 0}
                     onChange={(e) => {
                       const raw = e.target.value.replace(/[^0-9]/g, '')
-                      setFormData({ ...formData, minHoursPerWeek: raw === '' ? 0 : Number(raw) })
+                      setFormData({ ...formData, minHoursPerWeek: raw === '' ? ('' as unknown as number) : Number(raw) })
                     }}
                     onFocus={(e) => {
                       if (e.target.value === '0') e.target.value = ''
                     }}
                     onBlur={(e) => {
-                      if (e.target.value === '') e.target.value = '0'
+                      if (e.target.value === '') {
+                        setFormData({ ...formData, minHoursPerWeek: 0 })
+                      }
                     }}
                   />
                 </div>
