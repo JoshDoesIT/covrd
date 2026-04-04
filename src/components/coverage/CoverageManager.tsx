@@ -8,6 +8,7 @@ import { createCoverageRequirement, createBaselineRequirement } from '../../type
 import type { CoverageRequirement, BaselineRequirement } from '../../types/index'
 import { formatTime } from '../../utils/formatTime'
 import { EmptyState } from '../shared/EmptyState'
+import { Modal } from '../shared/Modal'
 import './CoverageManager.css'
 
 function getDaysInMonth(year: number, month: number) {
@@ -39,6 +40,7 @@ export function CoverageManager() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [isCreating, setIsCreating] = useState(false)
   const [formData, setFormData] = useState<Partial<CoverageRequirement | BaselineRequirement>>({})
+  const [reqToDelete, setReqToDelete] = useState<string | null>(null)
 
   const hd = useMemo(() => new Holidays(holidayCountry || 'US'), [holidayCountry])
   const currentYear = currentDate.getFullYear()
@@ -97,16 +99,20 @@ export function CoverageManager() {
     })
   }
 
-  const handleDelete = (e: React.MouseEvent, reqId: string) => {
+  const handleDeletePrompt = (e: React.MouseEvent, reqId: string) => {
     e.stopPropagation()
-    if (confirm('Are you sure you want to remove this requirement?')) {
-      if (viewMode === 'baseline') {
-        removeBaselineRequirement(reqId)
-      } else {
-        removeRequirement(reqId)
-      }
-      if (editingId === reqId) setEditingId(null)
+    setReqToDelete(reqId)
+  }
+
+  const confirmDelete = () => {
+    if (!reqToDelete) return
+    if (viewMode === 'baseline') {
+      removeBaselineRequirement(reqToDelete)
+    } else {
+      removeRequirement(reqToDelete)
     }
+    if (editingId === reqToDelete) setEditingId(null)
+    setReqToDelete(null)
   }
 
   const handleSave = () => {
@@ -372,7 +378,7 @@ export function CoverageManager() {
                             <button className="ec-btn-icon" onClick={(e) => handleStartEdit(e, req)}>
                               <Edit2 size={14} />
                             </button>
-                            <button className="ec-btn-icon danger" onClick={(e) => handleDelete(e, req.id)}>
+                            <button className="ec-btn-icon danger" onClick={(e) => handleDeletePrompt(e, req.id)}>
                               <Trash2 size={14} />
                             </button>
                           </div>
@@ -471,6 +477,28 @@ export function CoverageManager() {
           </div>
         )}
       </div>
+
+      <Modal
+        isOpen={!!reqToDelete}
+        onClose={() => setReqToDelete(null)}
+        title="Delete Shift"
+      >
+        <p style={{ marginBottom: '1.5rem', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
+          Are you sure you want to completely remove this shift requirement? This action cannot be undone and will affect any future schedule generation.
+        </p>
+        <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
+          <button className="btn-secondary" onClick={() => setReqToDelete(null)}>
+            Cancel
+          </button>
+          <button
+            className="btn-primary danger"
+            onClick={confirmDelete}
+            style={{ background: 'var(--color-error)' }}
+          >
+            Yes, Remove Shift
+          </button>
+        </div>
+      </Modal>
     </div>
   )
 }

@@ -11,6 +11,15 @@
   animation: toast-slide-in 0.3s ease-out;
 }
 
+.toast--success {
+  background: var(--color-success);
+  border-color: var(--color-success);
+}
+
+.toast--success .toast__message {
+  color: #ffffff;
+}
+
 .toast__message {
   color: var(--color-text-primary);
   font-size: 0.875rem;

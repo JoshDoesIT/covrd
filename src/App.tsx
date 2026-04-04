@@ -88,7 +88,7 @@ export function App() {
       const sharedState = hydrateFromHash()
       if (sharedState) {
         await applySharedState(sharedState)
-        setToastMessage('Shared schedule & rules successfully replaced your local state!')
+        setToastMessage('Successfully loaded data!')
         window.history.replaceState(null, '', window.location.pathname)
       }
     }
@@ -127,7 +127,7 @@ export function App() {
   return (
     <>
       {toastMessage && (
-        <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} duration={4000} />
+        <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} duration={4000} type="success" />
       )}
       {showOnboarding && <OnboardingWizard onComplete={handleOnboardingComplete} />}
       <AppShell />

@@ -332,7 +332,7 @@ export function ScheduleManager() {
                     }
 
                     setActiveSchedule(imported.schedule)
-                    setToastMessage(`Successfully imported ${imported.schedule.name}`)
+                    setToastMessage('Successfully loaded data!')
                   } catch (err: unknown) {
                     setErrorStatus(err instanceof Error ? err.message : 'Failed to import JSON file')
                   }
@@ -432,7 +432,7 @@ export function ScheduleManager() {
 
       <div className="sm-content">
         {toastMessage && (
-          <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} duration={4000} />
+          <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} duration={4000} type="success" />
         )}
         
         {isConfirmingGenerate && (
