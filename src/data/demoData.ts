@@ -160,10 +160,10 @@ export const DEMO_EMPLOYEES: Employee[] = [
 
 export const DEMO_COVERAGE_REQUIREMENTS: CoverageRequirement[] = (() => {
   const requirements: CoverageRequirement[] = []
-  
+
   // Create 4 weeks of demo requirements
   for (let week = 0; week < 4; week++) {
-    // April 6 is a Monday. 
+    // April 6 is a Monday.
     const baseDateMs = new Date('2026-04-06T00:00:00').getTime()
     const weekOffsetMs = week * 7 * 24 * 60 * 60 * 1000
 
@@ -174,13 +174,13 @@ export const DEMO_COVERAGE_REQUIREMENTS: CoverageRequirement[] = (() => {
       { d: 'thursday', offset: 3 },
       { d: 'friday', offset: 4 },
       { d: 'saturday', offset: 5 },
-      { d: 'sunday', offset: 6 }
+      { d: 'sunday', offset: 6 },
     ]
 
     days.forEach(({ d, offset }) => {
       const dt = new Date(baseDateMs + weekOffsetMs + offset * 24 * 60 * 60 * 1000)
       const dateStr = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`
-      
+
       const isWeekend = d === 'saturday' || d === 'sunday'
 
       if (!isWeekend) {
@@ -199,7 +199,7 @@ export const DEMO_COVERAGE_REQUIREMENTS: CoverageRequirement[] = (() => {
           endTime: '22:00',
           unpaidBreakMinutes: 60,
           // Reduced to 1 to ensure a perfect 100% demo schedule
-          requiredStaff: 1, 
+          requiredStaff: 1,
         })
       } else {
         requirements.push({
@@ -236,7 +236,7 @@ export async function loadDemoDataAsync() {
     if (weekNumber >= 0 && weekNumber < totalWeeks) {
       // dayDiff is 0-based from Monday (since baseDate is always a Monday).
       // DAY_MAP uses Sunday=0, Monday=1. Shift by +1 to align.
-      const dayOfWeek = (dayDiff % 7 + 1) % 7
+      const dayOfWeek = ((dayDiff % 7) + 1) % 7
       const shift = createShift({
         day:
           (Object.keys(DAY_MAP).find(

@@ -64,7 +64,7 @@ export function solveSchedule(employees: Employee[], targetShifts: Shift[]): Sol
 
     return {
       // It's only a true absolute success if there are no unfilled shifts.
-      // Partial assignments flow through regardless into the generated schedule. 
+      // Partial assignments flow through regardless into the generated schedule.
       success: finalUnfilled.length === 0,
       assignedShifts: finalShifts,
       unfilledShifts: finalUnfilled,

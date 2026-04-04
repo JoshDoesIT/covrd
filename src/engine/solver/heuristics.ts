@@ -20,7 +20,7 @@ export function sortShiftsByMRV(shifts: Shift[], candidateCounts: Map<string, nu
     if (a.weekNumber !== b.weekNumber) {
       return a.weekNumber - b.weekNumber
     }
-    
+
     // Normalize day to Monday=0, Sunday=6
     const normDayA = a.dayOfWeek === 0 ? 6 : a.dayOfWeek - 1
     const normDayB = b.dayOfWeek === 0 ? 6 : b.dayOfWeek - 1
@@ -32,7 +32,7 @@ export function sortShiftsByMRV(shifts: Shift[], candidateCounts: Map<string, nu
 
     // Tie-breaker 2: Longer shifts are generally harder to place
     if (a.durationHours !== b.durationHours) return b.durationHours - a.durationHours
-    
+
     // Deterministic final tie-breaker prevents fragile cross-browser search space deviations
     return a.id.localeCompare(b.id)
   })
