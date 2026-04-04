@@ -324,14 +324,14 @@ export function CoverageManager() {
                   }}
                 >
                   <span className="cm-cell-date">{dayOfMonth}</span>
+                  {reqs.length > 0 && (
+                    <div className="cm-req-count">{reqs.length} shift{reqs.length === 1 ? '' : 's'}</div>
+                  )}
                   {isHoliday && (
-                    <div className="cm-holiday-marker" title={holidays[dateStr].join(', ')}>
+                    <div className="cm-holiday-marker" title={holidays[dateStr].join(', ')} style={{ marginTop: '0.25rem' }}>
                       <Star size={10} style={{ marginRight: '4px', display: 'inline-block', verticalAlign: 'middle' }} />
                       <span style={{ verticalAlign: 'middle' }}>{holidays[dateStr][0]}</span>
                     </div>
-                  )}
-                  {reqs.length > 0 && (
-                    <div className="cm-req-count">{reqs.length} shift{reqs.length === 1 ? '' : 's'}</div>
                   )}
                 </div>
               )
