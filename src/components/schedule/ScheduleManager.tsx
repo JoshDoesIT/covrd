@@ -352,7 +352,6 @@ export function ScheduleManager() {
               />
             </>
           )}
-
         </div>
 
         <div className="sm-generate-zone">
@@ -428,11 +427,7 @@ export function ScheduleManager() {
             </div>
           </div>
 
-          <button
-            className="sm-btn-generate"
-            onClick={handleGenerateClick}
-            disabled={isGenerating}
-          >
+          <button className="sm-btn-generate" onClick={handleGenerateClick} disabled={isGenerating}>
             {isGenerating ? (
               <RefreshCw size={16} className="lucide-spin" />
             ) : (
