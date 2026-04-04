@@ -230,7 +230,7 @@ export function ScheduleManager() {
             <CalendarDays size={20} color="var(--color-accent)" />
             Schedule Builder
           </h2>
-          <p className="sm-subtitle">Generate, review, and fine-tune your staff schedules.</p>
+          <p className="sm-subtitle">Generate staff schedules.</p>
         </div>
         <div className="sm-actions">
           {activeSchedule && (

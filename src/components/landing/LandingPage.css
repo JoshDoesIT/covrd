@@ -609,6 +609,9 @@
   .landing__privacy-banner {
     flex-direction: column;
     gap: var(--space-6);
-    align-items: flex-start;
+    align-items: center; /* Centered */
+  }
+  .landing__privacy-capsules {
+    justify-content: center; /* Center the pills */
   }
 }
