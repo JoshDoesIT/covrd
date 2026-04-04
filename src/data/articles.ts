@@ -28,14 +28,14 @@ Building your schedule involves three main steps:
 ### Tips for Success
 
 As far as success is concerned, it is important to note that being specific with your drafted coverage shifts yields the best results. Additionally, you should avoid overly limiting employee availability, because the engine might fail to find a valid scheduling solution if constraints are too severe.
-\`
+`,
   },
   {
     id: 'using-coverage-canvas',
     title: 'How to Use the Coverage Canvas',
     category: 'User Guide',
     tags: ['coverage', 'calendar', 'drafting'],
-    content: \`
+    content: `
 # Using the Coverage Canvas
 
 The Coverage Canvas gives you a high-level monthly view to visualize and define your staffing requirements. I decided to build this as an interactive calendar because businesses often need to deploy different staffing models depending on holidays, seasons, or active promotions.
@@ -47,14 +47,14 @@ To begin mapping your staffing needs, simply click on any date cell within the m
 ## Stamping a Pattern
 
 You likely do not want to draft every single shift manually for the entire month. For this reason, I built the "Stamp Weekly Pattern" utility. First, you draft a full week of required shifts anywhere in the current month. Once you have a perfect week configured, click the **Stamp Weekly Pattern** button at the top of the canvas. The engine will instantly grab that fully assembled week and accurately copy it across to every other remaining week in the month.
-\`
+`,
   },
   {
     id: 'fair-scheduling',
     title: 'Principles of Fair Scheduling',
     category: 'Best Practices',
     tags: ['fairness', 'burnout', 'retention'],
-    content: \`
+    content: `
 # Principles of Fair Scheduling
 
 Staff rotation should not result in random chaos for your team. Following fair scheduling principles actively increases employee retention by respecting boundaries.

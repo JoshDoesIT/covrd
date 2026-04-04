@@ -99,7 +99,13 @@ export function serializeScheduleCSV(
     rows.push('--- COVERAGE REQUIREMENTS ---')
     rows.push('Role,Date,Required Staff')
     for (const cov of state.coverageRequirements) {
-      rows.push([escapeCsvField(cov.role || 'Any'), escapeCsvField(cov.date), cov.requiredStaff.toString()].join(','))
+      rows.push(
+        [
+          escapeCsvField(cov.role || 'Any'),
+          escapeCsvField(cov.date),
+          cov.requiredStaff.toString(),
+        ].join(','),
+      )
     }
 
     rows.push('') // Blank line spacer

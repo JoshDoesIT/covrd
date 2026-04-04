@@ -63,7 +63,15 @@ function computeCoverage(
   })
 
   // Sum required staff per day from coverage requirements
-  const DAY_ORDER_INDEX: DayOfWeek[] = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
+  const DAY_ORDER_INDEX: DayOfWeek[] = [
+    'sunday',
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
+  ]
   const requiredByDay = new Map<DayOfWeek, number>()
   coverageReqs.forEach((req) => {
     const dObj = new Date(`${req.date}T00:00:00`)
