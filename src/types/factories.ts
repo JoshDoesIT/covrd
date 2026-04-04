@@ -156,8 +156,6 @@ export function createConstraint(
   }
 }
 
-
-
 // Re-export types for convenience
 export type {
   Employee,

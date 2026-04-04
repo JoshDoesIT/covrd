@@ -74,17 +74,35 @@ describe('Constraint Validators', () => {
     ]
 
     it('returns true if another shift exists on the exact same day', () => {
-      const newShift: Shift = { ...mockShift, start: '16:00', end: '18:00', dayOfWeek: 1, weekNumber: 0 }
+      const newShift: Shift = {
+        ...mockShift,
+        start: '16:00',
+        end: '18:00',
+        dayOfWeek: 1,
+        weekNumber: 0,
+      }
       expect(hasShiftOnSameDay(newShift, existingShifts)).toBe(true)
     })
 
     it('returns false if shift is on a different day', () => {
-      const newShift: Shift = { ...mockShift, start: '13:00', end: '17:00', dayOfWeek: 2, weekNumber: 0 }
+      const newShift: Shift = {
+        ...mockShift,
+        start: '13:00',
+        end: '17:00',
+        dayOfWeek: 2,
+        weekNumber: 0,
+      }
       expect(hasShiftOnSameDay(newShift, existingShifts)).toBe(false)
     })
 
     it('returns false if shift is on the same dayOfWeek but in a different week', () => {
-      const newShift: Shift = { ...mockShift, start: '11:00', end: '15:00', dayOfWeek: 1, weekNumber: 1 }
+      const newShift: Shift = {
+        ...mockShift,
+        start: '11:00',
+        end: '15:00',
+        dayOfWeek: 1,
+        weekNumber: 1,
+      }
       expect(hasShiftOnSameDay(newShift, existingShifts)).toBe(false)
     })
   })

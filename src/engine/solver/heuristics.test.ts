@@ -108,9 +108,9 @@ describe('Solver Heuristics', () => {
     it('prioritizes employees furthest from their target hours', () => {
       // Mock Map<employeeId, Map<weekNumber, workedHours>>
       const e1Hours = new Map<number, number>([[0, 30]]) // Needs 6 more
-      const e2Hours = new Map<number, number>([[0, 0]])  // Needs 36 more (highest priority)
+      const e2Hours = new Map<number, number>([[0, 0]]) // Needs 36 more (highest priority)
       const e3Hours = new Map<number, number>([[0, 36]]) // Exact target (lowest priority)
-      
+
       const currentHours = new Map<string, Map<number, number>>([
         ['e1', e1Hours],
         ['e2', e2Hours],
@@ -125,12 +125,17 @@ describe('Solver Heuristics', () => {
         end: '17:00',
         role: 'RN',
         durationHours: 8,
-        isAssigned: false
+        isAssigned: false,
       }
-      
+
       const mockAssignments = new Map<string, Shift[]>()
 
-      const sorted = sortCandidatesByFairness([emp1, emp2, emp3], currentHours, mockShiftToAssign, mockAssignments)
+      const sorted = sortCandidatesByFairness(
+        [emp1, emp2, emp3],
+        currentHours,
+        mockShiftToAssign,
+        mockAssignments,
+      )
       expect(sorted[0].id).toBe('e2')
       expect(sorted[1].id).toBe('e1')
       expect(sorted[2].id).toBe('e3')

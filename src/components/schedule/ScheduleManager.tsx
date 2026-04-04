@@ -103,7 +103,7 @@ export function ScheduleManager() {
       const shiftDate = new Date(`${r.date}T00:00:00`)
       const dayDiff = Math.round((shiftDate.getTime() - baseMs) / (1000 * 60 * 60 * 24))
       const weekNumber = Math.floor(dayDiff / 7)
-      
+
       // If it falls within the 4-week window we are generating
       if (weekNumber >= 0 && weekNumber < totalWeeks) {
         // Map native Date day (0=Sun, 1=Mon) to our DAY_MAP integer if needed,
@@ -113,7 +113,10 @@ export function ScheduleManager() {
         const dayOfWeek = dayDiff % 7
 
         const shift = createShift({
-          day: (Object.keys(DAY_MAP).find(k => DAY_MAP[k as keyof typeof DAY_MAP] === dayOfWeek) as DayOfWeek) || 'monday',
+          day:
+            (Object.keys(DAY_MAP).find(
+              (k) => DAY_MAP[k as keyof typeof DAY_MAP] === dayOfWeek,
+            ) as DayOfWeek) || 'monday',
           startTime: r.startTime,
           endTime: r.endTime,
           requiredStaff: r.requiredStaff,
@@ -406,8 +409,6 @@ export function ScheduleManager() {
         </div>
       </header>
 
-
-
       <div className="sm-content">
         {isConfirmingGenerate && (
           <div className="sm-overlay" style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}>
@@ -516,7 +517,9 @@ export function ScheduleManager() {
             >
               <div>
                 <h3 style={{ color: 'var(--color-text-primary)', margin: 0 }}>
-                  {activeSchedule.name.startsWith('Auto Generated') ? 'Weekly Schedule' : activeSchedule.name}
+                  {activeSchedule.name.startsWith('Auto Generated')
+                    ? 'Weekly Schedule'
+                    : activeSchedule.name}
                 </h3>
                 <p
                   style={{
@@ -608,10 +611,7 @@ export function ScheduleManager() {
             <div className="scroll-matrix-wrapper" style={{ overflowY: 'auto' }}>
               <div className="weekly-block">
                 {viewMode === 'matrix' ? (
-                  <WeeklyGrid
-                    weekNumber={activeWeekNumber}
-                    startDate={activeSchedule.startDate}
-                  />
+                  <WeeklyGrid weekNumber={activeWeekNumber} startDate={activeSchedule.startDate} />
                 ) : (
                   <TimelineGrid
                     weekNumber={activeWeekNumber}

@@ -45,7 +45,9 @@
   color: var(--color-text-primary);
   font-size: 0.875rem;
   font-family: var(--font-body);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .kb-search-input:focus {
@@ -90,7 +92,10 @@
   border-radius: var(--radius-lg);
   padding: 1.25rem;
   cursor: pointer;
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -189,7 +194,7 @@
   margin-bottom: 1rem;
 }
 
-.kb-article-content ul, 
+.kb-article-content ul,
 .kb-article-content ol {
   margin-bottom: 1rem;
   padding-left: 1.5rem;

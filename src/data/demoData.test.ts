@@ -11,8 +11,8 @@ vi.mock('../engine/worker/client', () => ({
     unfilledShifts: [],
     totalCost: 0,
     qualityScore: 100,
-    metrics: {}
-  })
+    metrics: {},
+  }),
 }))
 
 describe('Demo Data', () => {

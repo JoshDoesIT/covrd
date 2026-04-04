@@ -70,7 +70,7 @@ Second, fair weekend distribution is critical. Almost everyone dislikes working 
 ## 3. Predictable Notice
 
 Finally, predictable notice is essential. You should aim to release schedules at least two weeks in advance. According to industry research, last-minute schedule changes are one of the leading causes of turnover in shift-based work environments.
-`
+`,
   },
   {
     id: 'labor-compliance-basics',
@@ -89,6 +89,6 @@ In many regions, shifts that approach six or eight hours legally require an unpa
 ## Maximum Hours and Overtime
 
 Additionally, unmonitored overtime can quickly crush your labor budget. By properly configuring each employee's **Max Hours** inside the Team Roster, Covrd's solver engine is mathematically restricted from ever scheduling an individual into overtime. Instead, the engine will automatically prioritize scheduling staff members who still have remaining hour allocations for the week.
-`
-  }
+`,
+  },
 ]

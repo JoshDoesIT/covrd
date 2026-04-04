@@ -104,16 +104,18 @@ export function printSchedule(
   const dateRange = `${formatWeekRange(startDate, 0)}${totalWeeks > 1 ? ` → ${formatWeekRange(startDate, totalWeeks - 1)}` : ''}`
 
   // Build employee roster rows for cover page
-  const rosterRows = employees.map((emp) => {
-    const empAssignments = schedule.assignments.filter((a) => a.employeeId === emp.id).length
-    return `<tr>
+  const rosterRows = employees
+    .map((emp) => {
+      const empAssignments = schedule.assignments.filter((a) => a.employeeId === emp.id).length
+      return `<tr>
       <td style="font-weight:600">${emp.name}</td>
       <td>${emp.role}</td>
       <td>${emp.employmentType}</td>
       <td>${emp.maxHoursPerWeek}h</td>
       <td>${empAssignments}</td>
     </tr>`
-  }).join('\n')
+    })
+    .join('\n')
 
   const html = `<!DOCTYPE html>
 <html lang="en">

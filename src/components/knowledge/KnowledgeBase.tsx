@@ -10,7 +10,7 @@ import './KnowledgeBase.css'
  */
 function parseSimpleMarkdown(markdown: string) {
   const blocks = markdown.trim().split('\n\n')
-  
+
   return blocks.map((block, idx) => {
     // Headings
     if (block.startsWith('# ')) {
@@ -22,10 +22,10 @@ function parseSimpleMarkdown(markdown: string) {
     if (block.startsWith('### ')) {
       return <h3 key={idx}>{block.replace('### ', '')}</h3>
     }
-    
+
     // Lists (poor man's ul/li parser)
     if (block.startsWith('- ') || block.startsWith('* ')) {
-      const items = block.split('\n').map(line => line.replace(/^[-*] /, ''))
+      const items = block.split('\n').map((line) => line.replace(/^[-*] /, ''))
       return (
         <ul key={idx}>
           {items.map((item, i) => (
@@ -37,7 +37,7 @@ function parseSimpleMarkdown(markdown: string) {
 
     // Ordered Lists (ol/li)
     if (/^\d+\.\s/.test(block)) {
-      const items = block.split('\n').map(line => line.replace(/^\d+\.\s/, ''))
+      const items = block.split('\n').map((line) => line.replace(/^\d+\.\s/, ''))
       return (
         <ol key={idx}>
           {items.map((item, i) => (
@@ -54,7 +54,7 @@ function parseSimpleMarkdown(markdown: string) {
 
 // Helper for inline styles (bold, italic)
 function parseInline(text: string) {
-  // We'll use a dangerouslySetInnerHTML approach for inline formatting 
+  // We'll use a dangerouslySetInnerHTML approach for inline formatting
   // since this is controlled static data without XSS risk from users.
   const html = text
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -69,24 +69,25 @@ export function KnowledgeBase() {
 
   const selectedArticle = useMemo(() => {
     if (!selectedArticleId) return null
-    return ARTICLES.find(a => a.id === selectedArticleId) || null
+    return ARTICLES.find((a) => a.id === selectedArticleId) || null
   }, [selectedArticleId])
 
   const filteredArticles = useMemo(() => {
     if (!searchTerm.trim()) return ARTICLES
-    
+
     const query = searchTerm.toLowerCase()
-    return ARTICLES.filter(a => 
-      a.title.toLowerCase().includes(query) ||
-      a.category.toLowerCase().includes(query) ||
-      a.tags.some(t => t.toLowerCase().includes(query)) ||
-      a.content.toLowerCase().includes(query)
+    return ARTICLES.filter(
+      (a) =>
+        a.title.toLowerCase().includes(query) ||
+        a.category.toLowerCase().includes(query) ||
+        a.tags.some((t) => t.toLowerCase().includes(query)) ||
+        a.content.toLowerCase().includes(query),
     )
   }, [searchTerm])
 
   const groupedArticles = useMemo(() => {
     const groups: Record<string, Article[]> = {}
-    filteredArticles.forEach(a => {
+    filteredArticles.forEach((a) => {
       if (!groups[a.category]) groups[a.category] = []
       groups[a.category].push(a)
     })
@@ -100,10 +101,8 @@ export function KnowledgeBase() {
           <button className="kb-back-btn" onClick={() => setSelectedArticleId(null)}>
             <ArrowLeft size={16} /> Back to Library
           </button>
-          
-          <div className="kb-article-content">
-            {parseSimpleMarkdown(selectedArticle.content)}
-          </div>
+
+          <div className="kb-article-content">{parseSimpleMarkdown(selectedArticle.content)}</div>
         </div>
       </div>
     )
@@ -118,10 +117,10 @@ export function KnowledgeBase() {
         </h2>
         <div className="kb-search-container">
           <Search size={16} className="kb-search-icon" />
-          <input 
-            type="text" 
+          <input
+            type="text"
             className="kb-search-input"
-            placeholder="Search articles, guides, or keywords..." 
+            placeholder="Search articles, guides, or keywords..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -136,16 +135,18 @@ export function KnowledgeBase() {
             <div key={category} className="kb-category">
               <h3>{category}</h3>
               <div className="kb-grid">
-                {articles.map(article => (
-                  <div 
-                    key={article.id} 
+                {articles.map((article) => (
+                  <div
+                    key={article.id}
                     className="kb-card"
                     onClick={() => setSelectedArticleId(article.id)}
                   >
                     <h4 className="kb-card-title">{article.title}</h4>
                     <div className="kb-card-tags">
-                      {article.tags.map(tag => (
-                        <span key={tag} className="kb-tag">{tag}</span>
+                      {article.tags.map((tag) => (
+                        <span key={tag} className="kb-tag">
+                          {tag}
+                        </span>
                       ))}
                     </div>
                   </div>

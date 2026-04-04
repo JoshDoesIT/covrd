@@ -396,16 +396,16 @@
   .employee-card {
     padding: 1rem;
   }
-  
+
   .ec-stats {
     flex-wrap: wrap;
     gap: 0.75rem;
   }
-  
+
   .ec-actions {
     opacity: 1; /* Always show icons on touch screens/mobile */
   }
-  
+
   .form-row {
     flex-direction: column;
     gap: 0.5rem;

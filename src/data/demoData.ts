@@ -155,13 +155,13 @@ export const DEMO_EMPLOYEES: Employee[] = [
 /** Coverage requirements: morning + afternoon shifts for each weekday, single shift on weekends. */
 export const DEMO_COVERAGE_REQUIREMENTS: CoverageRequirement[] = [
   // Weekdays — morning and afternoon
-  ...([
+  ...[
     { d: 'monday', dt: '2026-04-06' },
     { d: 'tuesday', dt: '2026-04-07' },
     { d: 'wednesday', dt: '2026-04-08' },
     { d: 'thursday', dt: '2026-04-09' },
-    { d: 'friday', dt: '2026-04-10' }
-  ]).flatMap(({ d, dt }) => [
+    { d: 'friday', dt: '2026-04-10' },
+  ].flatMap(({ d, dt }) => [
     {
       id: `demo-cov-${d}-am`,
       name: 'Day Shift',
@@ -210,18 +210,21 @@ export async function loadDemoDataAsync() {
   const baseDate = new Date('2026-04-06T00:00:00')
   const actualStartMonday = getNextMonday(baseDate)
   const baseMs = actualStartMonday.getTime()
-  
+
   const generatedShifts: Shift[] = []
 
   coverageRequirements.forEach((r) => {
     const shiftDate = new Date(`${r.date}T00:00:00`)
     const dayDiff = Math.round((shiftDate.getTime() - baseMs) / (1000 * 60 * 60 * 24))
     const weekNumber = Math.floor(dayDiff / 7)
-    
+
     if (weekNumber >= 0 && weekNumber < totalWeeks) {
       const dayOfWeek = dayDiff % 7
       const shift = createShift({
-        day: (Object.keys(DAY_MAP).find(k => DAY_MAP[k as keyof typeof DAY_MAP] === dayOfWeek) as DayOfWeek) || 'monday',
+        day:
+          (Object.keys(DAY_MAP).find(
+            (k) => DAY_MAP[k as keyof typeof DAY_MAP] === dayOfWeek,
+          ) as DayOfWeek) || 'monday',
         startTime: r.startTime,
         endTime: r.endTime,
         requiredStaff: r.requiredStaff,

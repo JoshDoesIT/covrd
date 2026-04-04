@@ -381,11 +381,13 @@ a:hover {
     border-right: none !important;
   }
 
-  .wg-row-label, .wg-header-cell.wg-corner {
+  .wg-row-label,
+  .wg-header-cell.wg-corner {
     width: 180px !important;
   }
 
-  .wg-header-cell:not(.wg-corner), .wg-cell {
+  .wg-header-cell:not(.wg-corner),
+  .wg-cell {
     width: auto !important;
   }
 

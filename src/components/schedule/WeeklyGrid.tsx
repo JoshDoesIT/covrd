@@ -199,7 +199,9 @@ export function WeeklyGrid({
                   borderRight: 'none',
                 }}
               >
-                <strong>{activeSchedule?.name || 'Weekly Schedule'} - Week {weekNumber + 1}</strong>
+                <strong>
+                  {activeSchedule?.name || 'Weekly Schedule'} - Week {weekNumber + 1}
+                </strong>
                 {startDate && (
                   <span style={{ marginLeft: '12px', fontWeight: 'normal' }}>
                     ({formatWeekRange(startDate, weekNumber)})
@@ -255,56 +257,56 @@ export function WeeklyGrid({
               })}
             </tr>
 
-          {/* Employee Rows */}
-          {employees.map((emp) => {
-            // Calculate assigned hours EXACTLY for this week for display
-            const assignedShifts = activeSchedule.assignments
-              .filter((a) => a.employeeId === emp.id)
-              .map((a) => activeSchedule.shifts.find((s) => s.id === a.shiftId))
-              .filter((s) => s && (s.weekNumber || 0) === weekNumber) as Shift[]
+            {/* Employee Rows */}
+            {employees.map((emp) => {
+              // Calculate assigned hours EXACTLY for this week for display
+              const assignedShifts = activeSchedule.assignments
+                .filter((a) => a.employeeId === emp.id)
+                .map((a) => activeSchedule.shifts.find((s) => s.id === a.shiftId))
+                .filter((s) => s && (s.weekNumber || 0) === weekNumber) as Shift[]
 
-            let totalHours = 0
-            assignedShifts.forEach((s) => {
-              const st = parseInt(s.startTime.split(':')[0], 10)
-              const et = parseInt(s.endTime.split(':')[0], 10)
-              let duration = et > st ? et - st : 24 - st + et
-              if (s.unpaidBreakMinutes) {
-                duration -= s.unpaidBreakMinutes / 60
-              }
-              totalHours += duration
-            })
+              let totalHours = 0
+              assignedShifts.forEach((s) => {
+                const st = parseInt(s.startTime.split(':')[0], 10)
+                const et = parseInt(s.endTime.split(':')[0], 10)
+                let duration = et > st ? et - st : 24 - st + et
+                if (s.unpaidBreakMinutes) {
+                  duration -= s.unpaidBreakMinutes / 60
+                }
+                totalHours += duration
+              })
 
-            return (
-              <tr className="wg-print-row-group" key={emp.id}>
-                <th className="wg-row-label">
-                  <span className="wg-emp-name">{emp.name}</span>
-                  <span
-                    className="wg-emp-target"
-                    style={{ color: totalHours > emp.maxHoursPerWeek ? '#ef4444' : undefined }}
-                  >
-                    {totalHours}h / {emp.maxHoursPerWeek}h
-                  </span>
-                </th>
+              return (
+                <tr className="wg-print-row-group" key={emp.id}>
+                  <th className="wg-row-label">
+                    <span className="wg-emp-name">{emp.name}</span>
+                    <span
+                      className="wg-emp-target"
+                      style={{ color: totalHours > emp.maxHoursPerWeek ? '#ef4444' : undefined }}
+                    >
+                      {totalHours}h / {emp.maxHoursPerWeek}h
+                    </span>
+                  </th>
 
-                {DAYS_OF_WEEK.map((day) => {
-                  const empDayShifts = assignedShifts.filter((s) => s.day === day)
+                  {DAYS_OF_WEEK.map((day) => {
+                    const empDayShifts = assignedShifts.filter((s) => s.day === day)
 
-                  return (
-                    <DroppableCell key={`${emp.id}-${day}`} id={`${emp.id}-${day}`} day={day}>
-                      {empDayShifts.map((s) => (
-                        <DraggableShift
-                          key={`assigned-${s.id}-${emp.id}`}
-                          shift={s}
-                          employee={emp}
-                          isAssigned={true}
-                        />
-                      ))}
-                    </DroppableCell>
-                  )
-                })}
-              </tr>
-            )
-          })}
+                    return (
+                      <DroppableCell key={`${emp.id}-${day}`} id={`${emp.id}-${day}`} day={day}>
+                        {empDayShifts.map((s) => (
+                          <DraggableShift
+                            key={`assigned-${s.id}-${emp.id}`}
+                            shift={s}
+                            employee={emp}
+                            isAssigned={true}
+                          />
+                        ))}
+                      </DroppableCell>
+                    )
+                  })}
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>
