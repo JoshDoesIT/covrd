@@ -110,7 +110,9 @@ export function ScheduleManager() {
         // Wait, Engine expects dayOfWeek 0-6 where 0=Monday (our DayOfWeek enum).
         // native getDay() is 0=Sun. Our DAY_MAP: Monday=0, Tuesday=1 ... Sunday=6
         // Let's deduce dayOfWeek from dayDiff
-        const dayOfWeek = dayDiff % 7
+        // dayDiff is 0-based from Monday (since baseDate is always a Monday).
+        // DAY_MAP uses Sunday=0, Monday=1. Shift by +1 to align.
+        const dayOfWeek = (dayDiff % 7 + 1) % 7
 
         const shift = createShift({
           day:

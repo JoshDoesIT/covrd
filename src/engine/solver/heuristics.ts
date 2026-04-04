@@ -120,11 +120,13 @@ export function sortCandidatesByFairness(
   return [...candidates].sort((a, b) => {
     const empWeekMapA = hourTotals.get(a.id) ?? new Map<number, number>()
     const hoursA = empWeekMapA.get(shiftToAssign.weekNumber) ?? 0
-    const deficitA = a.targetHours - hoursA
+    // Proportional deficit: normalize to 0-1 range so part-timers and full-timers
+    // compete fairly. A PT at 0/20hrs (100%) has equal priority to FT at 0/40hrs (100%).
+    const proportionalDeficitA = a.targetHours > 0 ? (a.targetHours - hoursA) / a.targetHours : 0
 
     const empWeekMapB = hourTotals.get(b.id) ?? new Map<number, number>()
     const hoursB = empWeekMapB.get(shiftToAssign.weekNumber) ?? 0
-    const deficitB = b.targetHours - hoursB
+    const proportionalDeficitB = b.targetHours > 0 ? (b.targetHours - hoursB) / b.targetHours : 0
 
     const assignedShiftsA = assignments.get(a.id) ?? []
     const assignedDaysA = assignedShiftsA.map((s) => getAbsoluteDayIndex(s.weekNumber, s.dayOfWeek))
@@ -136,9 +138,9 @@ export function sortCandidatesByFairness(
     const clumpModifierB = getClumpingModifier(assignedDaysB, targetDayIndex)
     const consistencyModifierB = getConsistencyModifier(assignedShiftsB, shiftToAssign)
 
-    // Deficit is primary metric (10pts per missing hour).
-    const scoreA = deficitA * 10 + clumpModifierA + consistencyModifierA
-    const scoreB = deficitB * 10 + clumpModifierB + consistencyModifierB
+    // Proportional deficit scaled to 1000 for integer-safe comparison with modifiers.
+    const scoreA = proportionalDeficitA * 1000 + clumpModifierA + consistencyModifierA
+    const scoreB = proportionalDeficitB * 1000 + clumpModifierB + consistencyModifierB
 
     if (scoreA !== scoreB) {
       // Higher score means they SHOULD be assigned first (descending)

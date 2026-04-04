@@ -234,7 +234,9 @@ export async function loadDemoDataAsync() {
     const weekNumber = Math.floor(dayDiff / 7)
 
     if (weekNumber >= 0 && weekNumber < totalWeeks) {
-      const dayOfWeek = dayDiff % 7
+      // dayDiff is 0-based from Monday (since baseDate is always a Monday).
+      // DAY_MAP uses Sunday=0, Monday=1. Shift by +1 to align.
+      const dayOfWeek = (dayDiff % 7 + 1) % 7
       const shift = createShift({
         day:
           (Object.keys(DAY_MAP).find(
