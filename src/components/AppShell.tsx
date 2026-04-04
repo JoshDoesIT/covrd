@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { CommandPalette } from './tooling/CommandPalette'
 import { PolicyModal } from './shared/PolicyModal'
 import { useSettingsStore } from '../stores/settingsStore'
@@ -55,7 +55,32 @@ const isMac = typeof navigator !== 'undefined' && /Mac/i.test(navigator.userAgen
  */
 export function AppShell() {
   const [collapsed, setCollapsed] = useState(false)
-  const [activeNav, setActiveNav] = useState('schedule')
+  const [activeNav, setActiveNavState] = useState(() => {
+    // Only check browser location if window is defined (safe for SSR environments)
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.replace('#', '')
+      return NAV_ITEMS.some((item) => item.id === hash) ? hash : 'schedule'
+    }
+    return 'schedule'
+  })
+
+  const setActiveNav = (id: string) => {
+    if (typeof window !== 'undefined') {
+      window.location.hash = id
+    }
+    setActiveNavState(id)
+  }
+
+  useEffect(() => {
+    const onHashChange = () => {
+      const hash = window.location.hash.replace('#', '')
+      if (NAV_ITEMS.some((item) => item.id === hash)) {
+        setActiveNavState(hash)
+      }
+    }
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
   const [policyModal, setPolicyModal] = useState<'privacy' | 'accessibility' | null>(null)
   const [cmdOpen, setCmdOpen] = useState(false)
   const { timeFormat, update: updateSettings } = useSettingsStore()
