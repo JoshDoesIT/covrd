@@ -122,9 +122,12 @@ export function CoverageHeatmap({ activeWeekNumber }: { activeWeekNumber: number
 
   const overallFillRate = useMemo(() => {
     const totalRequired = data.reduce((s, d) => s + d.required, 0)
-    const totalAssigned = data.reduce((s, d) => s + d.assigned, 0)
-    if (totalRequired === 0) return totalAssigned > 0 ? 100 : 0
-    return Math.round((totalAssigned / totalRequired) * 100)
+    // By capping the effective assignment count to the required count per day,
+    // we prevent over-drafting on one day from falsely padding the week's overall fill rate.
+    const effectiveAssigned = data.reduce((s, d) => s + Math.min(d.assigned, d.required), 0)
+
+    if (totalRequired === 0) return effectiveAssigned > 0 ? 100 : 0
+    return Math.round((effectiveAssigned / totalRequired) * 100)
   }, [data])
 
   if (!activeSchedule) {
