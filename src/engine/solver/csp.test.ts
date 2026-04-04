@@ -96,4 +96,40 @@ describe('Constraint Satisfaction Problem Solver', () => {
     expect(result.success).toBe(true)
     expect(result.assignedShifts[0].employeeId).toBe('emp-1')
   })
+
+  it('assigns partial schedules when some shifts are permanently impossible (prevents depth-0 domain wipeout)', () => {
+    const charlie: Employee = {
+      id: 'emp-3',
+      name: 'Charlie',
+      role: 'RN',
+      maxHours: 12,
+      minHours: 0,
+      targetHours: 8,
+      isFullTime: true,
+      availability: [],
+      createdAt: 0,
+      updatedAt: 0,
+    }
+
+    // shift1 is standard RN shift. Charlie can work this.
+    // impossibleShift requires 'Doctor' role, which Charlie doesn't have. 
+    // This shift evaluates to 0 candidates immediately.
+    const impossibleShift: Shift = {
+      ...shift2,
+      id: 'impossible-shift',
+      role: 'Doctor'
+    }
+
+    const result = solveSchedule([charlie], [shift1, impossibleShift])
+
+    // Should not return global success since one shift failed
+    expect(result.success).toBe(false)
+    
+    // BUT should still output the partial assignment for shift1!
+    expect(result.assignedShifts).toHaveLength(1)
+    expect(result.assignedShifts[0].id).toBe('s1')
+    
+    expect(result.unfilledShifts).toHaveLength(1)
+    expect(result.unfilledShifts[0].id).toBe('impossible-shift')
+  })
 })
