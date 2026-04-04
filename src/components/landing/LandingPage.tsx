@@ -30,7 +30,7 @@ export function LandingPage({ onLaunch, onShowPrivacy, onShowAccessibility }: La
         <div className="landing__logo" style={{ display: 'flex', alignItems: 'center' }}>
           <img
             src="/logo-dark.png"
-            alt="Covrd Logo"
+            alt="covrd Logo"
             style={{ height: '56px', width: 'auto', objectFit: 'contain' }}
           />
         </div>
@@ -42,7 +42,7 @@ export function LandingPage({ onLaunch, onShowPrivacy, onShowAccessibility }: La
           <h1 className="landing__hero-title">
             Every shift<span className="landing__hero-comma">,</span>
             <br />
-            <img src="/logo-dark.png" alt="Covrd" className="landing__hero-title-logo" />.
+            <img src="/logo-dark.png" alt="covrd" className="landing__hero-title-logo" />.
           </h1>
           <p className="landing__hero-subtitle">
             Auto staff scheduling that respects your privacy. Your data never leaves your browser.
@@ -53,7 +53,7 @@ export function LandingPage({ onLaunch, onShowPrivacy, onShowAccessibility }: La
               Launch App
             </button>
             <a
-              href="https://github.com/JoshDoesIT/Covrd"
+              href="https://github.com/JoshDoesIT/covrd"
               target="_blank"
               rel="noreferrer"
               className="landing__btn-secondary"
@@ -129,7 +129,7 @@ export function LandingPage({ onLaunch, onShowPrivacy, onShowAccessibility }: La
             </div>
             <h3 className="landing__bento-title">Zero Trust Architecture</h3>
             <p className="landing__bento-desc">
-              Covrd operates entirely within your browser's local sandbox. There is absolutely no
+              covrd operates entirely within your browser's local sandbox. There is absolutely no
               server telemetry, no user accounts, and no backend database holding your employee
               data.
             </p>
@@ -174,7 +174,7 @@ export function LandingPage({ onLaunch, onShowPrivacy, onShowAccessibility }: La
 
       <footer className="landing__footer">
         <p>
-          © 2026 Covrd. Built by{' '}
+          © 2026 covrd. Built by{' '}
           <a
             href="https://www.joshdoes.it"
             target="_blank"

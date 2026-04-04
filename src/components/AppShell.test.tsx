@@ -18,9 +18,9 @@ describe('AppShell', () => {
     expect(screen.getByRole('main')).toBeInTheDocument()
   })
 
-  it('displays the Covrd logo in the sidebar', () => {
+  it('displays the covrd logo in the sidebar', () => {
     render(<AppShell />)
-    expect(screen.getAllByAltText('Covrd').length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByAltText('covrd').length).toBeGreaterThanOrEqual(1)
   })
 
   it('renders navigation items', () => {

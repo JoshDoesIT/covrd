@@ -1,6 +1,6 @@
 # Scheduling Engine Architecture
 
-The core of Covrd relies on a custom Constraint Satisfaction Problem (CSP) solver built into the client suite. Because we do not rely on server-side processing, our solver processes thousands of permutations instantly within the browser using specific heuristic models.
+The core of covrd relies on a custom Constraint Satisfaction Problem (CSP) solver built into the client suite. Because we do not rely on server-side processing, our solver processes thousands of permutations instantly within the browser using specific heuristic models.
 
 ## The Approach
 

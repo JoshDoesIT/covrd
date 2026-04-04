@@ -11,7 +11,7 @@ describe('KnowledgeBase', () => {
     expect(screen.getByText('Compliance')).toBeInTheDocument()
 
     // Check for specific article titles
-    expect(screen.getByText('Getting Started with Covrd')).toBeInTheDocument()
+    expect(screen.getByText('Getting Started with covrd')).toBeInTheDocument()
     expect(screen.getByText('Labor Compliance & Break Times')).toBeInTheDocument()
   })
 
@@ -23,8 +23,8 @@ describe('KnowledgeBase', () => {
     // Search for specific text found in one article
     fireEvent.change(searchInput, { target: { value: 'Automagic' } })
 
-    // 'Automagic' should match Getting Started with Covrd
-    expect(screen.getByText('Getting Started with Covrd')).toBeInTheDocument()
+    // 'Automagic' should match Getting Started with covrd
+    expect(screen.getByText('Getting Started with covrd')).toBeInTheDocument()
 
     // Other articles should be hidden
     expect(screen.queryByText('Labor Compliance & Break Times')).not.toBeInTheDocument()
@@ -34,10 +34,10 @@ describe('KnowledgeBase', () => {
     render(<KnowledgeBase />)
 
     // Click an article card
-    fireEvent.click(screen.getByText('Getting Started with Covrd'))
+    fireEvent.click(screen.getByText('Getting Started with covrd'))
 
-    // Detailed view should show rendered markdown headers (e.g. "Welcome to Covrd!")
-    expect(screen.getByRole('heading', { level: 1, name: 'Welcome to Covrd!' })).toBeInTheDocument()
+    // Detailed view should show rendered markdown headers (e.g. "Welcome to covrd!")
+    expect(screen.getByRole('heading', { level: 1, name: 'Welcome to covrd!' })).toBeInTheDocument()
 
     // Category list shouldn't be visible in detail view
     expect(screen.queryByText('User Guide', { selector: 'h3' })).not.toBeInTheDocument()
@@ -56,7 +56,7 @@ describe('KnowledgeBase', () => {
     render(<KnowledgeBase />)
 
     // We navigate to an article known to have **bold** or *italic* syntax elements
-    fireEvent.click(screen.getByText('Getting Started with Covrd'))
+    fireEvent.click(screen.getByText('Getting Started with covrd'))
 
     // Check if the DOM rendered a standard HTML strong element from **text** syntax
     // There are strong tags in our article data. We can assert that the HTML element
@@ -79,7 +79,7 @@ describe('KnowledgeBase', () => {
     render(<KnowledgeBase />)
 
     // Getting Started uses an ordered list for 'The Core Process'
-    fireEvent.click(screen.getByText('Getting Started with Covrd'))
+    fireEvent.click(screen.getByText('Getting Started with covrd'))
 
     // We expect there to be an ordered list present
     const ols = document.querySelectorAll('ol')

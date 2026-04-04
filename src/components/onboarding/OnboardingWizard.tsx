@@ -21,7 +21,7 @@ const STEPS = [
   {
     key: 'welcome',
     icon: Sparkles,
-    title: 'Welcome to Covrd',
+    title: 'Welcome to covrd',
     description:
       'Your privacy-first staff scheduling tool. Everything runs in your browser — no servers, no tracking, no data ever leaves your device.',
     cta: 'Get Started',

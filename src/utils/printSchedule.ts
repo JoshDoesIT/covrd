@@ -121,7 +121,7 @@ export function printSchedule(
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>${displayName} — Covrd Schedule</title>
+  <title>${displayName} — covrd Schedule</title>
   <style>
     @page {
       size: landscape;
@@ -388,7 +388,7 @@ export function printSchedule(
   ${weekTables.join('\n')}
 
   <div class="print-footer">
-    Printed from Covrd &middot; ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}
+    Printed from covrd &middot; ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}
   </div>
 </body>
 </html>`

@@ -5,7 +5,7 @@ import type { Employee, CoverageRequirement, BaselineRequirement, Schedule } fro
  * CovrdDatabase — Dexie.js IndexedDB database for persistent storage.
  *
  * All user data is stored locally in the browser via IndexedDB.
- * No data ever leaves the device. This aligns with Covrd's
+ * No data ever leaves the device. This aligns with covrd's
  * privacy-first, client-side-only architecture.
  *
  * @version 1 — Initial schema with four core tables.

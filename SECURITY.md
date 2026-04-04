@@ -2,7 +2,7 @@
 
 ## Reporting a Vulnerability
 
-We take the security of Covrd seriously. If you discover a security vulnerability, please report it responsibly.
+We take the security of covrd seriously. If you discover a security vulnerability, please report it responsibly.
 
 ### Private Disclosure
 
@@ -10,7 +10,7 @@ We take the security of Covrd seriously. If you discover a security vulnerabilit
 
 Use **GitHub Security Advisories** to report vulnerabilities privately:
 
-- Navigate to [Security Advisories](https://github.com/JoshDoesIT/Covrd/security/advisories/new)
+- Navigate to [Security Advisories](https://github.com/JoshDoesIT/covrd/security/advisories/new)
 - Submit a detailed report using the private form
 
 ### What to Include
@@ -28,7 +28,7 @@ Use **GitHub Security Advisories** to report vulnerabilities privately:
 
 ### Scope
 
-Since Covrd is a **client-side-only application** with no backend servers, the attack surface is limited to:
+Since covrd is a **client-side-only application** with no backend servers, the attack surface is limited to:
 
 - Cross-site scripting (XSS) via URL state decoding
 - Malicious data injection through imported files
@@ -44,7 +44,7 @@ Since Covrd is a **client-side-only application** with no backend servers, the a
 
 ## Security Architecture
 
-Covrd is designed with privacy and security as core principles:
+covrd is designed with privacy and security as core principles:
 
 - **Zero server-side data handling** — All data stays in your browser
 - **No analytics or tracking** — Zero telemetry

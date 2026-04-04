@@ -13,7 +13,7 @@ import type { Employee, CoverageRequirement } from './types/index'
 const ONBOARDING_KEY = 'covrd-onboarding-complete'
 
 /**
- * Root application component for Covrd.
+ * Root application component for covrd.
  *
  * On first launch, displays the onboarding wizard.
  * On subsequent launches, renders the AppShell directly.

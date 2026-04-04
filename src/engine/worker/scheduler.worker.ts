@@ -11,7 +11,7 @@ self.onmessage = (e: MessageEvent) => {
       self.postMessage({ type: 'PROGRESS', percent: 10 })
 
       // Note: A true long-running solver would yield to emit progress,
-      // but for Covrd typical datasets (50 emps, 7 days) the CSP is
+      // but for covrd typical datasets (50 emps, 7 days) the CSP is
       // very fast. In the future we can interleave progress emits during backtracking.
       const result = solveSchedule(employees, shifts)
 

@@ -4,14 +4,14 @@
 
 .shell {
   display: flex;
-  min-height: 100vh;
+  min-height: 100dvh;
   background: var(--color-bg-primary);
 }
 
 /* --- Sidebar --- */
 .shell__sidebar {
   width: var(--sidebar-width);
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   background: var(--color-bg-surface);
@@ -46,6 +46,12 @@
   width: 0;
   overflow: hidden;
   position: absolute;
+}
+
+.shell__sidebar--collapsed .shell__time-toggle,
+.shell__sidebar--collapsed .shell__policy-links,
+.shell__sidebar--collapsed .shell__privacy-badge {
+  display: none;
 }
 
 .shell__sidebar--collapsed .shell__sidebar-header {
@@ -280,7 +286,7 @@
   flex-direction: column;
   margin-left: var(--sidebar-width);
   transition: margin-left var(--transition-base);
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .shell__sidebar--collapsed ~ .shell__main-area {
