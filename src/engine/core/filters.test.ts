@@ -43,6 +43,7 @@ describe('Eligibility Filters', () => {
 
   const shift: Shift = {
     id: 'shift-1',
+    weekNumber: 0,
     dayOfWeek: 1,
     start: '09:00',
     end: '17:00',
@@ -66,6 +67,7 @@ describe('Eligibility Filters', () => {
     existingShifts.set(alice.id, [
       {
         id: 'shift-overlap',
+        weekNumber: 0,
         dayOfWeek: 1,
         start: '08:00',
         end: '12:00',
@@ -76,8 +78,8 @@ describe('Eligibility Filters', () => {
       },
     ])
 
-    const currentHours = new Map<string, number>()
-    currentHours.set(alice.id, 4)
+    const currentHours = new Map<string, Map<number, number>>()
+    currentHours.set(alice.id, new Map([[0, 4]]))
 
     const candidates = getEligibleCandidates([alice], shift, existingShifts, currentHours)
     expect(candidates).toHaveLength(0) // Alice filtered out due to overlap

@@ -4,7 +4,6 @@ import {
   createShift,
   createSchedule,
   createConstraint,
-  createRecurringTemplate,
 } from './factories'
 
 describe('Entity Factories', () => {
@@ -72,15 +71,13 @@ describe('Entity Factories', () => {
   describe('createCoverageRequirement', () => {
     it('creates a coverage requirement with required fields', () => {
       const req = createCoverageRequirement({
-        name: 'Morning',
-        day: 'monday',
+        date: '2026-04-06',
         startTime: '09:00',
         endTime: '13:00',
         requiredStaff: 3,
       })
 
-      expect(req.name).toBe('Morning')
-      expect(req.day).toBe('monday')
+      expect(req.date).toBe('2026-04-06')
       expect(req.startTime).toBe('09:00')
       expect(req.endTime).toBe('13:00')
       expect(req.requiredStaff).toBe(3)
@@ -144,30 +141,10 @@ describe('Entity Factories', () => {
         rule: { kind: 'max-consecutive-days', maxDays: 5 },
       })
 
+      expect(constraint.name).toBe('Max 5 consecutive days')
       expect(constraint.type).toBe('soft')
-    })
-  })
-
-  describe('createRecurringTemplate', () => {
-    it('creates a template with weekly pattern', () => {
-      const template = createRecurringTemplate({
-        name: 'Summer Schedule',
-        pattern: { kind: 'weekly' },
-      })
-
-      expect(template.name).toBe('Summer Schedule')
-      expect(template.pattern).toEqual({ kind: 'weekly' })
-      expect(template.coverageRequirements).toEqual([])
-      expect(template.constraints).toEqual([])
-    })
-
-    it('creates a template with biweekly rotation', () => {
-      const template = createRecurringTemplate({
-        name: 'Alternating',
-        pattern: { kind: 'biweekly', weekA: 'Early', weekB: 'Late' },
-      })
-
-      expect(template.pattern.kind).toBe('biweekly')
+      expect(constraint.enabled).toBe(true)
+      expect(constraint.rule).toEqual({ kind: 'max-consecutive-days', maxDays: 5 })
     })
   })
 })

@@ -77,8 +77,7 @@ describe('Validators', () => {
   describe('validateCoverageRequirement', () => {
     it('accepts a valid coverage requirement', () => {
       const req = createCoverageRequirement({
-        name: 'Morning',
-        day: 'monday',
+        date: '2026-04-06',
         startTime: '09:00',
         endTime: '13:00',
         requiredStaff: 3,
@@ -88,8 +87,7 @@ describe('Validators', () => {
 
     it('rejects zero required staff', () => {
       const req = createCoverageRequirement({
-        name: 'Morning',
-        day: 'monday',
+        date: '2026-04-06',
         startTime: '09:00',
         endTime: '13:00',
         requiredStaff: 0,
@@ -98,10 +96,9 @@ describe('Validators', () => {
       expect(result.valid).toBe(false)
     })
 
-    it('rejects empty name', () => {
+    it('rejects invalid date format', () => {
       const req = createCoverageRequirement({
-        name: '',
-        day: 'monday',
+        date: 'April 6, 2026',
         startTime: '09:00',
         endTime: '13:00',
         requiredStaff: 2,

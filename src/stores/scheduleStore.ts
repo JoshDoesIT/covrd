@@ -26,8 +26,6 @@ interface ScheduleState {
   commitSandbox: () => void
   discardSandbox: () => void
   reset: () => void
-  pendingTemplateId: string | null
-  setPendingTemplateId: (id: string | null) => void
 }
 
 /**
@@ -39,11 +37,8 @@ export const useScheduleStore = create<ScheduleState>((set) => ({
   activeSchedule: null,
   isSandboxMode: false,
   baselineSchedule: null,
-  pendingTemplateId: null,
   canUndo: false,
   canRedo: false,
-
-  setPendingTemplateId: (id) => set({ pendingTemplateId: id }),
 
   hydrate: (schedules) => {
     // If there's a schedule, set the most recent as active.

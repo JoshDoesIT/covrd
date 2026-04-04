@@ -5,8 +5,6 @@ import type {
   Schedule,
   Constraint,
   ConstraintType,
-  RecurringTemplate,
-  RecurrencePattern,
   DayOfWeek,
   EmploymentType,
   DayAvailability,
@@ -78,8 +76,7 @@ export function createEmployee(
  */
 export function createCoverageRequirement(props: {
   id?: string
-  name: string
-  day: DayOfWeek
+  date: string
   startTime: string
   endTime: string
   requiredStaff: number
@@ -88,8 +85,7 @@ export function createCoverageRequirement(props: {
 }) {
   return {
     id: props.id ?? generateId(),
-    name: props.name,
-    day: props.day,
+    date: props.date,
     startTime: props.startTime,
     endTime: props.endTime,
     requiredStaff: props.requiredStaff,
@@ -160,24 +156,7 @@ export function createConstraint(
   }
 }
 
-/**
- * Create a new RecurringTemplate.
- */
-export function createRecurringTemplate(
-  fields: Pick<RecurringTemplate, 'name' | 'pattern'> & Partial<Omit<RecurringTemplate, 'name'>>,
-): RecurringTemplate {
-  const timestamp = now()
 
-  return {
-    id: fields.id ?? generateId(),
-    name: fields.name,
-    coverageRequirements: fields.coverageRequirements ?? [],
-    constraints: fields.constraints ?? [],
-    pattern: fields.pattern,
-    createdAt: fields.createdAt ?? timestamp,
-    updatedAt: fields.updatedAt ?? timestamp,
-  }
-}
 
 // Re-export types for convenience
 export type {
@@ -185,10 +164,7 @@ export type {
   CoverageRequirement,
   Shift,
   Schedule,
-  Constraint,
   ConstraintType,
-  RecurringTemplate,
-  RecurrencePattern,
   DayOfWeek,
   EmploymentType,
   DayAvailability,

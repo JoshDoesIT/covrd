@@ -14,8 +14,7 @@ import { useEmployeeStore } from '../../stores/employeeStore'
 import { useCoverageStore } from '../../stores/coverageStore'
 import { generateScheduleAsync } from '../../engine/worker/client'
 import { createSchedule, createShift } from '../../types/factories'
-import type { Shift, ShiftAssignment } from '../../types/index'
-import { useTemplateStore } from '../../stores/templateStore'
+import type { Shift, ShiftAssignment, DayOfWeek } from '../../types/index'
 import { WeeklyGrid } from './WeeklyGrid'
 import { TimelineGrid } from './TimelineGrid'
 import { CoverageHeatmap } from './CoverageHeatmap'
@@ -56,7 +55,6 @@ export function ScheduleManager() {
   } = useScheduleStore()
   const { employees } = useEmployeeStore()
   const { requirements } = useCoverageStore()
-  const { templates } = useTemplateStore()
 
   const [viewMode, setViewMode] = useState<ViewMode>('matrix')
   const [activeWeekNumber, setActiveWeekNumber] = useState(0)
@@ -75,10 +73,7 @@ export function ScheduleManager() {
   const [isConfirmingGenerate, setIsConfirmingGenerate] = useState(false)
 
   const handleGenerateClick = () => {
-    const pendingTemplateId = useScheduleStore.getState().pendingTemplateId
-    const template = pendingTemplateId ? templates.find((t) => t.id === pendingTemplateId) : null
-
-    if (employees.length === 0 || (!template && requirements.length === 0)) {
+    if (employees.length === 0 || requirements.length === 0) {
       alert('You must configure at least 1 employee and 1 coverage requirement first.')
       return
     }
@@ -92,58 +87,43 @@ export function ScheduleManager() {
   }
 
   const executeGenerate = async () => {
-    const pendingTemplateId = useScheduleStore.getState().pendingTemplateId
-    const template = pendingTemplateId ? templates.find((t) => t.id === pendingTemplateId) : null
-
-    // Clear pending template flag once we begin
-    useScheduleStore.getState().setPendingTemplateId(null)
-
     setIsGenerating(true)
     setProgress(0)
     setErrorStatus(null)
 
-    let generatedShifts: Shift[] = []
-    let totalWeeks = 1
+    const baseDate = new Date(`${targetStartDate}T00:00:00`)
+    const actualStartMonday = getNextMonday(baseDate)
+    const baseMs = actualStartMonday.getTime()
 
-    if (template) {
-      // Epic 5: Multi-week schedule expansion
-      if (template.pattern.kind === 'biweekly') totalWeeks = 2
-      else if (template.pattern.kind === 'rotation')
-        totalWeeks = template.pattern.cycleLength || 4 // default 4 if empty
-      else if (template.pattern.kind === 'monthly') totalWeeks = 4
+    const totalWeeks = 4
+    const generatedShifts: Shift[] = []
 
-      for (let w = 0; w < totalWeeks; w++) {
-        const weeklyOffsetShifts = template.coverageRequirements.map((r) =>
-          createShift({
-            day: r.day,
-            startTime: r.startTime,
-            endTime: r.endTime,
-            requiredStaff: r.requiredStaff,
-            weekNumber: w, // assign the explicit week instance
-            role: r.role,
-            unpaidBreakMinutes: r.unpaidBreakMinutes,
-          }),
-        )
-        generatedShifts.push(...weeklyOffsetShifts)
+    // Find all requirements that fall within our 4-week target generation window
+    requirements.forEach((r) => {
+      const shiftDate = new Date(`${r.date}T00:00:00`)
+      const dayDiff = Math.round((shiftDate.getTime() - baseMs) / (1000 * 60 * 60 * 24))
+      const weekNumber = Math.floor(dayDiff / 7)
+      
+      // If it falls within the 4-week window we are generating
+      if (weekNumber >= 0 && weekNumber < totalWeeks) {
+        // Map native Date day (0=Sun, 1=Mon) to our DAY_MAP integer if needed,
+        // Wait, Engine expects dayOfWeek 0-6 where 0=Monday (our DayOfWeek enum).
+        // native getDay() is 0=Sun. Our DAY_MAP: Monday=0, Tuesday=1 ... Sunday=6
+        // Let's deduce dayOfWeek from dayDiff
+        const dayOfWeek = dayDiff % 7
+
+        const shift = createShift({
+          day: (Object.keys(DAY_MAP).find(k => DAY_MAP[k as keyof typeof DAY_MAP] === dayOfWeek) as DayOfWeek) || 'monday',
+          startTime: r.startTime,
+          endTime: r.endTime,
+          requiredStaff: r.requiredStaff,
+          weekNumber,
+          role: r.role,
+          unpaidBreakMinutes: r.unpaidBreakMinutes,
+        })
+        generatedShifts.push(shift)
       }
-    } else {
-      // Automatic Baseline Generation extends 4 weeks into the future
-      totalWeeks = 4
-      for (let w = 0; w < totalWeeks; w++) {
-        const weeklyOffsetShifts = requirements.map((r) =>
-          createShift({
-            day: r.day,
-            startTime: r.startTime,
-            endTime: r.endTime,
-            requiredStaff: r.requiredStaff,
-            weekNumber: w,
-            role: r.role,
-            unpaidBreakMinutes: r.unpaidBreakMinutes,
-          }),
-        )
-        generatedShifts.push(...weeklyOffsetShifts)
-      }
-    }
+    })
 
     // MAP TO ENGINE DTOs
     const engineEmployees: EngineEmployee[] = employees.map((e) => ({
@@ -173,7 +153,6 @@ export function ScheduleManager() {
         duration -= s.unpaidBreakMinutes / 60
       }
 
-      // Expand requiredStaff to individual engine shifts
       for (let i = 0; i < s.requiredStaff; i++) {
         engineShifts.push({
           id: `${s.id}-${i}`,
@@ -190,7 +169,7 @@ export function ScheduleManager() {
 
     try {
       const result = await generateScheduleAsync(engineEmployees, engineShifts, (p) => {
-        setProgress(Math.round(p * 100))
+        setProgress(Math.round(p))
       })
 
       // Convert engine result assignments to UI format
@@ -210,9 +189,7 @@ export function ScheduleManager() {
       const actualStartMonday = getNextMonday(baseDate)
 
       const newSchedule = createSchedule({
-        name: template
-          ? `Generated from ${template.name}`
-          : 'Weekly Schedule',
+        name: 'Standard Schedule',
         startDate: actualStartMonday.toISOString(),
         endDate: new Date(
           actualStartMonday.getTime() + totalWeeks * 7 * 24 * 60 * 60 * 1000,
@@ -324,6 +301,7 @@ export function ScheduleManager() {
                 state={{
                   employees,
                   coverageRequirements: requirements,
+
                   schedule: activeSchedule,
                 }}
                 onImport={async (file) => {
@@ -427,6 +405,8 @@ export function ScheduleManager() {
           </div>
         </div>
       </header>
+
+
 
       <div className="sm-content">
         {isConfirmingGenerate && (

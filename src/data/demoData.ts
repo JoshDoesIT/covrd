@@ -1,11 +1,24 @@
 import type {
   Employee,
   CoverageRequirement,
-  Schedule,
   DayOfWeek,
   Shift,
   ShiftAssignment,
 } from '../types/index'
+import { generateScheduleAsync } from '../engine/worker/client'
+import { createSchedule, createShift } from '../types/factories'
+import { getNextMonday } from '../utils/scheduleDates'
+import type { EngineEmployee, EngineShift } from '../engine/types'
+
+const DAY_MAP: Record<string, number> = {
+  sunday: 0,
+  monday: 1,
+  tuesday: 2,
+  wednesday: 3,
+  thursday: 4,
+  friday: 5,
+  saturday: 6,
+}
 
 /**
  * Demo Data — Pre-loaded example data for first-time users.
@@ -142,20 +155,26 @@ export const DEMO_EMPLOYEES: Employee[] = [
 /** Coverage requirements: morning + afternoon shifts for each weekday, single shift on weekends. */
 export const DEMO_COVERAGE_REQUIREMENTS: CoverageRequirement[] = [
   // Weekdays — morning and afternoon
-  ...(['monday', 'tuesday', 'wednesday', 'thursday', 'friday'] as DayOfWeek[]).flatMap((day) => [
+  ...([
+    { d: 'monday', dt: '2026-04-06' },
+    { d: 'tuesday', dt: '2026-04-07' },
+    { d: 'wednesday', dt: '2026-04-08' },
+    { d: 'thursday', dt: '2026-04-09' },
+    { d: 'friday', dt: '2026-04-10' }
+  ]).flatMap(({ d, dt }) => [
     {
-      id: `demo-cov-${day}-am`,
+      id: `demo-cov-${d}-am`,
       name: 'Day Shift',
-      day,
+      date: dt,
       startTime: '07:00',
       endTime: '16:00',
       unpaidBreakMinutes: 60,
       requiredStaff: 2,
     },
     {
-      id: `demo-cov-${day}-pm`,
+      id: `demo-cov-${d}-pm`,
       name: 'Evening Shift',
-      day,
+      date: dt,
       startTime: '13:00',
       endTime: '22:00',
       unpaidBreakMinutes: 60,
@@ -166,7 +185,7 @@ export const DEMO_COVERAGE_REQUIREMENTS: CoverageRequirement[] = [
   {
     id: 'demo-cov-saturday',
     name: 'Weekend Shift',
-    day: 'saturday',
+    date: '2026-04-11',
     startTime: '08:00',
     endTime: '17:00',
     unpaidBreakMinutes: 60,
@@ -175,7 +194,7 @@ export const DEMO_COVERAGE_REQUIREMENTS: CoverageRequirement[] = [
   {
     id: 'demo-cov-sunday',
     name: 'Weekend Shift',
-    day: 'sunday',
+    date: '2026-04-12',
     startTime: '09:00',
     endTime: '18:00',
     unpaidBreakMinutes: 60,
@@ -183,193 +202,101 @@ export const DEMO_COVERAGE_REQUIREMENTS: CoverageRequirement[] = [
   },
 ]
 
-/** Build shifts from coverage requirements. */
-const DEMO_SHIFTS: Shift[] = DEMO_COVERAGE_REQUIREMENTS.map((r) => ({
-  id: `demo-shift-${r.id}`,
-  day: r.day,
-  startTime: r.startTime,
-  endTime: r.endTime,
-  requiredStaff: r.requiredStaff,
-  unpaidBreakMinutes: r.unpaidBreakMinutes,
-  weekNumber: 0,
-}))
+export async function loadDemoDataAsync() {
+  const employees = DEMO_EMPLOYEES
+  const coverageRequirements = DEMO_COVERAGE_REQUIREMENTS
 
-/** Pre-built assignments pairing employees to shifts. */
-const DEMO_ASSIGNMENTS: ShiftAssignment[] = [
-  // Monday AM: Alex + Jordan
-  {
-    id: 'demo-asgn-1',
-    shiftId: 'demo-shift-demo-cov-monday-am',
-    employeeId: 'demo-emp-1',
-    isManual: false,
-  },
-  {
-    id: 'demo-asgn-2',
-    shiftId: 'demo-shift-demo-cov-monday-am',
-    employeeId: 'demo-emp-2',
-    isManual: false,
-  },
-  // Monday PM: Sam + Taylor
-  {
-    id: 'demo-asgn-3',
-    shiftId: 'demo-shift-demo-cov-monday-pm',
-    employeeId: 'demo-emp-3',
-    isManual: false,
-  },
-  {
-    id: 'demo-asgn-4',
-    shiftId: 'demo-shift-demo-cov-monday-pm',
-    employeeId: 'demo-emp-6',
-    isManual: false,
-  },
-  // Tuesday AM: Alex + Casey
-  {
-    id: 'demo-asgn-5',
-    shiftId: 'demo-shift-demo-cov-tuesday-am',
-    employeeId: 'demo-emp-1',
-    isManual: false,
-  },
-  {
-    id: 'demo-asgn-6',
-    shiftId: 'demo-shift-demo-cov-tuesday-am',
-    employeeId: 'demo-emp-2',
-    isManual: false,
-  },
-  // Tuesday PM: Sam + Morgan
-  {
-    id: 'demo-asgn-7',
-    shiftId: 'demo-shift-demo-cov-tuesday-pm',
-    employeeId: 'demo-emp-3',
-    isManual: false,
-  },
-  {
-    id: 'demo-asgn-8',
-    shiftId: 'demo-shift-demo-cov-tuesday-pm',
-    employeeId: 'demo-emp-5',
-    isManual: false,
-  },
-  // Wednesday AM: Alex + Jordan
-  {
-    id: 'demo-asgn-9',
-    shiftId: 'demo-shift-demo-cov-wednesday-am',
-    employeeId: 'demo-emp-1',
-    isManual: false,
-  },
-  {
-    id: 'demo-asgn-10',
-    shiftId: 'demo-shift-demo-cov-wednesday-am',
-    employeeId: 'demo-emp-4',
-    isManual: false,
-  },
-  // Wednesday PM: Sam + Alex
-  {
-    id: 'demo-asgn-11',
-    shiftId: 'demo-shift-demo-cov-wednesday-pm',
-    employeeId: 'demo-emp-3',
-    isManual: false,
-  },
-  {
-    id: 'demo-asgn-12',
-    shiftId: 'demo-shift-demo-cov-wednesday-pm',
-    employeeId: 'demo-emp-1',
-    isManual: false,
-  },
-  // Thursday AM: Jordan + Casey
-  {
-    id: 'demo-asgn-13',
-    shiftId: 'demo-shift-demo-cov-thursday-am',
-    employeeId: 'demo-emp-2',
-    isManual: false,
-  },
-  {
-    id: 'demo-asgn-14',
-    shiftId: 'demo-shift-demo-cov-thursday-am',
-    employeeId: 'demo-emp-1',
-    isManual: false,
-  },
-  // Thursday PM: Sam + Morgan
-  {
-    id: 'demo-asgn-15',
-    shiftId: 'demo-shift-demo-cov-thursday-pm',
-    employeeId: 'demo-emp-3',
-    isManual: false,
-  },
-  {
-    id: 'demo-asgn-16',
-    shiftId: 'demo-shift-demo-cov-thursday-pm',
-    employeeId: 'demo-emp-5',
-    isManual: false,
-  },
-  // Friday AM: Alex + Jordan
-  {
-    id: 'demo-asgn-17',
-    shiftId: 'demo-shift-demo-cov-friday-am',
-    employeeId: 'demo-emp-1',
-    isManual: false,
-  },
-  {
-    id: 'demo-asgn-18',
-    shiftId: 'demo-shift-demo-cov-friday-am',
-    employeeId: 'demo-emp-4',
-    isManual: false,
-  },
-  // Friday PM: Sam + Taylor
-  {
-    id: 'demo-asgn-19',
-    shiftId: 'demo-shift-demo-cov-friday-pm',
-    employeeId: 'demo-emp-3',
-    isManual: false,
-  },
-  {
-    id: 'demo-asgn-20',
-    shiftId: 'demo-shift-demo-cov-friday-pm',
-    employeeId: 'demo-emp-6',
-    isManual: false,
-  },
-  // Saturday: Casey + Morgan
-  {
-    id: 'demo-asgn-21',
-    shiftId: 'demo-shift-demo-cov-saturday',
-    employeeId: 'demo-emp-4',
-    isManual: false,
-  },
-  {
-    id: 'demo-asgn-22',
-    shiftId: 'demo-shift-demo-cov-saturday',
-    employeeId: 'demo-emp-5',
-    isManual: false,
-  },
-  // Sunday: Taylor
-  {
-    id: 'demo-asgn-23',
-    shiftId: 'demo-shift-demo-cov-sunday',
-    employeeId: 'demo-emp-6',
-    isManual: false,
-  },
-]
+  const totalWeeks = 4
+  const baseDate = new Date('2026-04-06T00:00:00')
+  const actualStartMonday = getNextMonday(baseDate)
+  const baseMs = actualStartMonday.getTime()
+  
+  const generatedShifts: Shift[] = []
 
-/** Pre-built demo schedule. */
-export const DEMO_SCHEDULE: Schedule = {
-  id: 'demo-schedule-1',
-  name: 'Demo — Week of April 6, 2026',
-  startDate: '2026-04-06T00:00:00.000Z',
-  endDate: '2026-04-12T23:59:59.000Z',
-  shifts: DEMO_SHIFTS,
-  assignments: DEMO_ASSIGNMENTS,
-  qualityScore: 92,
-  unfilledShiftIds: [],
-  createdAt: '2026-04-06T09:00:00.000Z',
-  updatedAt: '2026-04-06T09:00:00.000Z',
-}
+  coverageRequirements.forEach((r) => {
+    const shiftDate = new Date(`${r.date}T00:00:00`)
+    const dayDiff = Math.round((shiftDate.getTime() - baseMs) / (1000 * 60 * 60 * 24))
+    const weekNumber = Math.floor(dayDiff / 7)
+    
+    if (weekNumber >= 0 && weekNumber < totalWeeks) {
+      const dayOfWeek = dayDiff % 7
+      const shift = createShift({
+        day: (Object.keys(DAY_MAP).find(k => DAY_MAP[k as keyof typeof DAY_MAP] === dayOfWeek) as DayOfWeek) || 'monday',
+        startTime: r.startTime,
+        endTime: r.endTime,
+        requiredStaff: r.requiredStaff,
+        weekNumber,
+        role: r.role,
+        unpaidBreakMinutes: r.unpaidBreakMinutes,
+      })
+      generatedShifts.push(shift)
+    }
+  })
 
-/**
- * Load all demo data in a single call.
- * Used by the onboarding wizard and "Load Demo" command.
- */
-export function loadDemoData() {
-  return {
-    employees: DEMO_EMPLOYEES,
-    coverageRequirements: DEMO_COVERAGE_REQUIREMENTS,
-    schedule: DEMO_SCHEDULE,
-  }
+  // MAP TO ENGINE DTOs
+  const engineEmployees: EngineEmployee[] = employees.map((e) => ({
+    id: e.id,
+    name: e.name,
+    role: e.role,
+    maxHours: e.maxHoursPerWeek,
+    minHours: e.minHoursPerWeek,
+    targetHours: e.maxHoursPerWeek, // Simplified
+    isFullTime: e.employmentType === 'full-time',
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+    availability: e.availability.map((a) => ({
+      dayOfWeek: DAY_MAP[a.day] ?? 0,
+      isAvailable: a.blocks.length > 0,
+      preferences: a.blocks.map((b) => ({ start: b.startTime, end: b.endTime })),
+    })),
+  }))
+
+  const engineShifts: EngineShift[] = []
+  generatedShifts.forEach((s) => {
+    const startH = parseInt(s.startTime.split(':')[0], 10)
+    const endH = parseInt(s.endTime.split(':')[0], 10)
+    let duration = endH > startH ? endH - startH : 24 - startH + endH
+
+    if (s.unpaidBreakMinutes) {
+      duration -= s.unpaidBreakMinutes / 60
+    }
+
+    for (let i = 0; i < s.requiredStaff; i++) {
+      engineShifts.push({
+        id: `${s.id}-${i}`,
+        dayOfWeek: DAY_MAP[s.day] ?? 0,
+        weekNumber: s.weekNumber ?? 0,
+        start: s.startTime,
+        end: s.endTime,
+        role: s.role || 'any',
+        durationHours: duration,
+        isAssigned: false,
+      })
+    }
+  })
+
+  const result = await generateScheduleAsync(engineEmployees, engineShifts, () => {})
+
+  const finalAssignments: ShiftAssignment[] = result.assignedShifts
+    .filter((s) => s.employeeId)
+    .map((a) => ({
+      id: crypto.randomUUID(),
+      shiftId: a.id.substring(0, a.id.lastIndexOf('-')),
+      employeeId: a.employeeId!,
+      isManual: false,
+    }))
+
+  const schedule = createSchedule({
+    name: 'Demo — Week of April 6, 2026',
+    startDate: actualStartMonday.toISOString(),
+    endDate: new Date(
+      actualStartMonday.getTime() + totalWeeks * 7 * 24 * 60 * 60 * 1000,
+    ).toISOString(),
+    shifts: generatedShifts,
+    assignments: finalAssignments,
+    qualityScore: result.success ? 100 : 0,
+    unfilledShiftIds: result.unfilledShifts.map((s) => s.id),
+  })
+
+  return { employees, coverageRequirements, schedule }
 }

@@ -118,16 +118,17 @@ export interface Shift {
  */
 export interface CoverageRequirement {
   id: EntityId
-  /** Human-readable name (e.g., "Morning Rush"). */
-  name: string
-  day: DayOfWeek
+  /** The ISO date (YYYY-MM-DD) for this specific draft shift. */
+  date: string
+  /** Shift start time (HH:mm format). */
   startTime: string
+  /** Shift end time (HH:mm format). */
   endTime: string
-  /** Minimum staff required during this block. */
+  /** Number of staff needed for this exact timeframe on this day. */
   requiredStaff: number
-  /** Specific role required for this block. */
+  /** Specific role required (optional - defaults to any). */
   role?: string
-  /** Unpaid break duration in minutes (e.g. 30, 45, 60). */
+  /** Unpaid break minutes to deduct from total hours. */
   unpaidBreakMinutes?: number
 }
 
@@ -192,28 +193,6 @@ export interface Schedule {
 export type RecurrencePattern =
   | { kind: 'weekly' }
   | { kind: 'biweekly'; weekA: string; weekB: string }
-  | { kind: 'rotation'; weeks: string[]; cycleLength: number }
-  | { kind: 'monthly'; weekOfMonth: number }
-
-/**
- * A reusable schedule template with coverage requirements and rules.
- */
-export interface RecurringTemplate {
-  id: EntityId
-  /** Template name (e.g., "Summer Schedule"). */
-  name: string
-  /** Coverage requirements for this template. */
-  coverageRequirements: CoverageRequirement[]
-  /** Constraints for this template. */
-  constraints: Constraint[]
-  /** Recurrence pattern. */
-  pattern: RecurrencePattern
-  /** When this template was created. */
-  createdAt: string
-  /** When this template was last updated. */
-  updatedAt: string
-}
-
 /**
  * Application-level settings stored in localStorage.
  */
@@ -226,4 +205,6 @@ export interface AppSettings {
   defaultView: 'grid' | 'timeline'
   /** Time display format. */
   timeFormat: '12h' | '24h'
+  /** Country code for holiday API. */
+  holidayCountry: string
 }

@@ -2,7 +2,7 @@ import { useState, lazy, Suspense } from 'react'
 import { CommandPalette } from './tooling/CommandPalette'
 import { PolicyModal } from './shared/PolicyModal'
 import { useSettingsStore } from '../stores/settingsStore'
-import { Users, Target, CalendarDays, LayoutTemplate } from 'lucide-react'
+import { Users, ClipboardList, CalendarDays, BookOpen } from 'lucide-react'
 import './AppShell.css'
 
 /** Lazy-loaded views for bundle size optimization (Story 7.6). */
@@ -15,8 +15,8 @@ const EmployeeManager = lazy(() =>
 const CoverageManager = lazy(() =>
   import('./coverage/CoverageManager').then((m) => ({ default: m.CoverageManager })),
 )
-const TemplatesView = lazy(() =>
-  import('./templates/TemplatesView').then((m) => ({ default: m.TemplatesView })),
+const KnowledgeBase = lazy(() =>
+  import('./knowledge/KnowledgeBase').then((m) => ({ default: m.KnowledgeBase })),
 )
 
 /** Navigation items for the sidebar. */
@@ -29,17 +29,18 @@ const NAV_ITEMS = [
   {
     id: 'coverage',
     label: 'Coverage',
-    icon: Target,
+    icon: ClipboardList,
   },
   {
     id: 'schedule',
     label: 'Schedule',
     icon: CalendarDays,
   },
+
   {
-    id: 'templates',
-    label: 'Templates',
-    icon: LayoutTemplate,
+    id: 'knowledge',
+    label: 'Knowledge',
+    icon: BookOpen,
   },
 ] as const
 
@@ -67,8 +68,8 @@ export function AppShell() {
         return <EmployeeManager />
       case 'coverage':
         return <CoverageManager />
-      case 'templates':
-        return <TemplatesView onNavigate={setActiveNav} />
+      case 'knowledge':
+        return <KnowledgeBase />
       default:
         return (
           <div className="shell__placeholder">
@@ -182,6 +183,7 @@ export function AppShell() {
         {/* Header */}
         <header className="shell__header" role="banner">
           <div className="shell__header-left">
+            <img src="/logo-dark.png" alt="Covrd" className="shell__mobile-logo" />
             <h1 className="shell__page-title">
               {NAV_ITEMS.find((n) => n.id === activeNav)?.label ?? 'Covrd'}
             </h1>

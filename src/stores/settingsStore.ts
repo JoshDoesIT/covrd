@@ -8,6 +8,7 @@ const DEFAULT_SETTINGS: AppSettings = {
   sidebarCollapsed: false,
   defaultView: 'grid',
   timeFormat: '12h',
+  holidayCountry: 'US',
 }
 
 function loadSettings(): AppSettings {

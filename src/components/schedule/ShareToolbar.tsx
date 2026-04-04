@@ -98,9 +98,9 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
 
       setQrDataUrl(dataUrl)
       setShowQr(true)
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('QR Code Generation Error:', error)
-      if (error?.message?.includes('too big')) {
+      if (error instanceof Error && error.message.includes('too big')) {
         setToastMessage('Schedule still too massive for QR. Use Share Link or Export instead.')
       } else {
         setToastMessage('Failed to generate QR code')
@@ -110,16 +110,6 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
 
   return (
     <div className="share-toolbar">
-      <button
-        className="sm-btn-ghost share-toolbar__btn"
-        onClick={handleExportJSON}
-        aria-label="Export JSON"
-        title="Export schedule as JSON"
-      >
-        <Download size={14} />
-        <span className="share-toolbar__label">Export JSON</span>
-      </button>
-
       <button
         className="sm-btn-ghost share-toolbar__btn"
         onClick={handleImportClick}
@@ -137,6 +127,16 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
         style={{ display: 'none' }}
         aria-hidden="true"
       />
+
+      <button
+        className="sm-btn-ghost share-toolbar__btn"
+        onClick={handleExportJSON}
+        aria-label="Export JSON"
+        title="Export schedule as JSON"
+      >
+        <Download size={14} />
+        <span className="share-toolbar__label">Export JSON</span>
+      </button>
 
       <button
         className="sm-btn-ghost share-toolbar__btn"

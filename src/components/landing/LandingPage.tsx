@@ -2,7 +2,7 @@ import {
   Shield,
   LayoutDashboard,
   Calendar,
-  Terminal,
+  BookOpen,
   ServerOff,
   MonitorSmartphone,
 } from 'lucide-react'
@@ -13,6 +13,11 @@ interface LandingPageProps {
   onShowPrivacy: () => void
   onShowAccessibility: () => void
 }
+
+const MOCK_CALENDAR_DATA = Array.from({ length: 21 }).map((_, i) => ({
+  isFixed: Math.random() > 0.7,
+  delay: (i % 7) * 0.15 + Math.random() * 0.5,
+}))
 
 export function LandingPage({ onLaunch, onShowPrivacy, onShowAccessibility }: LandingPageProps) {
   return (
@@ -82,17 +87,13 @@ export function LandingPage({ onLaunch, onShowPrivacy, onShowAccessibility }: La
                 <span>S</span>
               </div>
               <div className="landing__mock-calendar-grid">
-                {Array.from({ length: 21 }).map((_, i) => {
-                  const isFixed = Math.random() > 0.7
-                  const delay = (i % 7) * 0.15 + Math.random() * 0.5
-                  return (
-                    <div
-                      key={i}
-                      className={`landing__mock-cell ${isFixed ? 'fixed' : ''}`}
-                      style={!isFixed ? { animationDelay: `${delay}s` } : {}}
-                    />
-                  )
-                })}
+                {MOCK_CALENDAR_DATA.map(({ isFixed, delay }, i) => (
+                  <div
+                    key={i}
+                    className={`landing__mock-cell ${isFixed ? 'fixed' : ''}`}
+                    style={!isFixed ? { animationDelay: `${delay}s` } : {}}
+                  />
+                ))}
               </div>
             </div>
           </div>
@@ -112,12 +113,12 @@ export function LandingPage({ onLaunch, onShowPrivacy, onShowAccessibility }: La
           {/* Card 3: 1 Column */}
           <div className="landing__bento-card landing__bento-span-1">
             <div className="landing__bento-icon">
-              <Terminal size={24} />
+              <BookOpen size={24} />
             </div>
-            <h3 className="landing__bento-title">Developer Ready</h3>
+            <h3 className="landing__bento-title">Knowledgebase Built-in</h3>
             <p className="landing__bento-desc">
-              Built on React, IndexedDB, and pure local TypeScript logic. Share state via URL
-              hashing.
+              Access comprehensive guides, labor compliance tips, and fair scheduling principles
+              directly in the app.
             </p>
           </div>
 

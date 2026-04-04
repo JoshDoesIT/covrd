@@ -12,6 +12,25 @@
   align-items: center;
 }
 
+.sm-template-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
+  background: var(--color-accent-muted);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  animation: banner-fade-in 0.3s ease;
+}
+
+@keyframes banner-fade-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .sm-title {
   font-size: 1.25rem;
   font-weight: 600;
@@ -283,6 +302,7 @@
   flex: 1;
   overflow: auto;
   position: relative;
+  -webkit-overflow-scrolling: touch; /* Added for mobile UX */
 }
 
 /* --- Responsive --- */
@@ -296,6 +316,7 @@
   .sm-actions {
     flex-wrap: wrap;
     gap: 0.5rem;
+    width: 100%;
   }
 
   .sm-view-toggle {

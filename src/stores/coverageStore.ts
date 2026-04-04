@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { CoverageRequirement, DayOfWeek } from '../types/index'
+import type { CoverageRequirement } from '../types/index'
 import { covrdDb } from '../db/db'
 
 /**
@@ -11,7 +11,7 @@ interface CoverageState {
   addRequirement: (req: CoverageRequirement) => void
   updateRequirement: (id: string, updates: Partial<CoverageRequirement>) => void
   removeRequirement: (id: string) => void
-  getRequirementsForDay: (day: DayOfWeek) => CoverageRequirement[]
+  getRequirementsForDate: (date: string) => CoverageRequirement[]
   reset: () => void
 }
 
@@ -54,8 +54,8 @@ export const useCoverageStore = create<CoverageState>((set, get) => ({
     }))
   },
 
-  getRequirementsForDay: (day) => {
-    return get().requirements.filter((req) => req.day === day)
+  getRequirementsForDate: (date) => {
+    return get().requirements.filter((req) => req.date === date)
   },
 
   reset: () => {

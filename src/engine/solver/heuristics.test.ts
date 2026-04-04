@@ -5,6 +5,7 @@ describe('Solver Heuristics', () => {
   describe('MRV (Minimum Remaining Values)', () => {
     const shift1: Shift = {
       id: 's1',
+      weekNumber: 0,
       dayOfWeek: 1,
       start: '09:00',
       end: '17:00',
@@ -14,6 +15,7 @@ describe('Solver Heuristics', () => {
     }
     const shift2: Shift = {
       id: 's2',
+      weekNumber: 0,
       dayOfWeek: 2,
       start: '09:00',
       end: '17:00',
@@ -23,6 +25,7 @@ describe('Solver Heuristics', () => {
     }
     const shift3: Shift = {
       id: 's3',
+      weekNumber: 0,
       dayOfWeek: 3,
       start: '09:00',
       end: '17:00',
@@ -103,13 +106,31 @@ describe('Solver Heuristics', () => {
     }
 
     it('prioritizes employees furthest from their target hours', () => {
-      const currentHours = new Map<string, number>([
-        ['e1', 30], // Needs 6 more
-        ['e2', 0], // Needs 36 more (highest priority)
-        ['e3', 36], // Exact target (lowest priority)
+      // Mock Map<employeeId, Map<weekNumber, workedHours>>
+      const e1Hours = new Map<number, number>([[0, 30]]) // Needs 6 more
+      const e2Hours = new Map<number, number>([[0, 0]])  // Needs 36 more (highest priority)
+      const e3Hours = new Map<number, number>([[0, 36]]) // Exact target (lowest priority)
+      
+      const currentHours = new Map<string, Map<number, number>>([
+        ['e1', e1Hours],
+        ['e2', e2Hours],
+        ['e3', e3Hours],
       ])
 
-      const sorted = sortCandidatesByFairness([emp1, emp2, emp3], currentHours)
+      const mockShiftToAssign: Shift = {
+        id: 's1',
+        dayOfWeek: 1,
+        weekNumber: 0,
+        start: '09:00',
+        end: '17:00',
+        role: 'RN',
+        durationHours: 8,
+        isAssigned: false
+      }
+      
+      const mockAssignments = new Map<string, Shift[]>()
+
+      const sorted = sortCandidatesByFairness([emp1, emp2, emp3], currentHours, mockShiftToAssign, mockAssignments)
       expect(sorted[0].id).toBe('e2')
       expect(sorted[1].id).toBe('e1')
       expect(sorted[2].id).toBe('e3')

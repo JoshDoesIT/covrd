@@ -20,8 +20,11 @@ export function solveSchedule(employees: Employee[], targetShifts: Shift[]): Sol
 
   const unassignedShifts = shifts.filter((s) => !s.isAssigned)
 
+  const startTime = Date.now()
+  const TIMEOUT_MS = 10000 // 10 seconds max
+
   // Recursively solve
-  const success = backtrack(unassignedShifts, employees, existingAssignments, currentHourTotals)
+  const success = backtrack(unassignedShifts, employees, existingAssignments, currentHourTotals, startTime, TIMEOUT_MS)
 
   if (success) {
     // Reconstruct the assigned shifts list
@@ -53,7 +56,13 @@ function backtrack(
   employees: Employee[],
   assignments: Map<string, Shift[]>,
   hourTotals: Map<string, Map<number, number>>,
+  startTime: number,
+  timeoutMs: number,
 ): boolean {
+  if (Date.now() - startTime > timeoutMs) {
+    throw new Error('Solver timeout: Failed to find a valid schedule within 10 seconds. You may not have enough staff hours to cover all required shifts.')
+  }
+
   if (unassignedShifts.length === 0) {
     return true // All scheduled successfully
   }
@@ -101,7 +110,7 @@ function backtrack(
 
     // Recurse with shift removed
     const remaining = unassignedShifts.filter((s) => s.id !== shiftToAssign.id)
-    const success = backtrack(remaining, employees, assignments, hourTotals)
+    const success = backtrack(remaining, employees, assignments, hourTotals, startTime, timeoutMs)
 
     if (success) {
       return true

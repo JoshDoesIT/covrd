@@ -23,6 +23,7 @@ describe('App', () => {
 
   it('displays the Covrd brand', async () => {
     render(<App />)
-    expect(await screen.findByAltText('Covrd')).toBeInTheDocument()
+    const logos = await screen.findAllByAltText('Covrd')
+    expect(logos.length).toBeGreaterThanOrEqual(1)
   })
 })

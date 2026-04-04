@@ -3,7 +3,7 @@ import { Sparkles, Users, CalendarDays, CheckCircle, ChevronRight, Zap } from 'l
 import { useEmployeeStore } from '../../stores/employeeStore'
 import { useCoverageStore } from '../../stores/coverageStore'
 import { useScheduleStore } from '../../stores/scheduleStore'
-import { loadDemoData } from '../../data/demoData'
+import { loadDemoDataAsync } from '../../data/demoData'
 import './OnboardingWizard.css'
 
 /**
@@ -67,8 +67,8 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
     }
   }
 
-  const handleLoadDemo = () => {
-    const { employees, coverageRequirements, schedule } = loadDemoData()
+  const handleLoadDemo = async () => {
+    const { employees, coverageRequirements, schedule } = await loadDemoDataAsync()
     employees.forEach((e) => useEmployeeStore.getState().addEmployee(e))
     coverageRequirements.forEach((r) => useCoverageStore.getState().addRequirement(r))
     useScheduleStore.getState().setActiveSchedule(schedule)

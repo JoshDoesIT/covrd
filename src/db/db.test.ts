@@ -7,14 +7,12 @@ describe('CovrdDatabase', () => {
     await covrdDb.employees.clear()
     await covrdDb.coverageRequirements.clear()
     await covrdDb.schedules.clear()
-    await covrdDb.templates.clear()
   })
 
   test('exposes all required tables', () => {
     expect(covrdDb.employees).toBeDefined()
     expect(covrdDb.coverageRequirements).toBeDefined()
     expect(covrdDb.schedules).toBeDefined()
-    expect(covrdDb.templates).toBeDefined()
   })
 
   test('stores and retrieves an employee', async () => {
@@ -71,22 +69,6 @@ describe('CovrdDatabase', () => {
     await covrdDb.schedules.put(schedule)
     const retrieved = await covrdDb.schedules.get('sched-1')
     expect(retrieved).toEqual(schedule)
-  })
-
-  test('stores and retrieves a template', async () => {
-    const template = {
-      id: 'tmpl-1',
-      name: 'Summer Schedule',
-      coverageRequirements: [],
-      constraints: [],
-      pattern: { kind: 'weekly' as const },
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    }
-
-    await covrdDb.templates.put(template)
-    const retrieved = await covrdDb.templates.get('tmpl-1')
-    expect(retrieved).toEqual(template)
   })
 
   test('bulk-puts and retrieves all employees', async () => {

@@ -8,11 +8,13 @@ import {
   Zap,
   Trash2,
   RefreshCcw,
+  BookOpen,
+  HelpCircle,
 } from 'lucide-react'
 import { useScheduleStore } from '../../stores/scheduleStore'
 import { useEmployeeStore } from '../../stores/employeeStore'
 import { useCoverageStore } from '../../stores/coverageStore'
-import { loadDemoData } from '../../data/demoData'
+import { loadDemoDataAsync } from '../../data/demoData'
 import { DataPurge } from '../settings/DataPurge'
 import './CommandPalette.css'
 
@@ -59,12 +61,15 @@ export function CommandPalette({ onNavigate, open, setOpen }: CommandPaletteProp
     } else if (action === 'action_commit_sandbox') {
       if (isSandboxMode) commitSandbox()
     } else if (action === 'action_load_demo') {
-      const { employees, coverageRequirements, schedule } = loadDemoData()
-      employees.forEach((e) => useEmployeeStore.getState().addEmployee(e))
-      coverageRequirements.forEach((r) => useCoverageStore.getState().addRequirement(r))
-      useScheduleStore.getState().setActiveSchedule(schedule)
+      loadDemoDataAsync().then(({ employees, coverageRequirements, schedule }) => {
+        employees.forEach((e) => useEmployeeStore.getState().addEmployee(e))
+        coverageRequirements.forEach((r) => useCoverageStore.getState().addRequirement(r))
+        useScheduleStore.getState().setActiveSchedule(schedule)
+      })
     } else if (action === 'action_purge') {
       setShowPurge(true)
+    } else if (action === 'action_tutorial') {
+      window.dispatchEvent(new CustomEvent('launch-tutorial'))
     }
   }
 
@@ -103,6 +108,14 @@ export function CommandPalette({ onNavigate, open, setOpen }: CommandPaletteProp
               <Calendar size={18} />
               Go to Schedule Builder
             </Command.Item>
+
+            <Command.Item
+              onSelect={() => handleAction('nav_knowledge')}
+              className="covrd-command-item"
+            >
+              <BookOpen size={18} />
+              Go to Knowledgebase
+            </Command.Item>
           </Command.Group>
 
           <Command.Group heading="Actions">
@@ -135,6 +148,13 @@ export function CommandPalette({ onNavigate, open, setOpen }: CommandPaletteProp
             >
               <Zap size={18} />
               Load Demo Data
+            </Command.Item>
+            <Command.Item
+              onSelect={() => handleAction('action_tutorial')}
+              className="covrd-command-item"
+            >
+              <HelpCircle size={18} />
+              Launch Tutorial
             </Command.Item>
             <Command.Item
               onSelect={() => handleAction('action_purge')}
