@@ -8,6 +8,7 @@ import { useCoverageStore } from './stores/coverageStore'
 import { covrdDb } from './db/db'
 import { LandingPage } from './components/landing/LandingPage'
 import { PolicyModal } from './components/shared/PolicyModal'
+import { Toast } from './components/tooling/Toast'
 
 /** LocalStorage key for tracking onboarding completion. */
 const ONBOARDING_KEY = 'covrd-onboarding-complete'
@@ -28,27 +29,36 @@ export function App() {
   )
   const [isLoading, setIsLoading] = useState(true)
   const [policyModal, setPolicyModal] = useState<'privacy' | 'accessibility' | null>(null)
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
+
+  const applySharedState = async (sharedState: any) => {
+    // 1. Wipe existing state completely
+    await covrdDb.purgeAll()
+
+    // 2. Clear out Zustand states cleanly
+    useEmployeeStore.getState().hydrate([])
+    useCoverageStore.getState().reset()
+    useScheduleStore.getState().hydrate([]) // Clear any previous schedules
+
+    // 3. Import data into Zustand (this will natively rewrite to IDB via store methods)
+    sharedState.employees.forEach((e: any) => useEmployeeStore.getState().addEmployee(e))
+    sharedState.coverageRequirements.forEach((r: any) =>
+      useCoverageStore.getState().addRequirement(r),
+    )
+    if (sharedState.baselineRequirements) {
+      sharedState.baselineRequirements.forEach((b: any) =>
+        useCoverageStore.getState().addBaselineRequirement(b),
+      )
+    }
+    useScheduleStore.getState().setActiveSchedule(sharedState.schedule)
+  }
 
   useEffect(() => {
     async function initData() {
       // First, try loading shared state from URL hash
       const sharedState = hydrateFromHash()
       if (sharedState) {
-        sharedState.employees.forEach((e) => useEmployeeStore.getState().addEmployee(e))
-        sharedState.coverageRequirements.forEach((r) =>
-          useCoverageStore.getState().addRequirement(r),
-        )
-        // If the sharedState URL included baselineRequirements, load them (future proofing)
-        if (sharedState.baselineRequirements) {
-          sharedState.baselineRequirements.forEach(
-            (
-              b: Parameters<
-                ReturnType<typeof useCoverageStore.getState>['addBaselineRequirement']
-              >[0],
-            ) => useCoverageStore.getState().addBaselineRequirement(b),
-          )
-        }
-        useScheduleStore.getState().setActiveSchedule(sharedState.schedule)
+        await applySharedState(sharedState)
         window.history.replaceState(null, '', window.location.pathname)
       } else {
         // Otherwise, hydrate from local IndexedDB
@@ -74,24 +84,11 @@ export function App() {
     window.addEventListener('launch-tutorial', onLaunchTutorial)
 
     // Listen for dynamically pasted share links (so users don't have to refresh)
-    const onGlobalHashChange = () => {
+    const onGlobalHashChange = async () => {
       const sharedState = hydrateFromHash()
       if (sharedState) {
-        sharedState.employees.forEach((e) => useEmployeeStore.getState().addEmployee(e))
-        sharedState.coverageRequirements.forEach((r) =>
-          useCoverageStore.getState().addRequirement(r),
-        )
-        if (sharedState.baselineRequirements) {
-          sharedState.baselineRequirements.forEach(
-            (
-              b: Parameters<
-                ReturnType<typeof useCoverageStore.getState>['addBaselineRequirement']
-              >[0],
-            ) => useCoverageStore.getState().addBaselineRequirement(b),
-          )
-        }
-        useScheduleStore.getState().setActiveSchedule(sharedState.schedule)
-        alert('Shared schedule successfully loaded!')
+        await applySharedState(sharedState)
+        setToastMessage('Shared schedule & rules successfully replaced your local state!')
         window.history.replaceState(null, '', window.location.pathname)
       }
     }
@@ -129,6 +126,9 @@ export function App() {
 
   return (
     <>
+      {toastMessage && (
+        <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} duration={4000} />
+      )}
       {showOnboarding && <OnboardingWizard onComplete={handleOnboardingComplete} />}
       <AppShell />
       {/* AppShell handles its own PolicyModal for the footer links, but we can also use a global one.
