@@ -72,7 +72,35 @@ export function App() {
   useEffect(() => {
     const onLaunchTutorial = () => setShowOnboarding(true)
     window.addEventListener('launch-tutorial', onLaunchTutorial)
-    return () => window.removeEventListener('launch-tutorial', onLaunchTutorial)
+
+    // Listen for dynamically pasted share links (so users don't have to refresh)
+    const onGlobalHashChange = () => {
+      const sharedState = hydrateFromHash()
+      if (sharedState) {
+        sharedState.employees.forEach((e) => useEmployeeStore.getState().addEmployee(e))
+        sharedState.coverageRequirements.forEach((r) =>
+          useCoverageStore.getState().addRequirement(r),
+        )
+        if (sharedState.baselineRequirements) {
+          sharedState.baselineRequirements.forEach(
+            (
+              b: Parameters<
+                ReturnType<typeof useCoverageStore.getState>['addBaselineRequirement']
+              >[0],
+            ) => useCoverageStore.getState().addBaselineRequirement(b),
+          )
+        }
+        useScheduleStore.getState().setActiveSchedule(sharedState.schedule)
+        alert('Shared schedule successfully loaded!')
+        window.history.replaceState(null, '', window.location.pathname)
+      }
+    }
+    window.addEventListener('hashchange', onGlobalHashChange)
+
+    return () => {
+      window.removeEventListener('launch-tutorial', onLaunchTutorial)
+      window.removeEventListener('hashchange', onGlobalHashChange)
+    }
   }, [])
 
   const handleOnboardingComplete = () => {
