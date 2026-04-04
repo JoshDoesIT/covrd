@@ -107,7 +107,7 @@
 
 .cm-calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   grid-template-rows: auto repeat(5, minmax(0, 1fr));
   flex: 1;
   background: var(--color-border);
@@ -135,6 +135,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
+  overflow: hidden;
 }
 
 .cm-calendar-cell:hover:not(.empty) {
