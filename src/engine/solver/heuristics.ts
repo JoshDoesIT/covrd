@@ -14,7 +14,25 @@ export function sortShiftsByMRV(shifts: Shift[], candidateCounts: Map<string, nu
       return countA - countB // Ascending: smallest domains first
     }
 
-    // Tie-breaker: Longer shifts are generally harder to place than shorter ones
+    // Tie-breaker 1: Chronological (Week -> Day -> Time)
+    // Building the schedule chronologically guarantees the "clumping" fairness heuristic
+    // operates correctly, as it evaluates "isolated gaps" based on past assignments.
+    if (a.weekNumber !== b.weekNumber) {
+      return a.weekNumber - b.weekNumber
+    }
+    
+    // Normalize day to Monday=0, Sunday=6
+    const normDayA = a.dayOfWeek === 0 ? 6 : a.dayOfWeek - 1
+    const normDayB = b.dayOfWeek === 0 ? 6 : b.dayOfWeek - 1
+    if (normDayA !== normDayB) {
+      return normDayA - normDayB
+    }
+
+    if (a.start !== b.start) {
+      return a.start.localeCompare(b.start)
+    }
+
+    // Tie-breaker 2: Longer shifts are generally harder to place
     return b.durationHours - a.durationHours
   })
 }
