@@ -18,6 +18,14 @@
 
 Covrd is a **privacy-first, client-side-only** web application that automatically generates optimized staff work schedules. Your data never leaves your browser - no accounts, no servers, no tracking.
 
+<p align="center">
+  <img src="docs/brand/screenshots/app_desktop.png" alt="Covrd Desktop Interface" width="100%">
+</p>
+
+<p align="center">
+  <img src="docs/brand/screenshots/app_mobile.png" alt="Covrd Mobile Interface" width="40%">
+</p>
+
 ## Privacy Pledge
 
 - **Zero server-side data handling** - All data stays in your browser
