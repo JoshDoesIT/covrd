@@ -16,9 +16,9 @@ async function capture() {
   // ==========================================
   // 1536px perfectly hugs the flexbox elements without overflowing
   // and without leaving vast empty space like 1920px (16:9) does.
-  const desktopWidth = 1536;
-  const desktopHeight = 960;
-  
+  const desktopWidth = 1536
+  const desktopHeight = 960
+
   const desktopContext = await browser.newContext({
     viewport: { width: desktopWidth, height: desktopHeight },
     deviceScaleFactor: 2,
@@ -26,13 +26,15 @@ async function capture() {
   await desktopContext.addInitScript(() => {
     localStorage.setItem('covrd-onboarding-complete', 'true')
   })
-  
+
   const desktopPage = await desktopContext.newPage()
   await desktopPage.goto(url, { waitUntil: 'load' })
   await desktopPage.evaluate(async () => {
-    await document.fonts.ready;
+    await document.fonts.ready
   })
-  await desktopPage.addStyleTag({ content: '::-webkit-scrollbar { display: none !important; } body { overflow-x: hidden; }' })
+  await desktopPage.addStyleTag({
+    content: '::-webkit-scrollbar { display: none !important; } body { overflow-x: hidden; }',
+  })
 
   await desktopPage.keyboard.press('Control+k')
   await desktopPage.waitForSelector('.covrd-command-input', { state: 'visible', timeout: 5000 })
@@ -40,26 +42,25 @@ async function capture() {
   await desktopPage.waitForTimeout(500)
   await desktopPage.keyboard.press('Enter')
   await desktopPage.waitForTimeout(1000)
-  
+
   await desktopPage.evaluate(() => {
     if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur();
+      document.activeElement.blur()
     }
-  });
+  })
   await desktopPage.setViewportSize({ width: desktopWidth, height: desktopHeight })
   await desktopPage.waitForTimeout(2000)
 
-  const rawDesktopPath = path.join(outDir, 'raw_desktop.png');
+  const rawDesktopPath = path.join(outDir, 'raw_desktop.png')
   await desktopPage.screenshot({ path: rawDesktopPath, fullPage: false })
   await desktopContext.close()
-
 
   // ==========================================
   // 2. Capture Raw Mobile (400x850 Responsive CSS)
   // ==========================================
-  const mobileWidth = 400;
-  const mobileHeight = 850;
-  
+  const mobileWidth = 400
+  const mobileHeight = 850
+
   const mobileContext = await browser.newContext({
     viewport: { width: mobileWidth, height: mobileHeight },
     deviceScaleFactor: 3,
@@ -67,13 +68,15 @@ async function capture() {
   await mobileContext.addInitScript(() => {
     localStorage.setItem('covrd-onboarding-complete', 'true')
   })
-  
+
   const mobilePage = await mobileContext.newPage()
   await mobilePage.goto(url, { waitUntil: 'load' })
   await mobilePage.evaluate(async () => {
-    await document.fonts.ready;
+    await document.fonts.ready
   })
-  await mobilePage.addStyleTag({ content: '::-webkit-scrollbar { display: none !important; } body { overflow-x: hidden; }' })
+  await mobilePage.addStyleTag({
+    content: '::-webkit-scrollbar { display: none !important; } body { overflow-x: hidden; }',
+  })
 
   await mobilePage.keyboard.press('Control+k')
   await mobilePage.waitForSelector('.covrd-command-input', { state: 'visible', timeout: 5000 })
@@ -84,20 +87,19 @@ async function capture() {
 
   await mobilePage.evaluate(() => {
     if (document.activeElement instanceof HTMLElement) {
-      document.activeElement.blur();
+      document.activeElement.blur()
     }
-    document.querySelectorAll('*').forEach(el => {
-      if (el.scrollLeft > 0) el.scrollLeft = 0;
-    });
-    window.scrollTo(0, 0);
-  });
-  
+    document.querySelectorAll('*').forEach((el) => {
+      if (el.scrollLeft > 0) el.scrollLeft = 0
+    })
+    window.scrollTo(0, 0)
+  })
+
   await mobilePage.waitForTimeout(2000)
 
-  const rawMobilePath = path.join(outDir, 'raw_mobile.png');
+  const rawMobilePath = path.join(outDir, 'raw_mobile.png')
   await mobilePage.screenshot({ path: rawMobilePath, fullPage: false })
   await mobileContext.close()
-
 
   // ==========================================
   // 3. Composite Desktop
@@ -107,8 +109,8 @@ async function capture() {
     deviceScaleFactor: 2,
   })
   const compPage = await compositeContext.newPage()
-  const desktopImgBase64 = fs.readFileSync(rawDesktopPath, 'base64');
-  
+  const desktopImgBase64 = fs.readFileSync(rawDesktopPath, 'base64')
+
   // Container matches exactly the source image width + 32px height for the taskbar
   await compPage.setContent(`
     <!DOCTYPE html>
@@ -129,13 +131,13 @@ async function capture() {
   `)
   await compPage.waitForLoadState('networkidle')
   await compPage.screenshot({ path: path.join(outDir, 'app_desktop.png') })
-  
+
   // ==========================================
   // 4. Composite Mobile
   // ==========================================
   await compPage.setViewportSize({ width: 600, height: 1000 })
-  const mobileImgBase64 = fs.readFileSync(rawMobilePath, 'base64');
-  
+  const mobileImgBase64 = fs.readFileSync(rawMobilePath, 'base64')
+
   await compPage.setContent(`
     <!DOCTYPE html>
     <html>
@@ -154,10 +156,10 @@ async function capture() {
 
   await compositeContext.close()
   await browser.close()
-  
+
   // Cleaning up raw frames this time since we know our system works
-  fs.unlinkSync(rawDesktopPath);
-  fs.unlinkSync(rawMobilePath);
+  fs.unlinkSync(rawDesktopPath)
+  fs.unlinkSync(rawMobilePath)
 
   console.log('Done screenshots')
 }
