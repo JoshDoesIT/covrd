@@ -153,6 +153,27 @@
   text-transform: uppercase;
 }
 
+@media (max-width: 1280px) {
+  .wg-grid {
+    grid-template-columns: 180px repeat(7, 1fr);
+    min-width: 900px;
+  }
+
+  .wg-header-cell {
+    padding: 0.6rem 0.4rem;
+    font-size: 0.7rem;
+  }
+
+  .wg-row-label {
+    padding: 0.6rem;
+  }
+
+  .wg-cell {
+    min-height: 80px;
+    padding: 0.4rem;
+  }
+}
+
 @media (max-width: 768px) {
   .wg-grid {
     grid-template-columns: 140px repeat(7, 1fr);

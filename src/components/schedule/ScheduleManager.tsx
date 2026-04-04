@@ -352,93 +352,89 @@ export function ScheduleManager() {
               />
             </>
           )}
+        </div>
 
-          <div className="sm-generate-zone">
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <label
-                htmlFor="sm-start-date"
-                style={{
-                  fontSize: '0.7rem',
-                  color: 'var(--color-text-muted)',
-                  marginBottom: '0.1rem',
-                  paddingLeft: '2px',
-                }}
-              >
-                Start Week (Mon)
-              </label>
-              <div style={{ display: 'flex', alignItems: 'center' }}>
-                <button
-                  className="sm-btn-ghost"
-                  style={{ padding: '0.2rem', marginRight: '0.25rem' }}
-                  onClick={() => {
-                    const d = new Date(`${targetStartDate}T00:00:00`)
-                    d.setDate(d.getDate() - 7)
-                    setTargetStartDate(
-                      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
-                    )
-                  }}
-                  title="Previous Week"
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                <input
-                  id="sm-start-date"
-                  type="date"
-                  value={targetStartDate}
-                  onChange={(e) => {
-                    const val = e.target.value
-                    if (!val) return
-                    // Enforce Monday selection visually if they typed it manually
-                    const d = new Date(`${val}T00:00:00`)
-                    if (d.getDay() !== 1) {
-                      // Snap to the Monday
-                      const nextMon = getNextMonday(d)
-                      setTargetStartDate(
-                        `${nextMon.getFullYear()}-${String(nextMon.getMonth() + 1).padStart(2, '0')}-${String(nextMon.getDate()).padStart(2, '0')}`,
-                      )
-                    } else {
-                      setTargetStartDate(val)
-                    }
-                  }}
-                  style={{
-                    background: 'var(--color-bg-elevated)',
-                    color: 'var(--color-text-primary)',
-                    border: '1px solid var(--color-border)',
-                    padding: '0.4rem 0.5rem',
-                    borderRadius: 'var(--radius-lg)',
-                    fontSize: '0.85rem',
-                  }}
-                />
-                <button
-                  className="sm-btn-ghost"
-                  style={{ padding: '0.2rem', marginLeft: '0.25rem' }}
-                  onClick={() => {
-                    const d = new Date(`${targetStartDate}T00:00:00`)
-                    d.setDate(d.getDate() + 7)
-                    setTargetStartDate(
-                      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
-                    )
-                  }}
-                  title="Next Week"
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
-            </div>
-
-            <button
-              className="sm-btn-generate"
-              onClick={handleGenerateClick}
-              disabled={isGenerating}
+        <div className="sm-generate-zone">
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <label
+              htmlFor="sm-start-date"
+              style={{
+                fontSize: '0.7rem',
+                color: 'var(--color-text-muted)',
+                marginBottom: '0.1rem',
+                paddingLeft: '2px',
+              }}
             >
-              {isGenerating ? (
-                <RefreshCw size={16} className="lucide-spin" />
-              ) : (
-                <Sparkles size={28} />
-              )}
-              {isGenerating ? 'Solving...' : 'Automagic Schedule'}
-            </button>
+              Start Week (Mon)
+            </label>
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <button
+                className="sm-btn-ghost"
+                style={{ padding: '0.2rem', marginRight: '0.25rem' }}
+                onClick={() => {
+                  const d = new Date(`${targetStartDate}T00:00:00`)
+                  d.setDate(d.getDate() - 7)
+                  setTargetStartDate(
+                    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
+                  )
+                }}
+                title="Previous Week"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <input
+                id="sm-start-date"
+                type="date"
+                value={targetStartDate}
+                onChange={(e) => {
+                  const val = e.target.value
+                  if (!val) return
+                  // Enforce Monday selection visually if they typed it manually
+                  const d = new Date(`${val}T00:00:00`)
+                  if (d.getDay() !== 1) {
+                    // Snap to the Monday
+                    const nextMon = getNextMonday(d)
+                    setTargetStartDate(
+                      `${nextMon.getFullYear()}-${String(nextMon.getMonth() + 1).padStart(2, '0')}-${String(nextMon.getDate()).padStart(2, '0')}`,
+                    )
+                  } else {
+                    setTargetStartDate(val)
+                  }
+                }}
+                style={{
+                  background: 'var(--color-bg-elevated)',
+                  color: 'var(--color-text-primary)',
+                  border: '1px solid var(--color-border)',
+                  padding: '0.4rem 0.5rem',
+                  borderRadius: 'var(--radius-lg)',
+                  fontSize: '0.85rem',
+                }}
+              />
+              <button
+                className="sm-btn-ghost"
+                style={{ padding: '0.2rem', marginLeft: '0.25rem' }}
+                onClick={() => {
+                  const d = new Date(`${targetStartDate}T00:00:00`)
+                  d.setDate(d.getDate() + 7)
+                  setTargetStartDate(
+                    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
+                  )
+                }}
+                title="Next Week"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
           </div>
+
+          <button className="sm-btn-generate" onClick={handleGenerateClick} disabled={isGenerating}>
+            {isGenerating ? (
+              <RefreshCw size={16} className="lucide-spin" />
+            ) : (
+              <Sparkles size={28} />
+            )}
+            {isGenerating ? 'Solving...' : 'Automagic Schedule'}
+          </button>
         </div>
       </header>
 

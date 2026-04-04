@@ -599,19 +599,41 @@
 }
 
 /* --- Media Queries --- */
-@media (max-width: 1024px) {
+@media (max-width: 1280px) {
+  .landing__bento-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .landing__bento-span-2 {
+    grid-column: span 2;
+  }
+  .landing__privacy-banner {
+    flex-direction: column;
+    gap: var(--space-6);
+    align-items: center;
+  }
+  .landing__privacy-capsules {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
   .landing__bento-grid {
     grid-template-columns: 1fr;
   }
   .landing__bento-span-2 {
     grid-column: span 1;
   }
-  .landing__privacy-banner {
-    flex-direction: column;
-    gap: var(--space-6);
-    align-items: center; /* Centered */
+  .landing__hero {
+    margin-bottom: var(--space-12);
+    padding-top: var(--space-4);
   }
-  .landing__privacy-capsules {
-    justify-content: center; /* Center the pills */
+  .landing__main {
+    padding: var(--space-4) var(--space-3);
+  }
+  .landing__bento-card {
+    padding: var(--space-6);
+  }
+  .landing__privacy-banner {
+    padding: var(--space-4) var(--space-5);
   }
 }

@@ -416,6 +416,20 @@
   background: rgba(239, 68, 68, 0.1);
 }
 
+@media (max-width: 1280px) {
+  .cm-roster {
+    flex: 0 0 280px;
+  }
+
+  .cm-roster.editing-mode {
+    flex: 0 0 380px;
+  }
+
+  .cm-calendar-header {
+    padding: 0.75rem 1rem;
+  }
+}
+
 @media (max-width: 1024px) {
   .cm-content {
     flex-direction: column;
