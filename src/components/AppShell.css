@@ -402,12 +402,15 @@
     justify-content: center;
   }
 
-  .shell__main-area {
-    margin-left: var(--sidebar-collapsed-width);
+  /* Hide footer elements that clip in the narrow collapsed sidebar */
+  .shell__sidebar .shell__time-toggle,
+  .shell__sidebar .shell__privacy-badge,
+  .shell__sidebar .shell__policy-links {
+    display: none;
   }
 
-  .shell__policy-links {
-    display: none;
+  .shell__main-area {
+    margin-left: var(--sidebar-collapsed-width);
   }
 }
 
