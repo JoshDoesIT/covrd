@@ -130,9 +130,9 @@ export function AvailabilityGrid({ employeeId, onClose }: Props) {
           </button>
           <h3 className="ag-title">
             <CalendarRange size={16} color="var(--primary)" />
-            {employee.name}'s Availability
+            {employee.name || 'New Employee'}'s Availability
           </h3>
-          <p className="ag-subtitle">Click and drag to mark available working hours.</p>
+          <p className="ag-subtitle">Click and drag to mark available working hours. If nothing is selected, this employee is considered available at all times.</p>
         </div>
         <div className="ag-controls">
           <button className="ag-btn" onClick={() => setMatrix({})}>

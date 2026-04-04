@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { Plus, Users, Edit2, Trash2, X, AlertCircle } from 'lucide-react'
 import { useEmployeeStore } from '../../stores/employeeStore'
 import { createEmployee } from '../../types/factories'
@@ -107,6 +107,14 @@ export function EmployeeManager() {
     setIsManagingAvail(false)
     setFormData({})
   }
+
+  // Keep the store in sync with formData during creation so
+  // child components (e.g. AvailabilityGrid) see the live name.
+  useEffect(() => {
+    if (isCreating && editingId && Object.keys(formData).length > 0) {
+      updateEmployee(editingId, formData)
+    }
+  }, [isCreating, editingId, formData, updateEmployee])
 
   return (
     <div className="employee-manager">
@@ -273,15 +281,18 @@ export function EmployeeManager() {
                 <div className="form-group">
                   <label className="form-label">Max Hours / wk</label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     className="form-input"
                     value={formData.maxHoursPerWeek ?? 40}
-                    onChange={(e) =>
-                      setFormData({ ...formData, maxHoursPerWeek: Number(e.target.value) })
-                    }
-                    onFocus={(e) => e.target.select()}
-                    min={1}
-                    max={168}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/[^0-9]/g, '')
+                      setFormData({ ...formData, maxHoursPerWeek: raw === '' ? 40 : Number(raw) })
+                    }}
+                    onFocus={(e) => {
+                      e.target.select()
+                    }}
                   />
                 </div>
               </div>
