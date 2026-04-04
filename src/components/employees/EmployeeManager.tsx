@@ -248,14 +248,21 @@ export function EmployeeManager() {
                 <div className="form-group">
                   <label className="form-label">Min Hours / wk</label>
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     className="form-input"
                     value={formData.minHoursPerWeek ?? 0}
-                    onChange={(e) =>
-                      setFormData({ ...formData, minHoursPerWeek: Number(e.target.value) })
-                    }
-                    min={0}
-                    max={168}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/[^0-9]/g, '')
+                      setFormData({ ...formData, minHoursPerWeek: raw === '' ? 0 : Number(raw) })
+                    }}
+                    onFocus={(e) => {
+                      if (e.target.value === '0') e.target.value = ''
+                    }}
+                    onBlur={(e) => {
+                      if (e.target.value === '') e.target.value = '0'
+                    }}
                   />
                 </div>
                 <div className="form-group">
@@ -267,14 +274,14 @@ export function EmployeeManager() {
                     onChange={(e) =>
                       setFormData({ ...formData, maxHoursPerWeek: Number(e.target.value) })
                     }
+                    onFocus={(e) => e.target.select()}
                     min={1}
                     max={168}
                   />
                 </div>
               </div>
 
-              {!isCreating && (
-                <div
+              <div
                   className="form-group"
                   style={{
                     marginTop: '1rem',
@@ -315,8 +322,7 @@ export function EmployeeManager() {
                   >
                     Open Availability Matrix
                   </button>
-                </div>
-              )}
+              </div>
             </div>
 
             <div className="editor-footer">

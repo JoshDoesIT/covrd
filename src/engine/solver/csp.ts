@@ -134,17 +134,25 @@ function backtrack(
 
   // Forward Checking & Optimization:
   // Calculate who can work what shift right now to build the domains.
+  // Shifts with zero candidates are skipped (unfillable given current state)
+  // rather than triggering a full backtrack, which would unwind all prior
+  // successful assignments and cause the solver to time out on multi-week schedules.
   const domains = new Map<string, Employee[]>()
+  const solvableShifts: Shift[] = []
 
   for (const shift of unassignedShifts) {
     const eligible = getEligibleCandidates(employees, shift, assignments, hourTotals)
     if (eligible.length === 0) {
-      // Domain wipeout! A shift cannot be filled given current assignments.
-      // We must backtrack to try different assignments. If it's globally impossible,
-      // it will backtrack up to the timeout limit and return the best partial schedule.
-      return false
+      // This shift cannot be filled with the current assignment state.
+      // Skip it — it will appear in the unfilled list at the end.
+      continue
     }
     domains.set(shift.id, eligible)
+    solvableShifts.push(shift)
+  }
+
+  if (solvableShifts.length === 0) {
+    return true // Everything that CAN be assigned IS assigned
   }
 
   // Heuristic: MRV. Pick the shift with the fewest options (hardest to fill).
@@ -153,7 +161,7 @@ function backtrack(
     candidateCounts.set(shiftId, emps.length)
   }
 
-  const sortedShifts = sortShiftsByMRV(unassignedShifts, candidateCounts)
+  const sortedShifts = sortShiftsByMRV(solvableShifts, candidateCounts)
   const shiftToAssign = sortedShifts[0]
 
   // Heuristic: LCV/Fairness + Consecutive Days

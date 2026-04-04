@@ -353,7 +353,7 @@ export function ScheduleManager() {
           )}
 
           <div className="sm-generate-zone">
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <label
                 htmlFor="sm-start-date"
                 style={{
