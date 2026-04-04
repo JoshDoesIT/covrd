@@ -97,11 +97,9 @@ export function serializeScheduleCSV(
 
     // 2. Coverage Targets Table
     rows.push('--- COVERAGE REQUIREMENTS ---')
-    rows.push('Role,Day,Target')
+    rows.push('Role,Date,Required Staff')
     for (const cov of state.coverageRequirements) {
-      for (const [day, target] of Object.entries(cov.targets)) {
-        rows.push([escapeCsvField(cov.role), escapeCsvField(day), target.toString()].join(','))
-      }
+      rows.push([escapeCsvField(cov.role || 'Any'), escapeCsvField(cov.date), cov.requiredStaff.toString()].join(','))
     }
 
     rows.push('') // Blank line spacer

@@ -17,8 +17,7 @@ describe('Schedule Export/Import Utilities', () => {
 
   const coverage = createCoverageRequirement({
     id: 'c1',
-    name: 'Morning',
-    day: 'monday',
+    date: '2026-04-06',
     startTime: '09:00',
     endTime: '13:00',
     requiredStaff: 2,

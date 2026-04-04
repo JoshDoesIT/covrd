@@ -36,6 +36,7 @@ describe('Constraint Satisfaction Problem Solver', () => {
     role: 'RN',
     durationHours: 8,
     isAssigned: false,
+    weekNumber: 0,
   }
   const shift2: Shift = {
     id: 's2',
@@ -45,6 +46,7 @@ describe('Constraint Satisfaction Problem Solver', () => {
     role: 'RN',
     durationHours: 8,
     isAssigned: false,
+    weekNumber: 0,
   }
 
   it('assigns all shifts to eligible employees', () => {

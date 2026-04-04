@@ -39,9 +39,8 @@ describe('CovrdDatabase', () => {
 
   test('stores and retrieves a coverage requirement', async () => {
     const req = {
-      id: 'cov-1',
-      name: 'Morning Shift',
-      day: 'monday' as const,
+      id: 'req1',
+      date: '2026-04-06',
       startTime: '09:00',
       endTime: '17:00',
       requiredStaff: 2,

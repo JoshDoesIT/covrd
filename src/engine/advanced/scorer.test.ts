@@ -35,6 +35,7 @@ describe('Quality Score Calculator', () => {
       {
         id: 's1',
         dayOfWeek: 1,
+    weekNumber: 0,
         start: '09:00',
         end: '17:00',
         durationHours: 8,
@@ -45,6 +46,7 @@ describe('Quality Score Calculator', () => {
       {
         id: 's2',
         dayOfWeek: 2,
+    weekNumber: 0,
         start: '09:00',
         end: '17:00',
         durationHours: 8,
@@ -80,6 +82,7 @@ describe('Quality Score Calculator', () => {
       {
         id: 's1',
         dayOfWeek: 1,
+    weekNumber: 0,
         start: '09:00',
         end: '17:00',
         durationHours: 8,
@@ -125,6 +128,7 @@ describe('Quality Score Calculator', () => {
       {
         id: 's1',
         dayOfWeek: 1,
+    weekNumber: 0,
         start: '09:00',
         end: '17:00',
         durationHours: 8,
@@ -135,6 +139,7 @@ describe('Quality Score Calculator', () => {
       {
         id: 's2',
         dayOfWeek: 2,
+    weekNumber: 0,
         start: '09:00',
         end: '17:00',
         durationHours: 8,

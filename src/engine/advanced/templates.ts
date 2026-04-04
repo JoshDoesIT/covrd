@@ -18,6 +18,7 @@ export function generateShiftsFromTemplate(requirements: CoverageRequirement[]):
       shifts.push({
         id: `${req.id}-${i}`,
         dayOfWeek: req.dayOfWeek,
+    weekNumber: 0,
         start: req.start,
         end: req.end,
         role: req.role,
