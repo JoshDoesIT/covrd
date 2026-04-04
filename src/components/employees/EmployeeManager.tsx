@@ -146,58 +146,63 @@ export function EmployeeManager() {
               />
             </div>
           ) : (
-            employees.filter((e) => !(isCreating && e.id === editingId)).map((emp) => (
-              <div
-                key={emp.id}
-                className="employee-card"
-                data-active={editingId === emp.id || undefined}
-                onClick={(e) => handleStartEdit(e, emp)}
-              >
-                <div className="ec-header">
-                  <div className="ec-identity">
-                    <div className="ec-avatar" style={{ borderColor: emp.color, color: emp.color }}>
-                      {emp.name.charAt(0).toUpperCase()}
+            employees
+              .filter((e) => !(isCreating && e.id === editingId))
+              .map((emp) => (
+                <div
+                  key={emp.id}
+                  className="employee-card"
+                  data-active={editingId === emp.id || undefined}
+                  onClick={(e) => handleStartEdit(e, emp)}
+                >
+                  <div className="ec-header">
+                    <div className="ec-identity">
+                      <div
+                        className="ec-avatar"
+                        style={{ borderColor: emp.color, color: emp.color }}
+                      >
+                        {emp.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <h3 className="ec-name">{emp.name}</h3>
+                        <p className="ec-role">{emp.role}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="ec-name">{emp.name}</h3>
-                      <p className="ec-role">{emp.role}</p>
+                    <div className="ec-header-right">
+                      <span className="ec-badge" data-type={emp.employmentType}>
+                        {emp.employmentType}
+                      </span>
+                      <div className="ec-actions">
+                        <button
+                          className="ec-btn-icon"
+                          onClick={(e) => handleStartEdit(e, emp)}
+                          title="Edit Employee"
+                        >
+                          <Edit2 size={14} />
+                        </button>
+                        <button
+                          className="ec-btn-icon danger"
+                          onClick={(e) => handleDeletePrompt(e, emp.id)}
+                          title="Remove Employee"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                  <div className="ec-header-right">
-                    <span className="ec-badge" data-type={emp.employmentType}>
-                      {emp.employmentType}
-                    </span>
-                    <div className="ec-actions">
-                      <button
-                        className="ec-btn-icon"
-                        onClick={(e) => handleStartEdit(e, emp)}
-                        title="Edit Employee"
-                      >
-                        <Edit2 size={14} />
-                      </button>
-                      <button
-                        className="ec-btn-icon danger"
-                        onClick={(e) => handleDeletePrompt(e, emp.id)}
-                        title="Remove Employee"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
 
-                <div className="ec-stats">
-                  <div className="ec-stat">
-                    <span className="ec-stat-val">{emp.maxHoursPerWeek}h</span>
-                    <span className="ec-stat-lbl">Max/Wk</span>
-                  </div>
-                  <div className="ec-stat">
-                    <span className="ec-stat-val">{emp.restrictions.length}</span>
-                    <span className="ec-stat-lbl">Constraints</span>
+                  <div className="ec-stats">
+                    <div className="ec-stat">
+                      <span className="ec-stat-val">{emp.maxHoursPerWeek}h</span>
+                      <span className="ec-stat-lbl">Max/Wk</span>
+                    </div>
+                    <div className="ec-stat">
+                      <span className="ec-stat-val">{emp.restrictions.length}</span>
+                      <span className="ec-stat-lbl">Constraints</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
+              ))
           )}
         </div>
 
@@ -268,7 +273,10 @@ export function EmployeeManager() {
                     value={formData.minHoursPerWeek ?? 0}
                     onChange={(e) => {
                       const raw = e.target.value.replace(/[^0-9]/g, '')
-                      setFormData({ ...formData, minHoursPerWeek: raw === '' ? ('' as unknown as number) : Number(raw) })
+                      setFormData({
+                        ...formData,
+                        minHoursPerWeek: raw === '' ? ('' as unknown as number) : Number(raw),
+                      })
                     }}
                     onFocus={(e) => {
                       if (e.target.value === '0') e.target.value = ''
@@ -290,7 +298,10 @@ export function EmployeeManager() {
                     value={formData.maxHoursPerWeek ?? 40}
                     onChange={(e) => {
                       const raw = e.target.value.replace(/[^0-9]/g, '')
-                      setFormData({ ...formData, maxHoursPerWeek: raw === '' ? ('' as unknown as number) : Number(raw) })
+                      setFormData({
+                        ...formData,
+                        maxHoursPerWeek: raw === '' ? ('' as unknown as number) : Number(raw),
+                      })
                     }}
                     onFocus={(e) => {
                       if (e.target.value === '40') e.target.value = ''
@@ -305,46 +316,44 @@ export function EmployeeManager() {
               </div>
 
               <div
-                  className="form-group"
+                className="form-group"
+                style={{
+                  marginTop: '1rem',
+                  padding: '1rem',
+                  background: 'rgba(255,255,255,0.02)',
+                  borderRadius: '8px',
+                  border: '1px solid var(--border)',
+                }}
+              >
+                <div
                   style={{
-                    marginTop: '1rem',
-                    padding: '1rem',
-                    background: 'rgba(255,255,255,0.02)',
-                    borderRadius: '8px',
-                    border: '1px solid var(--border)',
+                    display: 'flex',
+                    gap: '0.5rem',
+                    alignItems: 'center',
+                    marginBottom: '0.5rem',
+                    color: 'var(--text-base)',
                   }}
                 >
-                  <div
-                    style={{
-                      display: 'flex',
-                      gap: '0.5rem',
-                      alignItems: 'center',
-                      marginBottom: '0.5rem',
-                      color: 'var(--text-base)',
-                    }}
-                  >
-                    <AlertCircle size={16} />{' '}
-                    <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>
-                      Advanced Constraints
-                    </span>
-                  </div>
-                  <p
-                    style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}
-                  >
-                    Set which days and hours this employee is available, plus any scheduling
-                    restrictions.
-                  </p>
-                  <button
-                    className="btn-secondary"
-                    style={{
-                      width: '100%',
-                      borderColor: 'var(--primary)',
-                      color: 'var(--primary)',
-                    }}
-                    onClick={() => setIsManagingAvail(true)}
-                  >
-                    Open Availability Matrix
-                  </button>
+                  <AlertCircle size={16} />{' '}
+                  <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>
+                    Advanced Constraints
+                  </span>
+                </div>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+                  Set which days and hours this employee is available, plus any scheduling
+                  restrictions.
+                </p>
+                <button
+                  className="btn-secondary"
+                  style={{
+                    width: '100%',
+                    borderColor: 'var(--primary)',
+                    color: 'var(--primary)',
+                  }}
+                  onClick={() => setIsManagingAvail(true)}
+                >
+                  Open Availability Matrix
+                </button>
               </div>
             </div>
 

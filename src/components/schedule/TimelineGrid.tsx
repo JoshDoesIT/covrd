@@ -292,10 +292,7 @@ export function TimelineGrid({
                 ) : (
                   dayShifts.map(({ employee: emp, shift }) => (
                     <div key={shift.id} className="timeline-mobile-shift">
-                      <div
-                        className="timeline-mobile-dot"
-                        style={{ backgroundColor: emp.color }}
-                      />
+                      <div className="timeline-mobile-dot" style={{ backgroundColor: emp.color }} />
                       <span className="timeline-mobile-name">{emp.name}</span>
                       <span className="timeline-mobile-time">
                         {formatTime(shift.startTime, '12h')} – {formatTime(shift.endTime, '12h')}
