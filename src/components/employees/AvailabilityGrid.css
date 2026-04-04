@@ -3,6 +3,7 @@
   flex-direction: column;
   height: 100%;
   gap: 1rem;
+  min-width: 0;
 }
 
 .ag-header {
@@ -57,6 +58,7 @@
   border-radius: 8px;
   overflow: auto;
   position: relative;
+  min-width: 0;
 }
 
 .ag-grid {
@@ -129,6 +131,27 @@
 }
 
 @media (max-width: 768px) {
+  .ag-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .ag-header > div:first-child {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ag-controls {
+    width: 100%;
+  }
+
+  .ag-controls .ag-btn {
+    flex: 1;
+    text-align: center;
+  }
+
   .ag-grid {
     grid-template-columns: 50px repeat(7, 1fr);
     grid-template-rows: 28px repeat(24, 24px);
@@ -137,6 +160,7 @@
 
   .ag-header-col {
     font-size: 0.65rem;
+    padding: 0.25rem;
   }
 
   .ag-header-row {

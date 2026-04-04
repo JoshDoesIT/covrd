@@ -434,4 +434,8 @@
     flex-direction: column;
     gap: 0.5rem;
   }
+
+  .editor-header, .editor-body, .editor-footer {
+    padding: 1rem;
+  }
 }
