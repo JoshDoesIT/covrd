@@ -63,10 +63,9 @@ export function solveSchedule(employees: Employee[], targetShifts: Shift[]): Sol
     const finalUnfilled = shifts.filter((s) => !assignedIds.has(s.id))
 
     return {
-      // It's partially "successful" if we got at least some assignments,
-      // though for UI parity, success = true might imply perfect. We will
-      // let the partial assignments flow through into the generated schedule.
-      success: success || finalShifts.length > 0,
+      // It's only a true absolute success if there are no unfilled shifts.
+      // Partial assignments flow through regardless into the generated schedule. 
+      success: finalUnfilled.length === 0,
       assignedShifts: finalShifts,
       unfilledShifts: finalUnfilled,
     }

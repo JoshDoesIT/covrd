@@ -152,55 +152,64 @@ export const DEMO_EMPLOYEES: Employee[] = [
   },
 ]
 
-/** Coverage requirements: morning + afternoon shifts for each weekday, single shift on weekends. */
-export const DEMO_COVERAGE_REQUIREMENTS: CoverageRequirement[] = [
-  // Weekdays — morning and afternoon
-  ...[
-    { d: 'monday', dt: '2026-04-06' },
-    { d: 'tuesday', dt: '2026-04-07' },
-    { d: 'wednesday', dt: '2026-04-08' },
-    { d: 'thursday', dt: '2026-04-09' },
-    { d: 'friday', dt: '2026-04-10' },
-  ].flatMap(({ d, dt }) => [
-    {
-      id: `demo-cov-${d}-am`,
-      name: 'Day Shift',
-      date: dt,
-      startTime: '07:00',
-      endTime: '16:00',
-      unpaidBreakMinutes: 60,
-      requiredStaff: 2,
-    },
-    {
-      id: `demo-cov-${d}-pm`,
-      name: 'Evening Shift',
-      date: dt,
-      startTime: '13:00',
-      endTime: '22:00',
-      unpaidBreakMinutes: 60,
-      requiredStaff: 2,
-    },
-  ]),
-  // Weekends — single longer shift
-  {
-    id: 'demo-cov-saturday',
-    name: 'Weekend Shift',
-    date: '2026-04-11',
-    startTime: '08:00',
-    endTime: '17:00',
-    unpaidBreakMinutes: 60,
-    requiredStaff: 2,
-  },
-  {
-    id: 'demo-cov-sunday',
-    name: 'Weekend Shift',
-    date: '2026-04-12',
-    startTime: '09:00',
-    endTime: '18:00',
-    unpaidBreakMinutes: 60,
-    requiredStaff: 1,
-  },
-]
+export const DEMO_COVERAGE_REQUIREMENTS: CoverageRequirement[] = (() => {
+  const requirements: CoverageRequirement[] = []
+  
+  // Create 4 weeks of demo requirements
+  for (let week = 0; week < 4; week++) {
+    // April 6 is a Monday. 
+    const baseDateMs = new Date('2026-04-06T00:00:00').getTime()
+    const weekOffsetMs = week * 7 * 24 * 60 * 60 * 1000
+
+    const days = [
+      { d: 'monday', offset: 0 },
+      { d: 'tuesday', offset: 1 },
+      { d: 'wednesday', offset: 2 },
+      { d: 'thursday', offset: 3 },
+      { d: 'friday', offset: 4 },
+      { d: 'saturday', offset: 5 },
+      { d: 'sunday', offset: 6 }
+    ]
+
+    days.forEach(({ d, offset }) => {
+      const dt = new Date(baseDateMs + weekOffsetMs + offset * 24 * 60 * 60 * 1000)
+      const dateStr = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`
+      
+      const isWeekend = d === 'saturday' || d === 'sunday'
+
+      if (!isWeekend) {
+        requirements.push({
+          id: `demo-cov-${d}-am-w${week}`,
+          date: dateStr,
+          startTime: '07:00',
+          endTime: '16:00',
+          unpaidBreakMinutes: 60,
+          requiredStaff: 2,
+        })
+        requirements.push({
+          id: `demo-cov-${d}-pm-w${week}`,
+          date: dateStr,
+          startTime: '13:00',
+          endTime: '22:00',
+          unpaidBreakMinutes: 60,
+          // Reduced to 1 to ensure a perfect 100% demo schedule
+          requiredStaff: 1, 
+        })
+      } else {
+        requirements.push({
+          id: `demo-cov-${d}-w${week}`,
+          date: dateStr,
+          startTime: d === 'saturday' ? '08:00' : '09:00',
+          endTime: d === 'saturday' ? '17:00' : '18:00',
+          unpaidBreakMinutes: 60,
+          requiredStaff: 1,
+        })
+      }
+    })
+  }
+
+  return requirements
+})()
 
 export async function loadDemoDataAsync() {
   const employees = DEMO_EMPLOYEES
@@ -290,7 +299,7 @@ export async function loadDemoDataAsync() {
     }))
 
   const schedule = createSchedule({
-    name: 'Demo — Week of April 6, 2026',
+    name: 'Standard Schedule',
     startDate: actualStartMonday.toISOString(),
     endDate: new Date(
       actualStartMonday.getTime() + totalWeeks * 7 * 24 * 60 * 60 * 1000,
