@@ -9,6 +9,18 @@ export type SolveResult = {
 }
 
 /**
+ * Context passed through the recursive calls to track the best partial solution
+ * in case a complete solution is mathematically impossible and we time out.
+ */
+type SearchContext = {
+  startTime: number
+  timeoutMs: number
+  bestAssignedCount: number
+  bestAssignments: Map<string, Shift[]>
+  timedOut: boolean
+}
+
+/**
  * Constraint Satisfaction Problem (CSP) Solver for the Schedule.
  * It uses backtracking, MRV heuristics, and forward checking.
  */
@@ -20,8 +32,13 @@ export function solveSchedule(employees: Employee[], targetShifts: Shift[]): Sol
 
   const unassignedShifts = shifts.filter((s) => !s.isAssigned)
 
-  const startTime = Date.now()
-  const TIMEOUT_MS = 10000 // 10 seconds max
+  const context: SearchContext = {
+    startTime: Date.now(),
+    timeoutMs: 10000,
+    bestAssignedCount: -1,
+    bestAssignments: new Map(),
+    timedOut: false,
+  }
 
   // Recursively solve
   const success = backtrack(
@@ -29,29 +46,37 @@ export function solveSchedule(employees: Employee[], targetShifts: Shift[]): Sol
     employees,
     existingAssignments,
     currentHourTotals,
-    startTime,
-    TIMEOUT_MS,
+    context,
   )
 
-  if (success) {
-    // Reconstruct the assigned shifts list
+  if (success || context.bestAssignments.size > 0) {
+    // Reconstruct the assigned shifts list either from complete or best partial
     const finalShifts: Shift[] = []
-    for (const empshifts of existingAssignments.values()) {
+    const sourceAssignments = success ? existingAssignments : context.bestAssignments
+
+    for (const empshifts of sourceAssignments.values()) {
       finalShifts.push(...empshifts)
     }
 
+    // Filter out the shifts that were assigned to figure out what was unfilled
+    const assignedIds = new Set(finalShifts.map((s) => s.id))
+    const finalUnfilled = shifts.filter((s) => !assignedIds.has(s.id))
+
     return {
-      success: true,
+      // It's partially "successful" if we got at least some assignments,
+      // though for UI parity, success = true might imply perfect. We will
+      // let the partial assignments flow through into the generated schedule.
+      success: success || finalShifts.length > 0,
       assignedShifts: finalShifts,
-      unfilledShifts: [],
+      unfilledShifts: finalUnfilled,
     }
   }
 
-  // If we fail, return what we have (nothing since it reverted) and flag all as unfilled
+  // If we fail completely (no shifts could be scheduled at all)
   return {
     success: false,
     assignedShifts: [],
-    unfilledShifts: unassignedShifts, // All failed in this simplified non-partial test logic
+    unfilledShifts: unassignedShifts,
   }
 }
 
@@ -63,13 +88,29 @@ function backtrack(
   employees: Employee[],
   assignments: Map<string, Shift[]>,
   hourTotals: Map<string, Map<number, number>>,
-  startTime: number,
-  timeoutMs: number,
+  ctx: SearchContext,
 ): boolean {
-  if (Date.now() - startTime > timeoutMs) {
-    throw new Error(
-      'Solver timeout: Failed to find a valid schedule within 10 seconds. You may not have enough staff hours to cover all required shifts.',
-    )
+  if (ctx.timedOut) return false
+
+  if (Date.now() - ctx.startTime > ctx.timeoutMs) {
+    ctx.timedOut = true
+    return false // Unwind the stack gracefully without throwing
+  }
+
+  // Track the best partial assignment seen so far
+  let assignedCount = 0
+  for (const list of assignments.values()) assignedCount += list.length
+
+  if (assignedCount > ctx.bestAssignedCount) {
+    ctx.bestAssignedCount = assignedCount
+    ctx.bestAssignments.clear()
+    for (const [empId, list] of assignments.entries()) {
+      // Clone the shift objects so backtracking doesn't wipe them
+      ctx.bestAssignments.set(
+        empId,
+        list.map((s) => ({ ...s })),
+      )
+    }
   }
 
   if (unassignedShifts.length === 0) {
@@ -79,11 +120,16 @@ function backtrack(
   // Forward Checking & Optimization:
   // Calculate who can work what shift right now to build the domains.
   const domains = new Map<string, Employee[]>()
+
   for (const shift of unassignedShifts) {
     const eligible = getEligibleCandidates(employees, shift, assignments, hourTotals)
     if (eligible.length === 0) {
       // Domain wipeout! A shift cannot be filled given current assignments.
-      // Conflict-directed failure: backjump immediately.
+      // E.g. no employees have the required role or availability left.
+      // But instead of failing the WHOLE tree instantly (which abandons the partial branch),
+      // we could continue by ignoring this shift. However, true CSP backtracking says if X is required,
+      // and X is empty, this branch is invalid. Since we already recorded `bestAssignments`,
+      // we can safely return FALSE to backjump and look for better arrangements.
       return false
     }
     domains.set(shift.id, eligible)
@@ -119,10 +165,15 @@ function backtrack(
 
     // Recurse with shift removed
     const remaining = unassignedShifts.filter((s) => s.id !== shiftToAssign.id)
-    const success = backtrack(remaining, employees, assignments, hourTotals, startTime, timeoutMs)
+    const success = backtrack(remaining, employees, assignments, hourTotals, ctx)
 
     if (success) {
       return true
+    }
+
+    if (ctx.timedOut) {
+      // Stop exploring alternative branches
+      return false
     }
 
     // Backtrack (revert assignment)

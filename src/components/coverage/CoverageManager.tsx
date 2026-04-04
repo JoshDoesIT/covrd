@@ -275,11 +275,13 @@ export function CoverageManager() {
       <div className="cm-content">
         <div className="cm-calendar-container">
           <div className="cm-calendar-header">
-            <button className="ec-btn-icon" onClick={handlePrevMonth}><ChevronLeft size={20} /></button>
-            <h3 className="cm-calendar-title">
-              {currentDate.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
-            </h3>
-            <button className="ec-btn-icon" onClick={handleNextMonth}><ChevronRight size={20} /></button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+              <button className="ec-btn-icon" onClick={handlePrevMonth}><ChevronLeft size={20} /></button>
+              <h3 className="cm-calendar-title">
+                {currentDate.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
+              </h3>
+              <button className="ec-btn-icon" onClick={handleNextMonth}><ChevronRight size={20} /></button>
+            </div>
             <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
               <button className="action-btn" onClick={handleCurrentMonth} style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem' }}>
                 Today
