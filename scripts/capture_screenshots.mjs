@@ -11,13 +11,35 @@ async function capture() {
   }
   const browser = await chromium.launch({ headless: true })
 
+  // 1. Desktop
   const desktopContext = await browser.newContext({
     viewport: { width: 1440, height: 900 },
     deviceScaleFactor: 2,
   })
+  // Bypass Onboarding by setting localStorage before page load
+  await desktopContext.addInitScript(() => {
+    localStorage.setItem('covrd-onboarding-complete', 'true')
+  })
+  
   const desktopPage = await desktopContext.newPage()
   await desktopPage.goto(url, { waitUntil: 'load' })
-  await desktopPage.waitForTimeout(2000) // Give it time to load DB and render
+  await desktopPage.waitForTimeout(1000) 
+
+  // Command Palette: Load demo data
+  await desktopPage.keyboard.press('Control+k')
+  await desktopPage.waitForSelector('.covrd-command-input', { state: 'visible', timeout: 5000 })
+  await desktopPage.keyboard.type('demo', { delay: 50 })
+  await desktopPage.waitForTimeout(500)
+  await desktopPage.keyboard.press('Enter')
+  await desktopPage.waitForTimeout(1500) // Wait for data to load
+  
+  // Command Palette: Navigate to schedule
+  await desktopPage.keyboard.press('Control+k')
+  await desktopPage.waitForSelector('.covrd-command-input', { state: 'visible', timeout: 5000 })
+  await desktopPage.keyboard.type('schedule builder', { delay: 50 })
+  await desktopPage.waitForTimeout(500)
+  await desktopPage.keyboard.press('Enter')
+  await desktopPage.waitForTimeout(1500) // Allow render
 
   // Ensure style
   await desktopPage.evaluate(() => {
@@ -32,6 +54,7 @@ async function capture() {
     document.body.style.minHeight = '100vh'
     document.body.style.boxSizing = 'border-box'
     const frame = document.createElement('div')
+    // A classic 16:9 inner frame
     frame.style.width = '1200px'
     frame.style.height = '750px'
     frame.style.background = '#0F111A'
@@ -40,6 +63,7 @@ async function capture() {
     frame.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255,255,255,0.1)'
     frame.style.display = 'flex'
     frame.style.flexDirection = 'column'
+    
     const toolbar = document.createElement('div')
     toolbar.style.height = '32px'
     toolbar.style.background = '#1A1B26'
@@ -56,6 +80,7 @@ async function capture() {
       dot.style.background = color
       toolbar.appendChild(dot)
     })
+    
     const content = document.createElement('div')
     content.style.position = 'relative'
     content.style.flex = '1'
@@ -65,17 +90,38 @@ async function capture() {
     frame.appendChild(content)
     document.body.appendChild(frame)
   })
+  
   await desktopPage.screenshot({ path: path.join(outDir, 'app_desktop.png') })
   await desktopContext.close()
 
-  // Mobile
+  // 2. Mobile
   const mobileContext = await browser.newContext({
     ...devices['iPhone 13 Pro'],
     deviceScaleFactor: 3,
   })
+  await mobileContext.addInitScript(() => {
+    localStorage.setItem('covrd-onboarding-complete', 'true')
+  })
+  
   const mobilePage = await mobileContext.newPage()
   await mobilePage.goto(url, { waitUntil: 'load' })
-  await mobilePage.waitForTimeout(2000)
+  await mobilePage.waitForTimeout(1000)
+
+  // Command Palette: Load demo data
+  await mobilePage.keyboard.press('Control+k')
+  await mobilePage.waitForSelector('.covrd-command-input', { state: 'visible', timeout: 5000 })
+  await mobilePage.keyboard.type('demo', { delay: 50 })
+  await mobilePage.waitForTimeout(500)
+  await mobilePage.keyboard.press('Enter')
+  await mobilePage.waitForTimeout(1500)
+
+  // Command Palette: Schedule builder 
+  await mobilePage.keyboard.press('Control+k')
+  await mobilePage.waitForSelector('.covrd-command-input', { state: 'visible', timeout: 5000 })
+  await mobilePage.keyboard.type('schedule builder', { delay: 50 })
+  await mobilePage.waitForTimeout(500)
+  await mobilePage.keyboard.press('Enter')
+  await mobilePage.waitForTimeout(1500)
 
   // Ensure style
   await mobilePage.evaluate(() => {
@@ -89,17 +135,19 @@ async function capture() {
     document.body.style.padding = '40px'
     document.body.style.minHeight = '100vh'
     document.body.style.boxSizing = 'border-box'
+    
     const frame = document.createElement('div')
     frame.style.width = '390px'
     frame.style.height = '844px'
     frame.style.background = '#0F111A'
     frame.style.borderRadius = '40px'
     frame.style.overflow = 'hidden'
-    frame.style.boxShadow =
-      '0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 2px #333, inset 0 0 0 6px #000'
+    frame.style.boxShadow = '0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 0 2px #333, inset 0 0 0 6px #000'
     frame.style.display = 'flex'
     frame.style.flexDirection = 'column'
     frame.style.position = 'relative'
+    
+    // Notch
     const notch = document.createElement('div')
     notch.style.position = 'absolute'
     notch.style.top = '6px'
@@ -111,6 +159,7 @@ async function capture() {
     notch.style.borderBottomLeftRadius = '16px'
     notch.style.borderBottomRightRadius = '16px'
     notch.style.zIndex = '9999'
+    
     const content = document.createElement('div')
     content.style.position = 'relative'
     content.style.flex = '1'
@@ -121,6 +170,7 @@ async function capture() {
     frame.appendChild(content)
     document.body.appendChild(frame)
   })
+  
   await mobilePage.screenshot({ path: path.join(outDir, 'app_mobile.png') })
   await mobileContext.close()
 

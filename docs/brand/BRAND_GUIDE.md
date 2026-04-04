@@ -4,7 +4,7 @@
 
 **Covrd** is a privacy-first, client-side-only staff scheduling application. The brand communicates quiet confidence, technical precision, and trustworthiness.
 
-**Tagline:** Every shift. Covrd.
+**Tagline:** Every shift, covrd.
 
 **Positioning:** Covrd is not another clunky scheduling tool. It is a private, intelligent, and elegant utility that respects both the manager's time and their team's data.
 
