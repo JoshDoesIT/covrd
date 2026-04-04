@@ -396,8 +396,7 @@ export function printSchedule(
   // Open in a new window and trigger print
   const printWindow = window.open('', '_blank', 'width=1100,height=800')
   if (!printWindow) {
-    alert('Please allow pop-ups to print the schedule.')
-    return
+    throw new Error('Please allow pop-ups to print the schedule.')
   }
 
   printWindow.document.write(html)

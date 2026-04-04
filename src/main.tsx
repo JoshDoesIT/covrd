@@ -4,15 +4,18 @@ import './index.css'
 import { App } from './App'
 
 /**
- * Register the service worker for PWA offline support.
- * Only in production — dev server handles its own HMR.
+ * Unregister any existing service workers to fix cache-lock issue.
+ * We are removing the naive offline-first SW that blocked updates.
  */
-if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(() => {
-      // Service worker registration failed — app continues without offline support
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker
+    .getRegistrations()
+    .then((registrations) => {
+      for (const registration of registrations) {
+        registration.unregister()
+      }
     })
-  })
+    .catch(() => {})
 }
 
 createRoot(document.getElementById('root')!).render(

@@ -14,7 +14,14 @@ import { useEmployeeStore } from '../../stores/employeeStore'
 import { useCoverageStore } from '../../stores/coverageStore'
 import { generateScheduleAsync } from '../../engine/worker/client'
 import { createSchedule, createShift } from '../../types/factories'
-import type { Shift, ShiftAssignment, DayOfWeek } from '../../types/index'
+import type {
+  Shift,
+  ShiftAssignment,
+  DayOfWeek,
+  Employee,
+  CoverageRequirement,
+  BaselineRequirement,
+} from '../../types/index'
 import { WeeklyGrid } from './WeeklyGrid'
 import { TimelineGrid } from './TimelineGrid'
 import { CoverageHeatmap } from './CoverageHeatmap'
@@ -23,6 +30,8 @@ import { ShareToolbar } from './ShareToolbar'
 import { readFileAsText, deserializeScheduleJSON } from '../../utils/exportSchedule'
 import { getNextMonday, formatWeekRange } from '../../utils/scheduleDates'
 import { EmptyState } from '../shared/EmptyState'
+import { Toast } from '../tooling/Toast'
+import { covrdDb } from '../../db/db'
 import './ScheduleManager.css'
 
 type ViewMode = 'matrix' | 'timeline'
@@ -62,6 +71,7 @@ export function ScheduleManager() {
   const [isGenerating, setIsGenerating] = useState(false)
   const [progress, setProgress] = useState(0)
   const [errorStatus, setErrorStatus] = useState<string | null>(null)
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
 
   // Format initial date as YYYY-MM-DD string for HTML input
   const [targetStartDate, setTargetStartDate] = useState(() => {
@@ -304,16 +314,38 @@ export function ScheduleManager() {
                 state={{
                   employees,
                   coverageRequirements: requirements,
-
+                  baselineRequirements: baselineRequirements,
                   schedule: activeSchedule,
                 }}
                 onImport={async (file) => {
                   try {
                     const text = await readFileAsText(file)
                     const imported = deserializeScheduleJSON(text)
+
+                    // Wipe existing ecosystem to perform clean replacement
+                    await covrdDb.purgeAll()
+                    useEmployeeStore.getState().hydrate([])
+                    useCoverageStore.getState().reset()
+                    useScheduleStore.getState().hydrate([])
+
+                    imported.employees.forEach((e: Employee) =>
+                      useEmployeeStore.getState().addEmployee(e),
+                    )
+                    imported.coverageRequirements.forEach((r: CoverageRequirement) =>
+                      useCoverageStore.getState().addRequirement(r),
+                    )
+                    if (imported.baselineRequirements) {
+                      imported.baselineRequirements.forEach((b: BaselineRequirement) =>
+                        useCoverageStore.getState().addBaselineRequirement(b),
+                      )
+                    }
+
                     setActiveSchedule(imported.schedule)
+                    setToastMessage('Successfully loaded data!')
                   } catch (err: unknown) {
-                    setErrorStatus(err instanceof Error ? err.message : 'Failed to import schedule')
+                    setErrorStatus(
+                      err instanceof Error ? err.message : 'Failed to import JSON file',
+                    )
                   }
                 }}
               />
@@ -410,6 +442,15 @@ export function ScheduleManager() {
       </header>
 
       <div className="sm-content">
+        {toastMessage && (
+          <Toast
+            message={toastMessage}
+            onDismiss={() => setToastMessage(null)}
+            duration={4000}
+            type="success"
+          />
+        )}
+
         {isConfirmingGenerate && (
           <div className="sm-overlay" style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}>
             <div

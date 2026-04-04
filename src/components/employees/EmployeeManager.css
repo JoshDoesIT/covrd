@@ -157,6 +157,7 @@
   border-radius: 4px;
   background: var(--color-accent-muted);
   color: var(--color-accent);
+  white-space: nowrap;
 }
 
 .ec-badge[data-type='part-time'] {
@@ -244,6 +245,8 @@
   flex-direction: column;
   overflow: hidden;
   box-shadow: var(--shadow-lg);
+  align-self: flex-start;
+  max-height: 100%;
 }
 
 .editor-header {
@@ -389,6 +392,9 @@
     flex: none;
     max-height: 50vh;
     min-width: 0; /* Let it shrink on narrow screens */
+    align-self: stretch;
+    width: 100%;
+    box-sizing: border-box;
   }
 }
 
@@ -431,5 +437,11 @@
   .form-row {
     flex-direction: column;
     gap: 0.5rem;
+  }
+
+  .editor-header,
+  .editor-body,
+  .editor-footer {
+    padding: 1rem;
   }
 }

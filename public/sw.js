@@ -1,37 +1,33 @@
-const CACHE_NAME = 'covrd-v1'
-
-// Simple service worker for offline support (Story 7.7)
-// Excludes api/ dynamically if needed, but Covrd is client-side only!
+/**
+ * Self-destructing Service Worker
+ *
+ * This file replaces the old offline-first service worker that caused aggressive
+ * caching and locked users onto old deployments by serving a cached index.html.
+ *
+ * It immediately activates and deletes all caches upon installation to ensure
+ * old offline-first data is cleared.
+ */
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(['/', '/index.html', '/icon-192.png', '/icon-512.png', '/manifest.json'])
-    }),
-  )
-})
-
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      // Offline-first strategy
-      if (response) {
-        return response
-      }
-      return fetch(event.request)
-    }),
-  )
+  self.skipWaiting()
 })
 
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((name) => {
-          if (name !== CACHE_NAME) {
+    caches
+      .keys()
+      .then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((name) => {
             return caches.delete(name)
-          }
-        }),
-      )
-    }),
+          }),
+        )
+      })
+      .then(() => {
+        return self.clients.claim()
+      }),
   )
+})
+
+self.addEventListener('fetch', () => {
+  // Pass-through: do not handle any requests so network routing is native
 })

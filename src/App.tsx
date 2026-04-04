@@ -1,15 +1,15 @@
 import { useEffect, useState } from 'react'
 import { AppShell } from './components/AppShell'
 import { OnboardingWizard } from './components/onboarding/OnboardingWizard'
-import { hydrateFromHash } from './stores/urlState'
+import { hydrateFromHash, type ShareableState } from './stores/urlState'
 import { useScheduleStore } from './stores/scheduleStore'
 import { useEmployeeStore } from './stores/employeeStore'
 import { useCoverageStore } from './stores/coverageStore'
 import { covrdDb } from './db/db'
 import { LandingPage } from './components/landing/LandingPage'
 import { PolicyModal } from './components/shared/PolicyModal'
-
-/** LocalStorage key for tracking onboarding completion. */
+import { Toast } from './components/tooling/Toast'
+import type { Employee, CoverageRequirement } from './types/index'
 const ONBOARDING_KEY = 'covrd-onboarding-complete'
 
 /**
@@ -21,35 +21,49 @@ const ONBOARDING_KEY = 'covrd-onboarding-complete'
  */
 export function App() {
   const [isAppLaunched, setIsAppLaunched] = useState(
-    () => window.location.search.includes('app') || window.location.hash.includes('app'),
+    () =>
+      window.location.search.includes('app') ||
+      window.location.hash.includes('app') ||
+      !!hydrateFromHash(),
   )
   const [showOnboarding, setShowOnboarding] = useState(
     () => localStorage.getItem(ONBOARDING_KEY) !== 'true',
   )
   const [isLoading, setIsLoading] = useState(true)
   const [policyModal, setPolicyModal] = useState<'privacy' | 'accessibility' | null>(null)
+  const [toastMessage, setToastMessage] = useState<string | null>(null)
+
+  const applySharedState = async (sharedState: ShareableState) => {
+    // 1. Wipe existing state completely
+    await covrdDb.purgeAll()
+
+    // 2. Clear out Zustand states cleanly
+    useEmployeeStore.getState().hydrate([])
+    useCoverageStore.getState().reset()
+    useScheduleStore.getState().hydrate([]) // Clear any previous schedules
+
+    // 3. Import data into Zustand (this will natively rewrite to IDB via store methods)
+    sharedState.employees.forEach((e: Employee) => useEmployeeStore.getState().addEmployee(e))
+    sharedState.coverageRequirements.forEach((r: CoverageRequirement) =>
+      useCoverageStore.getState().addRequirement(r),
+    )
+    if (sharedState.baselineRequirements) {
+      sharedState.baselineRequirements.forEach((b) =>
+        useCoverageStore.getState().addBaselineRequirement(b),
+      )
+    }
+    useScheduleStore.getState().setActiveSchedule(sharedState.schedule)
+  }
 
   useEffect(() => {
     async function initData() {
       // First, try loading shared state from URL hash
       const sharedState = hydrateFromHash()
       if (sharedState) {
-        sharedState.employees.forEach((e) => useEmployeeStore.getState().addEmployee(e))
-        sharedState.coverageRequirements.forEach((r) =>
-          useCoverageStore.getState().addRequirement(r),
-        )
-        // If the sharedState URL included baselineRequirements, load them (future proofing)
-        if (sharedState.baselineRequirements) {
-          sharedState.baselineRequirements.forEach(
-            (
-              b: Parameters<
-                ReturnType<typeof useCoverageStore.getState>['addBaselineRequirement']
-              >[0],
-            ) => useCoverageStore.getState().addBaselineRequirement(b),
-          )
-        }
-        useScheduleStore.getState().setActiveSchedule(sharedState.schedule)
-        window.history.replaceState(null, '', window.location.pathname)
+        await applySharedState(sharedState)
+        setIsAppLaunched(true)
+        // Note: No toast message here so we don't bombard them on raw page load, but we redirect the hash neatly
+        window.history.replaceState(null, '', window.location.pathname + '#schedule')
       } else {
         // Otherwise, hydrate from local IndexedDB
         const [employees, reqs, baselines, schedules] = await Promise.all([
@@ -72,7 +86,35 @@ export function App() {
   useEffect(() => {
     const onLaunchTutorial = () => setShowOnboarding(true)
     window.addEventListener('launch-tutorial', onLaunchTutorial)
-    return () => window.removeEventListener('launch-tutorial', onLaunchTutorial)
+
+    // Listen for dynamically pasted share links (so users don't have to refresh)
+    const onGlobalHashChange = async (e: HashChangeEvent) => {
+      const sharedState = hydrateFromHash()
+      if (sharedState) {
+        await applySharedState(sharedState)
+        setIsAppLaunched(true)
+        setToastMessage('Successfully loaded data!')
+
+        let targetHash = '#schedule'
+        if (e.oldURL) {
+          try {
+            const oldUrlObj = new URL(e.oldURL)
+            if (oldUrlObj.hash && !oldUrlObj.hash.startsWith('#eJ')) {
+              targetHash = oldUrlObj.hash
+            }
+          } catch {
+            // ignore parsing failures
+          }
+        }
+        window.history.replaceState(null, '', window.location.pathname + targetHash)
+      }
+    }
+    window.addEventListener('hashchange', onGlobalHashChange)
+
+    return () => {
+      window.removeEventListener('launch-tutorial', onLaunchTutorial)
+      window.removeEventListener('hashchange', onGlobalHashChange)
+    }
   }, [])
 
   const handleOnboardingComplete = () => {
@@ -101,6 +143,14 @@ export function App() {
 
   return (
     <>
+      {toastMessage && (
+        <Toast
+          message={toastMessage}
+          onDismiss={() => setToastMessage(null)}
+          duration={4000}
+          type="success"
+        />
+      )}
       {showOnboarding && <OnboardingWizard onComplete={handleOnboardingComplete} />}
       <AppShell />
       {/* AppShell handles its own PolicyModal for the footer links, but we can also use a global one.

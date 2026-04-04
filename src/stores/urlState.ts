@@ -46,16 +46,28 @@ export function decodeStateFromHash(hash: string): ShareableState | null {
 
   try {
     const compressed = base64UrlToUint8(hash)
-    const json = pako.inflate(compressed, { to: 'string' })
+    const inflated = pako.inflate(compressed)
+    const json = new TextDecoder().decode(inflated)
     const parsed = JSON.parse(json) as ShareableState
 
     // Basic structural validation — don't trust URL input
-    if (!parsed.employees || !Array.isArray(parsed.employees)) return null
-    if (!parsed.coverageRequirements || !Array.isArray(parsed.coverageRequirements)) return null
-    if (!parsed.schedule || typeof parsed.schedule !== 'object') return null
+    if (!parsed.employees || !Array.isArray(parsed.employees)) {
+      console.warn('Hydration validation failed: employees missing/invalid')
+      return null
+    }
+    if (!parsed.coverageRequirements || !Array.isArray(parsed.coverageRequirements)) {
+      console.warn('Hydration validation failed: coverageRequirements missing/invalid')
+      return null
+    }
+    if (!parsed.schedule || typeof parsed.schedule !== 'object') {
+      console.warn('Hydration validation failed: schedule missing/invalid')
+      return null
+    }
 
+    console.log('Hydration: Decoded successfully!')
     return parsed
-  } catch {
+  } catch (error) {
+    console.error('Hydration Error Caught:', error)
     return null
   }
 }

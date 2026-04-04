@@ -30,7 +30,10 @@ interface ShareToolbarProps {
  * Renders inline with the ScheduleManager header when a schedule is active.
  */
 export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
-  const [toastMessage, setToastMessage] = useState<string | null>(null)
+  const [toastMessage, setToastMessage] = useState<{
+    text: string
+    type: 'default' | 'success'
+  } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { activeSchedule } = useScheduleStore()
   const { employees } = useEmployeeStore()
@@ -62,10 +65,14 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
   }
 
   const handlePrint = () => {
-    if (activeSchedule) {
-      printSchedule(activeSchedule, employees, timeFormat)
-    } else {
-      window.print()
+    try {
+      if (activeSchedule) {
+        printSchedule(activeSchedule, employees, timeFormat)
+      } else {
+        window.print()
+      }
+    } catch (err: unknown) {
+      if (err instanceof Error) setToastMessage({ text: err.message, type: 'default' })
     }
   }
 
@@ -73,9 +80,9 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
     const url = generateShareUrl(state)
     try {
       await navigator.clipboard.writeText(url)
-      setToastMessage('Link copied to clipboard!')
+      setToastMessage({ text: 'Link copied to clipboard!', type: 'success' })
     } catch {
-      setToastMessage('Failed to copy link')
+      setToastMessage({ text: 'Failed to copy link', type: 'default' })
     }
   }
 
@@ -145,7 +152,13 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
         </button>
       </div>
 
-      {toastMessage && <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} />}
+      {toastMessage && (
+        <Toast
+          message={toastMessage.text}
+          type={toastMessage.type}
+          onDismiss={() => setToastMessage(null)}
+        />
+      )}
     </div>
   )
 }

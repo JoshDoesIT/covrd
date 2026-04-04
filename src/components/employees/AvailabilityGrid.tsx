@@ -123,6 +123,7 @@ export function AvailabilityGrid({ employeeId, onClose }: Props) {
               gap: '0.25rem',
               marginBottom: '0.5rem',
               padding: 0,
+              alignSelf: 'flex-start',
             }}
           >
             <ArrowLeft size={14} /> Back to Profile
