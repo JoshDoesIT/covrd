@@ -8,6 +8,7 @@ import type {
   CoverageRequirement,
   DayOfWeek,
 } from '../../types/index'
+import { getShiftDate } from '../../utils/scheduleDates'
 import './CoverageHeatmap.css'
 
 const DAY_SHORT: Record<DayOfWeek, string> = {
@@ -74,13 +75,17 @@ function computeCoverage(
   ]
   const requiredByDay = new Map<DayOfWeek, number>()
 
-  const scheduleStartMillis = new Date(`${schedule.startDate}T00:00:00`).getTime()
-  const scheduleEndMillis = new Date(`${schedule.endDate}T23:59:59`).getTime()
+  const startOfWeek = getShiftDate(schedule.startDate, activeWeekNumber, 'monday')
+  const endOfWeek = getShiftDate(schedule.startDate, activeWeekNumber, 'sunday')
+  endOfWeek.setHours(23, 59, 59, 999)
+
+  const weekStartMillis = startOfWeek.getTime()
+  const weekEndMillis = endOfWeek.getTime()
 
   coverageReqs.forEach((req) => {
     const dObj = new Date(`${req.date}T00:00:00`)
     const t = dObj.getTime()
-    if (t >= scheduleStartMillis && t <= scheduleEndMillis) {
+    if (t >= weekStartMillis && t <= weekEndMillis) {
       const dayName = DAY_ORDER_INDEX[dObj.getDay()]
       requiredByDay.set(dayName, (requiredByDay.get(dayName) ?? 0) + req.requiredStaff)
     }

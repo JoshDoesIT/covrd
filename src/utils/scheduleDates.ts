@@ -34,7 +34,9 @@ export function getNextMonday(from: Date = new Date()): Date {
  * Assumes startDate is a Monday.
  */
 export function getShiftDate(startDateIso: string, weekOffset: number, day: DayOfWeek): Date {
-  const date = new Date(startDateIso)
+  // Ensure we append T00:00:00 if not present to force local timezone parsing instead of UTC
+  const safeIso = startDateIso.includes('T') ? startDateIso : `${startDateIso}T00:00:00`
+  const date = new Date(safeIso)
   date.setHours(0, 0, 0, 0)
 
   // Resiliency: Always align our base calculation to the Monday of the week `date` is in
