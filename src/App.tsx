@@ -21,7 +21,10 @@ const ONBOARDING_KEY = 'covrd-onboarding-complete'
  */
 export function App() {
   const [isAppLaunched, setIsAppLaunched] = useState(
-    () => window.location.search.includes('app') || window.location.hash.includes('app') || !!hydrateFromHash(),
+    () =>
+      window.location.search.includes('app') ||
+      window.location.hash.includes('app') ||
+      !!hydrateFromHash(),
   )
   const [showOnboarding, setShowOnboarding] = useState(
     () => localStorage.getItem(ONBOARDING_KEY) !== 'true',
@@ -141,7 +144,12 @@ export function App() {
   return (
     <>
       {toastMessage && (
-        <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} duration={4000} type="success" />
+        <Toast
+          message={toastMessage}
+          onDismiss={() => setToastMessage(null)}
+          duration={4000}
+          type="success"
+        />
       )}
       {showOnboarding && <OnboardingWizard onComplete={handleOnboardingComplete} />}
       <AppShell />

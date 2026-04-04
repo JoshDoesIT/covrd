@@ -30,7 +30,10 @@ interface ShareToolbarProps {
  * Renders inline with the ScheduleManager header when a schedule is active.
  */
 export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
-  const [toastMessage, setToastMessage] = useState<{text: string, type: 'default' | 'success'} | null>(null)
+  const [toastMessage, setToastMessage] = useState<{
+    text: string
+    type: 'default' | 'success'
+  } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { activeSchedule } = useScheduleStore()
   const { employees } = useEmployeeStore()
@@ -149,7 +152,13 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
         </button>
       </div>
 
-      {toastMessage && <Toast message={toastMessage.text} type={toastMessage.type} onDismiss={() => setToastMessage(null)} />}
+      {toastMessage && (
+        <Toast
+          message={toastMessage.text}
+          type={toastMessage.type}
+          onDismiss={() => setToastMessage(null)}
+        />
+      )}
     </div>
   )
 }

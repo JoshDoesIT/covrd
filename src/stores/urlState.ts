@@ -52,22 +52,22 @@ export function decodeStateFromHash(hash: string): ShareableState | null {
 
     // Basic structural validation — don't trust URL input
     if (!parsed.employees || !Array.isArray(parsed.employees)) {
-      console.warn("Hydration validation failed: employees missing/invalid");
+      console.warn('Hydration validation failed: employees missing/invalid')
       return null
     }
     if (!parsed.coverageRequirements || !Array.isArray(parsed.coverageRequirements)) {
-      console.warn("Hydration validation failed: coverageRequirements missing/invalid");
+      console.warn('Hydration validation failed: coverageRequirements missing/invalid')
       return null
     }
     if (!parsed.schedule || typeof parsed.schedule !== 'object') {
-      console.warn("Hydration validation failed: schedule missing/invalid");
+      console.warn('Hydration validation failed: schedule missing/invalid')
       return null
     }
 
-    console.log("Hydration: Decoded successfully!");
+    console.log('Hydration: Decoded successfully!')
     return parsed
   } catch (error) {
-    console.error("Hydration Error Caught:", error)
+    console.error('Hydration Error Caught:', error)
     return null
   }
 }

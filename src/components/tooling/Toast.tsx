@@ -28,7 +28,11 @@ export function Toast({ message, onDismiss, duration = 3000, type = 'default' }:
   }, [onDismiss, duration])
 
   return (
-    <div className={`toast ${type === 'success' ? 'toast--success' : ''}`} role="status" aria-live="polite">
+    <div
+      className={`toast ${type === 'success' ? 'toast--success' : ''}`}
+      role="status"
+      aria-live="polite"
+    >
       <span className="toast__message">{message}</span>
     </div>
   )

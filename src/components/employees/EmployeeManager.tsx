@@ -17,7 +17,10 @@ export function EmployeeManager() {
   const [isManagingAvail, setIsManagingAvail] = useState(false)
   const [formData, setFormData] = useState<Partial<Employee>>({})
   const [empToDelete, setEmpToDelete] = useState<string | null>(null)
-  const [toastMessage, setToastMessage] = useState<{ text: string, type: 'default' | 'success'} | null>(null)
+  const [toastMessage, setToastMessage] = useState<{
+    text: string
+    type: 'default' | 'success'
+  } | null>(null)
 
   // Determine which employee or new employee is actively shown in the right pane
   const activeEmployee = useMemo(() => {
@@ -328,13 +331,12 @@ export function EmployeeManager() {
         ) : null}
       </div>
 
-      <Modal
-        isOpen={!!empToDelete}
-        onClose={() => setEmpToDelete(null)}
-        title="Delete Employee"
-      >
-        <p style={{ marginBottom: '1.5rem', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}>
-          Are you sure you want to completely remove this employee from the roster? This will impact any generated schedules they are mapped to.
+      <Modal isOpen={!!empToDelete} onClose={() => setEmpToDelete(null)} title="Delete Employee">
+        <p
+          style={{ marginBottom: '1.5rem', color: 'var(--color-text-secondary)', lineHeight: 1.5 }}
+        >
+          Are you sure you want to completely remove this employee from the roster? This will impact
+          any generated schedules they are mapped to.
         </p>
         <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
           <button className="btn-secondary" onClick={() => setEmpToDelete(null)}>

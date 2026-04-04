@@ -14,7 +14,14 @@ import { useEmployeeStore } from '../../stores/employeeStore'
 import { useCoverageStore } from '../../stores/coverageStore'
 import { generateScheduleAsync } from '../../engine/worker/client'
 import { createSchedule, createShift } from '../../types/factories'
-import type { Shift, ShiftAssignment, DayOfWeek, Employee, CoverageRequirement, BaselineRequirement } from '../../types/index'
+import type {
+  Shift,
+  ShiftAssignment,
+  DayOfWeek,
+  Employee,
+  CoverageRequirement,
+  BaselineRequirement,
+} from '../../types/index'
 import { WeeklyGrid } from './WeeklyGrid'
 import { TimelineGrid } from './TimelineGrid'
 import { CoverageHeatmap } from './CoverageHeatmap'
@@ -320,8 +327,10 @@ export function ScheduleManager() {
                     useEmployeeStore.getState().hydrate([])
                     useCoverageStore.getState().reset()
                     useScheduleStore.getState().hydrate([])
-                    
-                    imported.employees.forEach((e: Employee) => useEmployeeStore.getState().addEmployee(e))
+
+                    imported.employees.forEach((e: Employee) =>
+                      useEmployeeStore.getState().addEmployee(e),
+                    )
                     imported.coverageRequirements.forEach((r: CoverageRequirement) =>
                       useCoverageStore.getState().addRequirement(r),
                     )
@@ -334,7 +343,9 @@ export function ScheduleManager() {
                     setActiveSchedule(imported.schedule)
                     setToastMessage('Successfully loaded data!')
                   } catch (err: unknown) {
-                    setErrorStatus(err instanceof Error ? err.message : 'Failed to import JSON file')
+                    setErrorStatus(
+                      err instanceof Error ? err.message : 'Failed to import JSON file',
+                    )
                   }
                 }}
               />
@@ -432,9 +443,14 @@ export function ScheduleManager() {
 
       <div className="sm-content">
         {toastMessage && (
-          <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} duration={4000} type="success" />
+          <Toast
+            message={toastMessage}
+            onDismiss={() => setToastMessage(null)}
+            duration={4000}
+            type="success"
+          />
         )}
-        
+
         {isConfirmingGenerate && (
           <div className="sm-overlay" style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}>
             <div
