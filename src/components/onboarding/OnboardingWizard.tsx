@@ -68,9 +68,11 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
   }
 
   const handleLoadDemo = async () => {
-    const { employees, coverageRequirements, schedule } = await loadDemoDataAsync()
+    const { employees, coverageRequirements, baselineRequirements, schedule } =
+      await loadDemoDataAsync()
     employees.forEach((e) => useEmployeeStore.getState().addEmployee(e))
     coverageRequirements.forEach((r) => useCoverageStore.getState().addRequirement(r))
+    baselineRequirements.forEach((r) => useCoverageStore.getState().addBaselineRequirement(r))
     useScheduleStore.getState().setActiveSchedule(schedule)
     setCurrentStep(STEPS.length - 1) // Jump to final step
   }

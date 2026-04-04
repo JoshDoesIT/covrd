@@ -1,11 +1,11 @@
 import { useState, useMemo } from 'react'
-import { Plus, Edit2, Trash2, X, Clock, ChevronLeft, ChevronRight, Copy, Star } from 'lucide-react'
+import { Plus, Edit2, Trash2, X, Clock, ChevronLeft, ChevronRight, Star } from 'lucide-react'
 import Holidays from 'date-holidays'
 import { useEmployeeStore } from '../../stores/employeeStore'
 import { useCoverageStore } from '../../stores/coverageStore'
 import { useSettingsStore } from '../../stores/settingsStore'
-import { createCoverageRequirement } from '../../types/factories'
-import type { CoverageRequirement } from '../../types/index'
+import { createCoverageRequirement, createBaselineRequirement } from '../../types/factories'
+import type { CoverageRequirement, BaselineRequirement } from '../../types/index'
 import { formatTime } from '../../utils/formatTime'
 import { EmptyState } from '../shared/EmptyState'
 import './CoverageManager.css'
@@ -20,7 +20,7 @@ function getFirstDayOfMonth(year: number, month: number) {
 }
 
 export function CoverageManager() {
-  const { requirements, addRequirement, updateRequirement, removeRequirement, getRequirementsForDate } = useCoverageStore()
+  const { requirements, baselineRequirements, addRequirement, updateRequirement, removeRequirement, addBaselineRequirement, updateBaselineRequirement, removeBaselineRequirement, getRequirementsForDate } = useCoverageStore()
   const { employees } = useEmployeeStore()
   const { timeFormat, holidayCountry, update } = useSettingsStore()
 
@@ -30,12 +30,15 @@ export function CoverageManager() {
     return Array.from(roles).sort()
   }, [employees])
 
+  const [viewMode, setViewMode] = useState<'baseline' | 'calendar'>('baseline')
+  const [activeBaselineDay, setActiveBaselineDay] = useState<number | null>(null) // 0(Mon)-6(Sun)
+  
   const [currentDate, setCurrentDate] = useState(new Date())
   const [activeDate, setActiveDate] = useState<string | null>(null) // YYYY-MM-DD
   
   const [editingId, setEditingId] = useState<string | null>(null)
   const [isCreating, setIsCreating] = useState(false)
-  const [formData, setFormData] = useState<Partial<CoverageRequirement>>({})
+  const [formData, setFormData] = useState<Partial<CoverageRequirement | BaselineRequirement>>({})
 
   const hd = useMemo(() => new Holidays(holidayCountry || 'US'), [holidayCountry])
   const currentYear = currentDate.getFullYear()
@@ -48,19 +51,32 @@ export function CoverageManager() {
     }, {} as Record<string, string[]>)
   }, [currentYear, hd])
 
-  const activeDateRequirements = activeDate ? getRequirementsForDate(activeDate) : []
+  const activeReqs = viewMode === 'baseline' 
+    ? (activeBaselineDay !== null ? baselineRequirements.filter(r => r.dayOfWeek === activeBaselineDay) : [])
+    : (activeDate ? requirements.filter(r => r.date === activeDate) : [])
 
   const activeReq = useMemo(() => {
-    if (isCreating) return { ...createCoverageRequirement({ date: activeDate || '', startTime: '09:00', endTime: '17:00', requiredStaff: 1 }), ...formData }
-    if (editingId) return { ...requirements.find((r) => r.id === editingId), ...formData } as CoverageRequirement
+    if (isCreating) {
+      if (viewMode === 'baseline') {
+        return { ...createBaselineRequirement({ dayOfWeek: activeBaselineDay ?? 0, startTime: '09:00', endTime: '17:00', requiredStaff: 1 }), ...formData }
+      } else {
+        return { ...createCoverageRequirement({ date: activeDate || '', startTime: '09:00', endTime: '17:00', requiredStaff: 1 }), ...formData }
+      }
+    }
+    if (editingId) {
+      if (viewMode === 'baseline') {
+        return { ...baselineRequirements.find((r) => r.id === editingId), ...formData }
+      } else {
+        return { ...requirements.find((r) => r.id === editingId), ...formData }
+      }
+    }
     return null
-  }, [editingId, isCreating, requirements, formData, activeDate])
+  }, [editingId, isCreating, requirements, baselineRequirements, formData, activeDate, activeBaselineDay, viewMode])
 
   const handleStartCreate = () => {
     setEditingId(null)
     setIsCreating(true)
     setFormData({
-      date: activeDate || '',
       startTime: '09:00',
       endTime: '17:00',
       requiredStaff: 2,
@@ -68,12 +84,11 @@ export function CoverageManager() {
     })
   }
 
-  const handleStartEdit = (e: React.MouseEvent, req: CoverageRequirement) => {
+  const handleStartEdit = (e: React.MouseEvent, req: CoverageRequirement | BaselineRequirement) => {
     e.stopPropagation()
     setIsCreating(false)
     setEditingId(req.id)
     setFormData({
-      date: req.date,
       startTime: req.startTime,
       endTime: req.endTime,
       requiredStaff: req.requiredStaff,
@@ -84,27 +99,45 @@ export function CoverageManager() {
 
   const handleDelete = (e: React.MouseEvent, reqId: string) => {
     e.stopPropagation()
-    if (confirm('Are you sure you want to remove this coverage requirement?')) {
-      removeRequirement(reqId)
+    if (confirm('Are you sure you want to remove this requirement?')) {
+      if (viewMode === 'baseline') {
+        removeBaselineRequirement(reqId)
+      } else {
+        removeRequirement(reqId)
+      }
       if (editingId === reqId) setEditingId(null)
     }
   }
 
   const handleSave = () => {
-    if (!formData.date) return alert('Date is required.')
-    
-    if (isCreating) {
-      const newReq = createCoverageRequirement({
-        date: formData.date,
-        startTime: formData.startTime ?? '09:00',
-        endTime: formData.endTime ?? '17:00',
-        requiredStaff: formData.requiredStaff ?? 1,
-        role: formData.role || undefined,
-        unpaidBreakMinutes: formData.unpaidBreakMinutes ?? 0
-      })
-      addRequirement(newReq)
-    } else if (editingId) {
-      updateRequirement(editingId, formData)
+    if (viewMode === 'baseline') {
+      if (activeBaselineDay === null) return alert('Day is required.')
+      if (isCreating) {
+        addBaselineRequirement(createBaselineRequirement({
+          dayOfWeek: activeBaselineDay,
+          startTime: formData.startTime ?? '09:00',
+          endTime: formData.endTime ?? '17:00',
+          requiredStaff: formData.requiredStaff ?? 1,
+          role: formData.role || undefined,
+          unpaidBreakMinutes: formData.unpaidBreakMinutes ?? 0
+        }))
+      } else if (editingId) {
+        updateBaselineRequirement(editingId, formData)
+      }
+    } else {
+      if (!activeDate) return alert('Date is required.')
+      if (isCreating) {
+        addRequirement(createCoverageRequirement({
+          date: activeDate,
+          startTime: formData.startTime ?? '09:00',
+          endTime: formData.endTime ?? '17:00',
+          requiredStaff: formData.requiredStaff ?? 1,
+          role: formData.role || undefined,
+          unpaidBreakMinutes: formData.unpaidBreakMinutes ?? 0
+        }))
+      } else if (editingId) {
+        updateRequirement(editingId, formData as Partial<CoverageRequirement>)
+      }
     }
     
     setIsCreating(false)
@@ -139,102 +172,7 @@ export function CoverageManager() {
     setActiveDate(null)
   }
 
-  const handleStampPattern = () => {
-    // Find the first Monday on the calendar grid
-    const firstDay = new Date(year, month, 1)
-    const firstMonday = new Date(firstDay)
-    const dayOfWeek = firstMonday.getDay()
-    const diff = (dayOfWeek === 0 ? -6 : 1) - dayOfWeek
-    firstMonday.setDate(firstMonday.getDate() + diff)
-    
-    let sourceWeekReqs: (CoverageRequirement & { sourceDate: string, offsetDays: number })[] = []
-    
-    // Scan up to 6 weeks on the grid to find the first drafted week
-    for (let w = 0; w < 6; w++) {
-      const weekReqs: (CoverageRequirement & { sourceDate: string, offsetDays: number })[] = []
-      for (let i = 0; i < 7; i++) {
-          const d = new Date(firstMonday)
-          d.setDate(d.getDate() + (w * 7) + i)
-          const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-          const reqs = getRequirementsForDate(iso)
-          reqs.forEach(r => weekReqs.push({ ...r, sourceDate: iso, offsetDays: i }))
-      }
-      
-      if (weekReqs.length > 0) {
-        sourceWeekReqs = weekReqs
-        break // Use the first seeded week we find as the pattern
-      }
-    }
 
-    // Fallback: If no data found in the current grid, look backward up to 4 weeks into the PREVIOUS month
-    if (sourceWeekReqs.length === 0) {
-      for (let w = -1; w >= -4; w--) {
-        const weekReqs: (CoverageRequirement & { sourceDate: string, offsetDays: number })[] = []
-        for (let i = 0; i < 7; i++) {
-          const d = new Date(firstMonday)
-          d.setDate(d.getDate() + (w * 7) + i)
-          const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-          const reqs = getRequirementsForDate(iso)
-          reqs.forEach(r => weekReqs.push({ ...r, sourceDate: iso, offsetDays: i }))
-        }
-        
-        if (weekReqs.length > 0) {
-          sourceWeekReqs = weekReqs
-          break
-        }
-      }
-    }
-
-    if (sourceWeekReqs.length === 0) {
-        alert('Please add at least one shift to stamp it across remaining weeks. No recent patterns found.')
-        return
-    }
-
-    // Now copy that pattern to all OTHER weeks in the month that belong to this month
-    // We stamp across the remaining 4-5 weeks of the grid where the dates fall in 'month'
-    let addedCount = 0
-    for (let w = 0; w < 6; w++) {
-      // Check if this iteration's week falls in the month we care about, to avoid infinite looping
-      // We will stamp if at least one day in the week is in the current month
-      let hasDayInMonth = false
-      for (let i = 0; i < 7; i++) {
-        const d = new Date(firstMonday)
-        d.setDate(d.getDate() + (w * 7) + i)
-        if (d.getMonth() === month) hasDayInMonth = true
-      }
-      
-      if (!hasDayInMonth) continue
-
-      sourceWeekReqs.forEach(req => {
-        const targetD = new Date(firstMonday)
-        targetD.setDate(targetD.getDate() + (w * 7) + req.offsetDays)
-        
-        const targetIso = `${targetD.getFullYear()}-${String(targetD.getMonth() + 1).padStart(2, '0')}-${String(targetD.getDate()).padStart(2, '0')}`
-        
-        // Skip if duplicating onto the exact same source date
-        if (targetIso === req.sourceDate) return
-
-        if (targetD.getMonth() === month) {
-          const newReq = createCoverageRequirement({
-            date: targetIso,
-            startTime: req.startTime,
-            endTime: req.endTime,
-            requiredStaff: req.requiredStaff,
-            role: req.role,
-            unpaidBreakMinutes: req.unpaidBreakMinutes
-          })
-          addRequirement(newReq)
-          addedCount++
-        }
-      })
-    }
-
-    if (addedCount > 0) {
-      alert(`Successfully stamped ${addedCount} shift(s) across the month.`)
-    } else {
-      alert('Pattern already fully applied.')
-    }
-  }
 
   // Generate calendar days
   const year = currentDate.getFullYear()
@@ -263,16 +201,60 @@ export function CoverageManager() {
             <Clock size={20} color="var(--color-accent)" />
             Coverage Canvas
           </h2>
-          <p className="cm-subtitle">Tap a date below to define the exact staffing needed.</p>
+          <p className="cm-subtitle">
+            {viewMode === 'baseline' 
+              ? 'Define your recurring weekly requirements.' 
+              : 'Add exceptions for specific calendar dates.'}
+          </p>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button className="action-btn" onClick={handleStampPattern}>
-            <Copy size={16} /> Stamp Weekly Pattern
-          </button>
+          <div className="view-mode-toggle" style={{ display: 'flex', background: 'var(--color-bg-primary)', padding: '4px', borderRadius: '8px', border: '1px solid var(--color-border)' }}>
+            <button 
+              className={`action-btn ${viewMode === 'baseline' ? 'active-toggle' : ''}`}
+              style={{ border: 'none', background: viewMode === 'baseline' ? 'var(--color-bg-surface)' : 'transparent', boxShadow: viewMode === 'baseline' ? 'var(--shadow-sm)' : 'none' }}
+              onClick={() => {
+                setViewMode('baseline')
+                setEditingId(null)
+                setIsCreating(false)
+              }}>
+              Baseline Template
+            </button>
+            <button 
+              className={`action-btn ${viewMode === 'calendar' ? 'active-toggle' : ''}`}
+              style={{ border: 'none', background: viewMode === 'calendar' ? 'var(--color-bg-surface)' : 'transparent', boxShadow: viewMode === 'calendar' ? 'var(--shadow-sm)' : 'none' }}
+              onClick={() => {
+                setViewMode('calendar')
+                setEditingId(null)
+                setIsCreating(false)
+              }}>
+              Calendar Exceptions
+            </button>
+          </div>
         </div>
       </header>
 
       <div className="cm-content">
+        {viewMode === 'baseline' ? (
+          <div className="cm-calendar-container">
+            <div className="cm-calendar-grid" style={{ gridTemplateRows: 'auto 1fr' }}>
+              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+                <div key={day} className="cm-calendar-col-header">{day}</div>
+              ))}
+              
+              {[0,1,2,3,4,5,6].map(dow => {
+                 const reqsCount = baselineRequirements.filter(r => r.dayOfWeek === dow).length
+                 const isActive = activeBaselineDay === dow
+                 
+                 return (
+                   <div key={`dow-${dow}`} className={`cm-calendar-cell ${isActive ? 'active' : ''}`}
+                        onClick={() => { setActiveBaselineDay(isActive ? null : dow); setIsCreating(false); setEditingId(null) }}>
+                      {reqsCount > 0 && <div className="cm-req-count">{reqsCount} shift{reqsCount === 1 ? '' : 's'}</div>}
+                   </div>
+                 )
+              })}
+            </div>
+          </div>
+        ) : (
         <div className="cm-calendar-container">
           <div className="cm-calendar-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -340,12 +322,13 @@ export function CoverageManager() {
             })}
           </div>
         </div>
+        )}
 
-        {/* Right Pane Editor for the specific Date */}
-        {activeDate && (
+        {/* Right Pane Editor */}
+        {(viewMode === 'baseline' ? activeBaselineDay !== null : activeDate !== null) && (
           <div className={`cm-roster ${isCreating || editingId ? 'editing-mode' : ''}`}>
              <div className="cm-roster-header">
-                <h3>Add Shifts for {activeDate}</h3>
+                <h3>Add Shifts for {viewMode === 'baseline' ? ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][activeBaselineDay!] : activeDate}</h3>
                 {!isCreating && !editingId && (
                   <button className="cm-add-btn" onClick={handleStartCreate}>
                     <Plus size={16} /> Add 
@@ -355,7 +338,7 @@ export function CoverageManager() {
 
              {/* Roster List Map */}
              {!isCreating && !editingId && (
-                activeDateRequirements.length === 0 ? (
+                activeReqs.length === 0 ? (
                   <EmptyState
                     title="No shifts identified"
                     description={`Define what you need for this day.`}
@@ -363,7 +346,7 @@ export function CoverageManager() {
                   />
                 ) : (
                   <div className="cm-roster-list">
-                    {activeDateRequirements.sort((a,b) => a.startTime.localeCompare(b.startTime)).map((req) => (
+                    {activeReqs.sort((a,b) => a.startTime.localeCompare(b.startTime)).map((req) => (
                       <div
                         key={req.id}
                         className="req-card"

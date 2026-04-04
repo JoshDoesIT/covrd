@@ -6,7 +6,7 @@ import type {
   ShiftAssignment,
 } from '../types/index'
 import { generateScheduleAsync } from '../engine/worker/client'
-import { createSchedule, createShift } from '../types/factories'
+import { createSchedule, createShift, createBaselineRequirement } from '../types/factories'
 import { getNextMonday } from '../utils/scheduleDates'
 import type { EngineEmployee, EngineShift } from '../engine/types'
 
@@ -158,68 +158,66 @@ export const DEMO_EMPLOYEES: Employee[] = [
   },
 ]
 
-export const DEMO_COVERAGE_REQUIREMENTS: CoverageRequirement[] = (() => {
-  const requirements: CoverageRequirement[] = []
+export const DEMO_COVERAGE_REQUIREMENTS: CoverageRequirement[] = []
 
-  // Create 4 weeks of demo requirements
-  for (let week = 0; week < 4; week++) {
-    // April 6 is a Monday.
-    const baseDateMs = new Date('2026-04-06T00:00:00').getTime()
-    const weekOffsetMs = week * 7 * 24 * 60 * 60 * 1000
+export const DEMO_BASELINE_REQUIREMENTS: import('../types/index').BaselineRequirement[] = (() => {
+  const baselines: import('../types/index').BaselineRequirement[] = []
 
-    const days = [
-      { d: 'monday', offset: 0 },
-      { d: 'tuesday', offset: 1 },
-      { d: 'wednesday', offset: 2 },
-      { d: 'thursday', offset: 3 },
-      { d: 'friday', offset: 4 },
-      { d: 'saturday', offset: 5 },
-      { d: 'sunday', offset: 6 },
-    ]
+  const days = [
+    { d: 'monday', dow: 0 },
+    { d: 'tuesday', dow: 1 },
+    { d: 'wednesday', dow: 2 },
+    { d: 'thursday', dow: 3 },
+    { d: 'friday', dow: 4 },
+    { d: 'saturday', dow: 5 },
+    { d: 'sunday', dow: 6 },
+  ]
 
-    days.forEach(({ d, offset }) => {
-      const dt = new Date(baseDateMs + weekOffsetMs + offset * 24 * 60 * 60 * 1000)
-      const dateStr = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`
+  days.forEach(({ d, dow }) => {
+    const isWeekend = d === 'saturday' || d === 'sunday'
 
-      const isWeekend = d === 'saturday' || d === 'sunday'
-
-      if (!isWeekend) {
-        requirements.push({
-          id: `demo-cov-${d}-am-w${week}`,
-          date: dateStr,
+    if (!isWeekend) {
+      baselines.push(
+        createBaselineRequirement({
+          id: `demo-base-${d}-am`,
+          dayOfWeek: dow,
           startTime: '07:00',
           endTime: '16:00',
           unpaidBreakMinutes: 60,
           requiredStaff: 2,
-        })
-        requirements.push({
-          id: `demo-cov-${d}-pm-w${week}`,
-          date: dateStr,
+        }),
+      )
+      baselines.push(
+        createBaselineRequirement({
+          id: `demo-base-${d}-pm`,
+          dayOfWeek: dow,
           startTime: '13:00',
           endTime: '22:00',
           unpaidBreakMinutes: 60,
-          // Reduced to 1 to ensure a perfect 100% demo schedule
           requiredStaff: 1,
-        })
-      } else {
-        requirements.push({
-          id: `demo-cov-${d}-w${week}`,
-          date: dateStr,
+        }),
+      )
+    } else {
+      baselines.push(
+        createBaselineRequirement({
+          id: `demo-base-${d}`,
+          dayOfWeek: dow,
           startTime: d === 'saturday' ? '08:00' : '09:00',
           endTime: d === 'saturday' ? '17:00' : '18:00',
           unpaidBreakMinutes: 60,
           requiredStaff: 1,
-        })
-      }
-    })
-  }
+        }),
+      )
+    }
+  })
 
-  return requirements
+  return baselines
 })()
 
 export async function loadDemoDataAsync() {
   const employees = DEMO_EMPLOYEES
   const coverageRequirements = DEMO_COVERAGE_REQUIREMENTS
+  const baselineRequirements = DEMO_BASELINE_REQUIREMENTS
 
   const totalWeeks = 4
   const baseDate = new Date('2026-04-06T00:00:00')
@@ -228,30 +226,31 @@ export async function loadDemoDataAsync() {
 
   const generatedShifts: Shift[] = []
 
-  coverageRequirements.forEach((r) => {
-    const shiftDate = new Date(`${r.date}T00:00:00`)
-    const dayDiff = Math.round((shiftDate.getTime() - baseMs) / (1000 * 60 * 60 * 24))
-    const weekNumber = Math.floor(dayDiff / 7)
+  // Generate mock runtime CoverageRequirements by iterating days
+  for (let weekNumber = 0; weekNumber < totalWeeks; weekNumber++) {
+    for (let dayOffset = 0; dayOffset < 7; dayOffset++) {
+      const dt = new Date(baseMs + (weekNumber * 7 + dayOffset) * 24 * 60 * 60 * 1000)
+      const rawDay = dt.getDay()
+      const dayOfWeekNum = rawDay === 0 ? 6 : rawDay - 1
 
-    if (weekNumber >= 0 && weekNumber < totalWeeks) {
-      // dayDiff is 0-based from Monday (since baseDate is always a Monday).
-      // DAY_MAP uses Sunday=0, Monday=1. Shift by +1 to align.
-      const dayOfWeek = ((dayDiff % 7) + 1) % 7
-      const shift = createShift({
-        day:
-          (Object.keys(DAY_MAP).find(
-            (k) => DAY_MAP[k as keyof typeof DAY_MAP] === dayOfWeek,
-          ) as DayOfWeek) || 'monday',
-        startTime: r.startTime,
-        endTime: r.endTime,
-        requiredStaff: r.requiredStaff,
-        weekNumber,
-        role: r.role,
-        unpaidBreakMinutes: r.unpaidBreakMinutes,
+      const reqs = baselineRequirements.filter((r) => r.dayOfWeek === dayOfWeekNum)
+
+      reqs.forEach((r) => {
+        const shift = createShift({
+          day:
+            (Object.keys(DAY_MAP).find((k) => DAY_MAP[k] === dayOfWeekNum) as DayOfWeek) ||
+            'monday',
+          startTime: r.startTime,
+          endTime: r.endTime,
+          requiredStaff: r.requiredStaff,
+          weekNumber,
+          role: r.role,
+          unpaidBreakMinutes: r.unpaidBreakMinutes,
+        })
+        generatedShifts.push(shift)
       })
-      generatedShifts.push(shift)
     }
-  })
+  }
 
   // MAP TO ENGINE DTOs
   const engineEmployees: EngineEmployee[] = employees.map((e) => ({
@@ -318,5 +317,5 @@ export async function loadDemoDataAsync() {
     unfilledShiftIds: result.unfilledShifts.map((s) => s.id),
   })
 
-  return { employees, coverageRequirements, schedule }
+  return { employees, coverageRequirements, baselineRequirements, schedule }
 }

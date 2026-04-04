@@ -38,18 +38,29 @@ export function App() {
         sharedState.coverageRequirements.forEach((r) =>
           useCoverageStore.getState().addRequirement(r),
         )
+        // If the sharedState URL included baselineRequirements, load them (future proofing)
+        if (sharedState.baselineRequirements) {
+          sharedState.baselineRequirements.forEach(
+            (
+              b: Parameters<
+                ReturnType<typeof useCoverageStore.getState>['addBaselineRequirement']
+              >[0],
+            ) => useCoverageStore.getState().addBaselineRequirement(b),
+          )
+        }
         useScheduleStore.getState().setActiveSchedule(sharedState.schedule)
         window.history.replaceState(null, '', window.location.pathname)
       } else {
         // Otherwise, hydrate from local IndexedDB
-        const [employees, reqs, schedules] = await Promise.all([
+        const [employees, reqs, baselines, schedules] = await Promise.all([
           covrdDb.employees.toArray(),
           covrdDb.coverageRequirements.toArray(),
+          covrdDb.baselineRequirements.toArray(),
           covrdDb.schedules.toArray(),
         ])
 
         useEmployeeStore.getState().hydrate(employees)
-        useCoverageStore.getState().hydrate(reqs)
+        useCoverageStore.getState().hydrate(reqs, baselines)
         useScheduleStore.getState().hydrate(schedules)
       }
       setIsLoading(false)

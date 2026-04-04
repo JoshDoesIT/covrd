@@ -1,5 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie'
-import type { Employee, CoverageRequirement, Schedule } from '../types/index'
+import type { Employee, CoverageRequirement, BaselineRequirement, Schedule } from '../types/index'
 
 /**
  * CovrdDatabase — Dexie.js IndexedDB database for persistent storage.
@@ -13,6 +13,7 @@ import type { Employee, CoverageRequirement, Schedule } from '../types/index'
 class CovrdDatabase extends Dexie {
   employees!: EntityTable<Employee, 'id'>
   coverageRequirements!: EntityTable<CoverageRequirement, 'id'>
+  baselineRequirements!: EntityTable<BaselineRequirement, 'id'>
   schedules!: EntityTable<Schedule, 'id'>
 
   constructor() {
@@ -21,6 +22,7 @@ class CovrdDatabase extends Dexie {
     this.version(1).stores({
       employees: 'id, name, role, employmentType',
       coverageRequirements: 'id, date',
+      baselineRequirements: 'id, dayOfWeek',
       schedules: 'id, name, startDate',
     })
   }
@@ -32,10 +34,11 @@ class CovrdDatabase extends Dexie {
   async purgeAll(): Promise<void> {
     await this.transaction(
       'rw',
-      [this.employees, this.coverageRequirements, this.schedules],
+      [this.employees, this.coverageRequirements, this.baselineRequirements, this.schedules],
       async () => {
         await this.employees.clear()
         await this.coverageRequirements.clear()
+        await this.baselineRequirements.clear()
         await this.schedules.clear()
       },
     )

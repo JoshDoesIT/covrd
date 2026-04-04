@@ -54,7 +54,7 @@ export function ScheduleManager() {
     canRedo,
   } = useScheduleStore()
   const { employees } = useEmployeeStore()
-  const { requirements } = useCoverageStore()
+  const { requirements, baselineRequirements } = useCoverageStore()
 
   const [viewMode, setViewMode] = useState<ViewMode>('matrix')
   const [activeWeekNumber, setActiveWeekNumber] = useState(0)
@@ -73,7 +73,10 @@ export function ScheduleManager() {
   const [isConfirmingGenerate, setIsConfirmingGenerate] = useState(false)
 
   const handleGenerateClick = () => {
-    if (employees.length === 0 || requirements.length === 0) {
+    if (
+      employees.length === 0 ||
+      (requirements.length === 0 && baselineRequirements.length === 0)
+    ) {
       setErrorStatus('You must configure at least 1 employee and 1 coverage requirement first.')
       return
     }
@@ -98,22 +101,19 @@ export function ScheduleManager() {
     const totalWeeks = 4
     const generatedShifts: Shift[] = []
 
-    // Find all requirements that fall within our 4-week target generation window
-    requirements.forEach((r) => {
-      const shiftDate = new Date(`${r.date}T00:00:00`)
-      const dayDiff = Math.round((shiftDate.getTime() - baseMs) / (1000 * 60 * 60 * 24))
-      const weekNumber = Math.floor(dayDiff / 7)
+    // Loop through every day in the generation window
+    for (let dayOffset = 0; dayOffset < totalWeeks * 7; dayOffset++) {
+      const d = new Date(baseMs + dayOffset * 24 * 60 * 60 * 1000)
+      const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 
-      // If it falls within the 4-week window we are generating
-      if (weekNumber >= 0 && weekNumber < totalWeeks) {
-        // Map native Date day (0=Sun, 1=Mon) to our DAY_MAP integer if needed,
-        // Wait, Engine expects dayOfWeek 0-6 where 0=Monday (our DayOfWeek enum).
-        // native getDay() is 0=Sun. Our DAY_MAP: Monday=0, Tuesday=1 ... Sunday=6
-        // Let's deduce dayOfWeek from dayDiff
-        // dayDiff is 0-based from Monday (since baseDate is always a Monday).
-        // DAY_MAP uses Sunday=0, Monday=1. Shift by +1 to align.
-        const dayOfWeek = ((dayDiff % 7) + 1) % 7
+      const reqs = useCoverageStore.getState().getRequirementsForDate(dateStr)
+      const weekNumber = Math.floor(dayOffset / 7)
 
+      // dayOffset is 0-based from Monday.
+      // Our DAY_MAP expects: Sunday=0, Monday=1, etc.
+      const dayOfWeek = ((dayOffset % 7) + 1) % 7
+
+      reqs.forEach((r) => {
         const shift = createShift({
           day:
             (Object.keys(DAY_MAP).find(
@@ -127,8 +127,8 @@ export function ScheduleManager() {
           unpaidBreakMinutes: r.unpaidBreakMinutes,
         })
         generatedShifts.push(shift)
-      }
-    })
+      })
+    }
 
     // MAP TO ENGINE DTOs
     const engineEmployees: EngineEmployee[] = employees.map((e) => ({
@@ -225,16 +225,12 @@ export function ScheduleManager() {
   return (
     <div className="schedule-manager">
       <header className="sm-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <div>
-            <h2 className="sm-title">
-              <CalendarDays size={20} color="var(--color-accent)" />
-              Schedule Builder
-            </h2>
-            <p className="sm-subtitle">Interactive visualization and solver dispatch.</p>
-          </div>
-
-          {/* Pagination moved to input zone */}
+        <div>
+          <h2 className="sm-title">
+            <CalendarDays size={20} color="var(--color-accent)" />
+            Schedule Builder
+          </h2>
+          <p className="sm-subtitle">Generate, review, and fine-tune your staff schedules.</p>
         </div>
         <div className="sm-actions">
           {activeSchedule && (

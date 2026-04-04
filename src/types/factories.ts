@@ -1,6 +1,7 @@
 import type {
   Employee,
   CoverageRequirement,
+  BaselineRequirement,
   Shift,
   Schedule,
   Constraint,
@@ -95,6 +96,29 @@ export function createCoverageRequirement(props: {
 }
 
 /**
+ * Create a new BaselineRequirement.
+ */
+export function createBaselineRequirement(props: {
+  id?: string
+  dayOfWeek: number
+  startTime: string
+  endTime: string
+  requiredStaff: number
+  role?: string
+  unpaidBreakMinutes?: number
+}) {
+  return {
+    id: props.id ?? generateId(),
+    dayOfWeek: props.dayOfWeek,
+    startTime: props.startTime,
+    endTime: props.endTime,
+    requiredStaff: props.requiredStaff,
+    role: props.role,
+    unpaidBreakMinutes: props.unpaidBreakMinutes,
+  }
+}
+
+/**
  * Create a new Shift.
  */
 export function createShift(props: {
@@ -160,6 +184,7 @@ export function createConstraint(
 export type {
   Employee,
   CoverageRequirement,
+  BaselineRequirement,
   Shift,
   Schedule,
   ConstraintType,
