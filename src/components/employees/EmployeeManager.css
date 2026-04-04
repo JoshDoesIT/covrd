@@ -157,6 +157,7 @@
   border-radius: 4px;
   background: var(--color-accent-muted);
   color: var(--color-accent);
+  white-space: nowrap;
 }
 
 .ec-badge[data-type='part-time'] {
@@ -391,6 +392,9 @@
     flex: none;
     max-height: 50vh;
     min-width: 0; /* Let it shrink on narrow screens */
+    align-self: stretch;
+    width: 100%;
+    box-sizing: border-box;
   }
 }
 
