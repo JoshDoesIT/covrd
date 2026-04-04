@@ -1,21 +1,58 @@
-/** CommandPalette styles matching the retro/cyberpunk identity **/
+/**
+ * CommandPalette styles — targeting cmdk v1 Radix Dialog structure.
+ *
+ * cmdk v1 renders via a Radix Portal with two elements:
+ *   1. [cmdk-overlay] — backdrop (gets overlayClassName)
+ *   2. [cmdk-dialog]  — content (gets contentClassName)
+ */
 
-.covrd-command-dialog[cmdk-dialog] {
+/* Overlay / backdrop — covers the entire screen */
+.covrd-command-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 998;
+  animation: cmdkFadeIn 0.15s ease-out;
+}
+
+/* Dialog content container */
+.covrd-command-dialog {
   position: fixed;
   top: 20%;
   left: 50%;
   transform: translateX(-50%);
   width: 90vw;
   max-width: 600px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
   box-shadow:
-    0 16px 32px rgba(0, 0, 0, 0.4),
-    0 0 0 100vw rgba(0, 0, 0, 0.6);
-  z-index: 1000;
+    0 24px 48px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(108, 92, 231, 0.1);
+  z-index: 999;
   overflow: hidden;
-  font-family: var(--font-mono);
+  font-family: var(--font-body);
+  animation: cmdkSlideIn 0.15s ease-out;
+}
+
+@keyframes cmdkFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cmdkSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
 }
 
 .covrd-command-input {
@@ -24,14 +61,14 @@
   font-size: 1.125rem;
   background: transparent;
   border: none;
-  border-bottom: 1px solid var(--border-color);
-  color: var(--text-base);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-primary);
   outline: none;
-  font-family: inherit;
+  font-family: var(--font-body);
 }
 
 .covrd-command-input::placeholder {
-  color: var(--text-muted);
+  color: var(--color-text-muted);
 }
 
 .covrd-command-list {
@@ -39,42 +76,53 @@
   overflow-y: auto;
   padding: 0.5rem;
   scrollbar-width: thin;
-  scrollbar-color: var(--primary-color) var(--bg-body);
+  scrollbar-color: var(--color-accent) var(--color-bg-primary);
 }
 
 .covrd-command-empty {
   padding: 2rem;
   text-align: center;
-  color: var(--text-muted);
+  color: var(--color-text-muted);
   font-style: italic;
 }
 
 [cmdk-group-heading] {
-  padding: 0.5rem 1rem;
-  font-size: 0.75rem;
+  padding: 0.75rem 1rem 0.5rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  color: var(--color-text-muted);
   user-select: none;
+  font-weight: var(--weight-semibold);
 }
 
 .covrd-command-item {
   display: flex;
   align-items: center;
+  gap: 0.75rem;
   padding: 0.75rem 1rem;
-  margin: 0.25rem 0;
-  border-radius: var(--radius-md);
+  margin: 0.125rem 0;
+  border-radius: var(--radius-lg);
   cursor: pointer;
-  color: var(--text-base);
-  transition: all 0.2s ease;
+  color: var(--color-text-secondary);
+  transition: all 0.15s ease;
   user-select: none;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
 }
 
-.covrd-command-item[cmdk-item][data-selected='true'] {
-  background-color: rgba(99, 102, 241, 0.15); /* primary-color with alpha */
-  color: var(--primary-color);
+.covrd-command-item[data-selected='true'] {
+  background: var(--color-accent-muted);
+  color: var(--color-text-primary);
 }
 
-.covrd-command-item[cmdk-item][data-selected='true'] svg {
-  filter: drop-shadow(0 0 4px var(--primary-color));
+.covrd-command-item[data-selected='true'] svg {
+  color: var(--color-accent);
+  filter: drop-shadow(0 0 4px var(--color-accent-glow));
+}
+
+.covrd-command-item svg {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
 }

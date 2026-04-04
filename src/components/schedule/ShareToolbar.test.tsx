@@ -12,8 +12,7 @@ describe('ShareToolbar', () => {
     coverageRequirements: [
       createCoverageRequirement({
         id: 'c1',
-        name: 'Morning',
-        day: 'monday',
+        date: '2026-04-06',
         startTime: '09:00',
         endTime: '13:00',
         requiredStaff: 2,
@@ -60,11 +59,6 @@ describe('ShareToolbar', () => {
   it('renders share link button', () => {
     render(<ShareToolbar state={state} />)
     expect(screen.getByRole('button', { name: /share link/i })).toBeInTheDocument()
-  })
-
-  it('renders QR code button', () => {
-    render(<ShareToolbar state={state} />)
-    expect(screen.getByRole('button', { name: /qr code/i })).toBeInTheDocument()
   })
 
   it('calls onImport when a file is uploaded', async () => {

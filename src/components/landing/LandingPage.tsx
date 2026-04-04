@@ -1,23 +1,38 @@
-import { Shield, LayoutDashboard, Calendar, Share2, Download, Terminal } from 'lucide-react'
+import {
+  Shield,
+  LayoutDashboard,
+  Calendar,
+  BookOpen,
+  ServerOff,
+  MonitorSmartphone,
+} from 'lucide-react'
 import './LandingPage.css'
 
 interface LandingPageProps {
   onLaunch: () => void
   onShowPrivacy: () => void
+  onShowAccessibility: () => void
 }
 
-export function LandingPage({ onLaunch, onShowPrivacy }: LandingPageProps) {
+const MOCK_CALENDAR_DATA = Array.from({ length: 21 }).map((_, i) => ({
+  isFixed: Math.random() > 0.7,
+  delay: (i % 7) * 0.15 + Math.random() * 0.5,
+}))
+
+export function LandingPage({ onLaunch, onShowPrivacy, onShowAccessibility }: LandingPageProps) {
   return (
     <div className="landing">
+      {/* Ambient backgrounds */}
+      <div className="landing__bg-mesh" />
+      <div className="landing__glow-orb" />
+
       <header className="landing__header">
-        <div
-          className="landing__logo"
-          style={{ display: 'flex', alignItems: 'center', gap: '12px' }}
-        >
-          <img src="/favicon.png" alt="Covrd Logo" style={{ height: '36px', width: '36px' }} />
-          <span>
-            Covr<span className="landing__logo-accent">d</span>
-          </span>
+        <div className="landing__logo" style={{ display: 'flex', alignItems: 'center' }}>
+          <img
+            src="/logo-dark.png"
+            alt="Covrd Logo"
+            style={{ height: '56px', width: 'auto', objectFit: 'contain' }}
+          />
         </div>
       </header>
 
@@ -27,7 +42,7 @@ export function LandingPage({ onLaunch, onShowPrivacy }: LandingPageProps) {
           <h1 className="landing__hero-title">
             Every Shift.
             <br />
-            <span className="landing__hero-title-accent">Coverd.</span>
+            <span className="landing__hero-title-accent">Covrd.</span>
           </h1>
           <p className="landing__hero-subtitle">
             Auto staff scheduling that respects your privacy. Your data never leaves your browser.
@@ -48,88 +63,128 @@ export function LandingPage({ onLaunch, onShowPrivacy }: LandingPageProps) {
           </div>
         </section>
 
-        <section className="landing__features">
-          <div className="landing__feature">
-            <div className="landing__feature-icon">
+        {/* Bento Grid */}
+        <section className="landing__bento-grid">
+          {/* Card 1: Spans 2 Columns */}
+          <div className="landing__bento-card landing__bento-span-2">
+            <div className="landing__bento-icon">
               <LayoutDashboard size={24} />
             </div>
-            <h3 className="landing__feature-title">Smart Auto-Scheduling</h3>
-            <p className="landing__feature-desc">
-              CSP solver with fairness balancing seamlessly creates optimized schedules in
-              milliseconds.
+            <h3 className="landing__bento-title">Smart Auto-Scheduling</h3>
+            <p className="landing__bento-desc">
+              Our embedded CSP solver uses fairness balancing to seamlessly create optimized
+              schedules in milliseconds. It learns your coverage requirements and instantly builds
+              perfect shifts.
             </p>
+            <div className="landing__mock-scheduler">
+              <div className="landing__mock-calendar-header">
+                <span>S</span>
+                <span>M</span>
+                <span>T</span>
+                <span>W</span>
+                <span>T</span>
+                <span>F</span>
+                <span>S</span>
+              </div>
+              <div className="landing__mock-calendar-grid">
+                {MOCK_CALENDAR_DATA.map(({ isFixed, delay }, i) => (
+                  <div
+                    key={i}
+                    className={`landing__mock-cell ${isFixed ? 'fixed' : ''}`}
+                    style={!isFixed ? { animationDelay: `${delay}s` } : {}}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
-          <div className="landing__feature">
-            <div className="landing__feature-icon">
+
+          {/* Card 2: 1 Column */}
+          <div className="landing__bento-card landing__bento-span-1">
+            <div className="landing__bento-icon">
               <Calendar size={24} />
             </div>
-            <h3 className="landing__feature-title">Templates & Heatmaps</h3>
-            <p className="landing__feature-desc">
-              Support for Week A/B rotations, shift patterns, and instant visual staffing density.
+            <h3 className="landing__bento-title">Template Engines</h3>
+            <p className="landing__bento-desc">
+              Generate rotating bi-weekly, monthly, or seasonal schedules instantly based on
+              predefined templates.
             </p>
           </div>
-          <div className="landing__feature">
-            <div className="landing__feature-icon">
-              <Terminal size={24} />
+
+          {/* Card 3: 1 Column */}
+          <div className="landing__bento-card landing__bento-span-1">
+            <div className="landing__bento-icon">
+              <BookOpen size={24} />
             </div>
-            <h3 className="landing__feature-title">Power-user Workflow</h3>
-            <p className="landing__feature-desc">
-              Command Palette (Cmd/Ctrl+K) and snappy keyboard shortcuts for maximum efficiency.
+            <h3 className="landing__bento-title">Knowledgebase Built-in</h3>
+            <p className="landing__bento-desc">
+              Access comprehensive guides, labor compliance tips, and fair scheduling principles
+              directly in the app.
             </p>
           </div>
-          <div className="landing__feature">
-            <div className="landing__feature-icon">
-              <Share2 size={24} />
-            </div>
-            <h3 className="landing__feature-title">Share securely</h3>
-            <p className="landing__feature-desc">
-              Share schedules securely via compressed URL links that never touch a server.
-            </p>
-          </div>
-          <div className="landing__feature">
-            <div className="landing__feature-icon">
-              <Download size={24} />
-            </div>
-            <h3 className="landing__feature-title">Offline PWA</h3>
-            <p className="landing__feature-desc">
-              Works completely offline after the very first load. Export to JSON, CSV, or Print.
-            </p>
-          </div>
-          <div className="landing__feature">
-            <div className="landing__feature-icon">
+
+          {/* Card 4: 2 Columns */}
+          <div className="landing__bento-card landing__bento-span-2">
+            <div className="landing__bento-icon">
               <Shield size={24} />
             </div>
-            <h3 className="landing__feature-title">Zero Trust</h3>
-            <p className="landing__feature-desc">
-              All data stored locally in your browser automatically using IndexedDB.
+            <h3 className="landing__bento-title">Zero Trust Architecture</h3>
+            <p className="landing__bento-desc">
+              Covrd operates entirely within your browser's local sandbox. There is absolutely no
+              server telemetry, no user accounts, and no backend database holding your employee
+              data.
             </p>
+            <div className="landing__mock-security">
+              <div className="landing__security-node landing__security-node--browser">
+                <MonitorSmartphone size={24} />
+                <span>Local Sandbox</span>
+              </div>
+              <div className="landing__security-flow" />
+              <div className="landing__security-node landing__security-node--cloud">
+                <ServerOff size={24} />
+                <span>Blocked</span>
+              </div>
+            </div>
           </div>
         </section>
 
-        <section className="landing__privacy">
-          <h2>Our Privacy Pledge</h2>
-          <div className="landing__privacy-grid">
-            <div className="landing__privacy-item">
-              <strong>Zero server-side data handling.</strong> All data stays in your browser.
+        {/* Horizontal Privacy Pledge */}
+        <section className="landing__privacy-banner">
+          <div className="landing__privacy-capsules">
+            <div className="landing__privacy-capsule">
+              <Shield size={16} color="var(--color-accent)" /> 0% Server Tracking
             </div>
-            <div className="landing__privacy-item">
-              <strong>Zero analytics or tracking.</strong> No telemetry, no cookies.
+            <div className="landing__privacy-capsule">
+              <Shield size={16} color="var(--color-accent)" /> Free Open Source
             </div>
-            <div className="landing__privacy-item">
-              <strong>Zero accounts required.</strong> No sign-up, no login.
-            </div>
-            <div className="landing__privacy-item">
-              <strong>Full data ownership.</strong> Export, share, or delete your data anytime.
+            <div className="landing__privacy-capsule">
+              <Shield size={16} color="var(--color-accent)" /> Local Export
             </div>
           </div>
-          <button className="landing__link-btn" onClick={onShowPrivacy}>
-            Read the full Privacy Policy
-          </button>
+          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+            <button className="landing__link-btn" onClick={onShowPrivacy}>
+              Privacy
+            </button>
+            <span style={{ color: 'var(--color-text-disabled)' }}>•</span>
+            <button className="landing__link-btn" onClick={onShowAccessibility}>
+              Accessibility
+            </button>
+          </div>
         </section>
       </main>
 
       <footer className="landing__footer">
-        <p>© 2026 Covrd. Built with ♥ by JoshDoesIT.</p>
+        <p>
+          © 2026 Covrd. Built by{' '}
+          <a
+            href="https://www.joshdoes.it"
+            target="_blank"
+            rel="noreferrer"
+            style={{ color: 'inherit', textDecoration: 'underline' }}
+          >
+            JoshDoesIT
+          </a>
+          .
+        </p>
       </footer>
     </div>
   )

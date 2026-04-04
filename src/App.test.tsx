@@ -3,7 +3,7 @@ import { App } from './App'
 
 describe('App', () => {
   beforeEach(() => {
-    localStorage.setItem('covrd-onboarding-complete', 'true')
+    window.location.hash = 'app'
   })
   it('renders the AppShell with sidebar navigation', async () => {
     render(<App />)
@@ -23,6 +23,7 @@ describe('App', () => {
 
   it('displays the Covrd brand', async () => {
     render(<App />)
-    expect(await screen.findByText(/Covr/)).toBeInTheDocument()
+    const logos = await screen.findAllByAltText('Covrd')
+    expect(logos.length).toBeGreaterThanOrEqual(1)
   })
 })

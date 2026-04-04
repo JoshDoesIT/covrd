@@ -18,9 +18,9 @@ describe('AppShell', () => {
     expect(screen.getByRole('main')).toBeInTheDocument()
   })
 
-  it('displays the Covrd wordmark in the sidebar', () => {
+  it('displays the Covrd logo in the sidebar', () => {
     render(<AppShell />)
-    expect(screen.getByText(/Covr/)).toBeInTheDocument()
+    expect(screen.getAllByAltText('Covrd').length).toBeGreaterThanOrEqual(1)
   })
 
   it('renders navigation items', () => {
@@ -28,7 +28,7 @@ describe('AppShell', () => {
     expect(screen.getAllByText('Employees').length).toBeGreaterThanOrEqual(1)
     expect(screen.getByText('Coverage')).toBeInTheDocument()
     expect(screen.getAllByText('Schedule').length).toBeGreaterThanOrEqual(1)
-    expect(screen.getByText('Templates')).toBeInTheDocument()
+    expect(screen.getByText('Knowledge')).toBeInTheDocument()
   })
 
   it('highlights the active navigation item', () => {

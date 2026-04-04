@@ -1,18 +1,27 @@
 import { useState } from 'react'
-import { Sparkles, CalendarDays, RefreshCw, XCircle, Undo2, Redo2 } from 'lucide-react'
+import {
+  Sparkles,
+  CalendarDays,
+  RefreshCw,
+  XCircle,
+  Undo2,
+  Redo2,
+  ChevronLeft,
+  ChevronRight,
+} from 'lucide-react'
 import { useScheduleStore } from '../../stores/scheduleStore'
 import { useEmployeeStore } from '../../stores/employeeStore'
 import { useCoverageStore } from '../../stores/coverageStore'
 import { generateScheduleAsync } from '../../engine/worker/client'
 import { createSchedule, createShift } from '../../types/factories'
-import type { Shift, ShiftAssignment } from '../../types/index'
-import { useTemplateStore } from '../../stores/templateStore'
+import type { Shift, ShiftAssignment, DayOfWeek } from '../../types/index'
 import { WeeklyGrid } from './WeeklyGrid'
 import { TimelineGrid } from './TimelineGrid'
 import { CoverageHeatmap } from './CoverageHeatmap'
 import { FairnessChart } from './FairnessChart'
 import { ShareToolbar } from './ShareToolbar'
 import { readFileAsText, deserializeScheduleJSON } from '../../utils/exportSchedule'
+import { getNextMonday, formatWeekRange } from '../../utils/scheduleDates'
 import { EmptyState } from '../shared/EmptyState'
 import './ScheduleManager.css'
 
@@ -46,64 +55,80 @@ export function ScheduleManager() {
   } = useScheduleStore()
   const { employees } = useEmployeeStore()
   const { requirements } = useCoverageStore()
-  const { templates } = useTemplateStore()
 
   const [viewMode, setViewMode] = useState<ViewMode>('matrix')
+  const [activeWeekNumber, setActiveWeekNumber] = useState(0)
 
   const [isGenerating, setIsGenerating] = useState(false)
   const [progress, setProgress] = useState(0)
   const [errorStatus, setErrorStatus] = useState<string | null>(null)
 
-  const handleGenerate = async () => {
-    const pendingTemplateId = useScheduleStore.getState().pendingTemplateId
-    const template = pendingTemplateId ? templates.find((t) => t.id === pendingTemplateId) : null
+  // Format initial date as YYYY-MM-DD string for HTML input
+  const [targetStartDate, setTargetStartDate] = useState(() => {
+    const d = getNextMonday()
+    // Avoid UTC timezone shifting when formatting as string
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  })
 
-    if (employees.length === 0 || (!template && requirements.length === 0)) {
-      alert('You must configure at least 1 employee and 1 coverage requirement first.')
+  const [isConfirmingGenerate, setIsConfirmingGenerate] = useState(false)
+
+  const handleGenerateClick = () => {
+    if (employees.length === 0 || requirements.length === 0) {
+      setErrorStatus('You must configure at least 1 employee and 1 coverage requirement first.')
       return
     }
 
-    // Clear pending template flag once we begin
-    useScheduleStore.getState().setPendingTemplateId(null)
+    if (activeSchedule && activeSchedule.assignments.length > 0) {
+      setIsConfirmingGenerate(true)
+      return
+    }
 
+    executeGenerate()
+  }
+
+  const executeGenerate = async () => {
     setIsGenerating(true)
     setProgress(0)
     setErrorStatus(null)
 
-    let generatedShifts: Shift[] = []
-    let totalWeeks = 1
+    const baseDate = new Date(`${targetStartDate}T00:00:00`)
+    const actualStartMonday = getNextMonday(baseDate)
+    const baseMs = actualStartMonday.getTime()
 
-    if (template) {
-      // Epic 5: Multi-week schedule expansion
-      if (template.pattern.kind === 'biweekly') totalWeeks = 2
-      else if (template.pattern.kind === 'rotation')
-        totalWeeks = template.pattern.cycleLength || 4 // default 4 if empty
-      else if (template.pattern.kind === 'monthly') totalWeeks = 4
+    const totalWeeks = 4
+    const generatedShifts: Shift[] = []
 
-      for (let w = 0; w < totalWeeks; w++) {
-        const weeklyOffsetShifts = template.coverageRequirements.map((r) =>
-          createShift({
-            day: r.day,
-            startTime: r.startTime,
-            endTime: r.endTime,
-            requiredStaff: r.requiredStaff,
-            weekNumber: w, // assign the explicit week instance
-          }),
-        )
-        generatedShifts.push(...weeklyOffsetShifts)
-      }
-    } else {
-      // Epic 4 fallback (1 week from manual baseline requirements)
-      generatedShifts = requirements.map((r) =>
-        createShift({
-          day: r.day,
+    // Find all requirements that fall within our 4-week target generation window
+    requirements.forEach((r) => {
+      const shiftDate = new Date(`${r.date}T00:00:00`)
+      const dayDiff = Math.round((shiftDate.getTime() - baseMs) / (1000 * 60 * 60 * 24))
+      const weekNumber = Math.floor(dayDiff / 7)
+
+      // If it falls within the 4-week window we are generating
+      if (weekNumber >= 0 && weekNumber < totalWeeks) {
+        // Map native Date day (0=Sun, 1=Mon) to our DAY_MAP integer if needed,
+        // Wait, Engine expects dayOfWeek 0-6 where 0=Monday (our DayOfWeek enum).
+        // native getDay() is 0=Sun. Our DAY_MAP: Monday=0, Tuesday=1 ... Sunday=6
+        // Let's deduce dayOfWeek from dayDiff
+        // dayDiff is 0-based from Monday (since baseDate is always a Monday).
+        // DAY_MAP uses Sunday=0, Monday=1. Shift by +1 to align.
+        const dayOfWeek = ((dayDiff % 7) + 1) % 7
+
+        const shift = createShift({
+          day:
+            (Object.keys(DAY_MAP).find(
+              (k) => DAY_MAP[k as keyof typeof DAY_MAP] === dayOfWeek,
+            ) as DayOfWeek) || 'monday',
           startTime: r.startTime,
           endTime: r.endTime,
           requiredStaff: r.requiredStaff,
-          weekNumber: 0,
-        }),
-      )
-    }
+          weekNumber,
+          role: r.role,
+          unpaidBreakMinutes: r.unpaidBreakMinutes,
+        })
+        generatedShifts.push(shift)
+      }
+    })
 
     // MAP TO ENGINE DTOs
     const engineEmployees: EngineEmployee[] = employees.map((e) => ({
@@ -127,16 +152,20 @@ export function ScheduleManager() {
     generatedShifts.forEach((s) => {
       const startH = parseInt(s.startTime.split(':')[0], 10)
       const endH = parseInt(s.endTime.split(':')[0], 10)
-      const duration = endH > startH ? endH - startH : 24 - startH + endH
+      let duration = endH > startH ? endH - startH : 24 - startH + endH
 
-      // Expand requiredStaff to individual engine shifts
+      if (s.unpaidBreakMinutes) {
+        duration -= s.unpaidBreakMinutes / 60
+      }
+
       for (let i = 0; i < s.requiredStaff; i++) {
         engineShifts.push({
           id: `${s.id}-${i}`,
           dayOfWeek: DAY_MAP[s.day] ?? 0,
+          weekNumber: s.weekNumber ?? 0,
           start: s.startTime,
           end: s.endTime,
-          role: 'any',
+          role: s.role || 'any',
           durationHours: duration,
           isAssigned: false,
         })
@@ -145,25 +174,31 @@ export function ScheduleManager() {
 
     try {
       const result = await generateScheduleAsync(engineEmployees, engineShifts, (p) => {
-        setProgress(Math.round(p * 100))
+        setProgress(Math.round(p))
       })
 
       // Convert engine result assignments to UI format
+      // Engine shift IDs are "${baseShiftId}-${expansionIndex}" — strip the last "-N" suffix
       const finalAssignments: ShiftAssignment[] = result.assignedShifts
         .filter((s) => s.employeeId)
         .map((a) => ({
           id: crypto.randomUUID(),
-          shiftId: a.id.split('-')[0], // Extract base shift ID from expanded suffix
+          shiftId: a.id.substring(0, a.id.lastIndexOf('-')),
           employeeId: a.employeeId!,
           isManual: false,
         }))
 
+      // Ensure the start date behaves as local-time midnight
+      const baseDate = new Date(`${targetStartDate}T00:00:00`)
+      // Pass the explicit date to getNextMonday to enforce Monday alignment securely
+      const actualStartMonday = getNextMonday(baseDate)
+
       const newSchedule = createSchedule({
-        name: template
-          ? `Generated from ${template.name}`
-          : `Auto Generated - Week of ${new Date().toLocaleDateString()}`,
-        startDate: new Date().toISOString(),
-        endDate: new Date(Date.now() + totalWeeks * 7 * 24 * 60 * 60 * 1000).toISOString(),
+        name: 'Standard Schedule',
+        startDate: actualStartMonday.toISOString(),
+        endDate: new Date(
+          actualStartMonday.getTime() + totalWeeks * 7 * 24 * 60 * 60 * 1000,
+        ).toISOString(),
         shifts: generatedShifts,
         assignments: finalAssignments,
         qualityScore: result.success ? 100 : 0,
@@ -171,6 +206,7 @@ export function ScheduleManager() {
       })
 
       setActiveSchedule(newSchedule)
+      setActiveWeekNumber(0)
     } catch (err: unknown) {
       setErrorStatus(err instanceof Error ? err.message : 'Solver Engine Failed')
     } finally {
@@ -178,36 +214,40 @@ export function ScheduleManager() {
     }
   }
 
+  const totalWeeksInSchedule = activeSchedule
+    ? Math.ceil(
+        (new Date(activeSchedule.endDate).getTime() -
+          new Date(activeSchedule.startDate).getTime()) /
+          (7 * 24 * 60 * 60 * 1000),
+      ) || 1
+    : 1
+
   return (
     <div className="schedule-manager">
       <header className="sm-header">
-        <div>
-          <h2 className="sm-title">
-            <CalendarDays size={20} color="var(--primary)" />
-            Schedule Builder
-          </h2>
-          <p className="sm-subtitle">Interactive visualization and solver dispatch.</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div>
+            <h2 className="sm-title">
+              <CalendarDays size={20} color="var(--color-accent)" />
+              Schedule Builder
+            </h2>
+            <p className="sm-subtitle">Interactive visualization and solver dispatch.</p>
+          </div>
+
+          {/* Pagination moved to input zone */}
         </div>
         <div className="sm-actions">
           {activeSchedule && (
             <>
-              <div
-                className="sm-view-toggle"
-                style={{
-                  display: 'flex',
-                  gap: '0.5rem',
-                  marginRight: '1rem',
-                  alignItems: 'center',
-                }}
-              >
+              <div className="sm-view-toggle">
                 <button
-                  className={`sm-btn-ghost ${viewMode === 'matrix' ? 'active' : ''}`}
+                  className={`sm-view-btn ${viewMode === 'matrix' ? 'sm-view-btn--active' : ''}`}
                   onClick={() => setViewMode('matrix')}
                 >
                   Matrix
                 </button>
                 <button
-                  className={`sm-btn-ghost ${viewMode === 'timeline' ? 'active' : ''}`}
+                  className={`sm-view-btn ${viewMode === 'timeline' ? 'sm-view-btn--active' : ''}`}
                   onClick={() => setViewMode('timeline')}
                 >
                   Timeline
@@ -266,6 +306,7 @@ export function ScheduleManager() {
                 state={{
                   employees,
                   coverageRequirements: requirements,
+
                   schedule: activeSchedule,
                 }}
                 onImport={async (file) => {
@@ -280,23 +321,162 @@ export function ScheduleManager() {
               />
             </>
           )}
-          <button className="sm-btn-generate" onClick={handleGenerate} disabled={isGenerating}>
-            {isGenerating ? (
-              <RefreshCw size={16} className="lucide-spin" />
-            ) : (
-              <Sparkles size={16} />
-            )}
-            {isGenerating ? 'Solving...' : 'Automagic Schedule'}
-          </button>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <label
+                htmlFor="sm-start-date"
+                style={{
+                  fontSize: '0.7rem',
+                  color: 'var(--color-text-muted)',
+                  marginBottom: '0.1rem',
+                  paddingLeft: '2px',
+                }}
+              >
+                Start Week (Mon)
+              </label>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <button
+                  className="sm-btn-ghost"
+                  style={{ padding: '0.2rem', marginRight: '0.25rem' }}
+                  onClick={() => {
+                    const d = new Date(`${targetStartDate}T00:00:00`)
+                    d.setDate(d.getDate() - 7)
+                    setTargetStartDate(
+                      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
+                    )
+                  }}
+                  title="Previous Week"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <input
+                  id="sm-start-date"
+                  type="date"
+                  value={targetStartDate}
+                  onChange={(e) => {
+                    const val = e.target.value
+                    if (!val) return
+                    // Enforce Monday selection visually if they typed it manually
+                    const d = new Date(`${val}T00:00:00`)
+                    if (d.getDay() !== 1) {
+                      // Snap to the Monday
+                      const nextMon = getNextMonday(d)
+                      setTargetStartDate(
+                        `${nextMon.getFullYear()}-${String(nextMon.getMonth() + 1).padStart(2, '0')}-${String(nextMon.getDate()).padStart(2, '0')}`,
+                      )
+                    } else {
+                      setTargetStartDate(val)
+                    }
+                  }}
+                  style={{
+                    background: 'var(--color-bg-elevated)',
+                    color: 'var(--color-text-primary)',
+                    border: '1px solid var(--color-border)',
+                    padding: '0.4rem 0.5rem',
+                    borderRadius: 'var(--radius-lg)',
+                    fontSize: '0.85rem',
+                  }}
+                />
+                <button
+                  className="sm-btn-ghost"
+                  style={{ padding: '0.2rem', marginLeft: '0.25rem' }}
+                  onClick={() => {
+                    const d = new Date(`${targetStartDate}T00:00:00`)
+                    d.setDate(d.getDate() + 7)
+                    setTargetStartDate(
+                      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
+                    )
+                  }}
+                  title="Next Week"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            </div>
+
+            <button
+              className="sm-btn-generate"
+              onClick={handleGenerateClick}
+              disabled={isGenerating}
+            >
+              {isGenerating ? (
+                <RefreshCw size={16} className="lucide-spin" />
+              ) : (
+                <Sparkles size={28} />
+              )}
+              {isGenerating ? 'Solving...' : 'Automagic Schedule'}
+            </button>
+          </div>
         </div>
       </header>
 
       <div className="sm-content">
+        {isConfirmingGenerate && (
+          <div className="sm-overlay" style={{ backgroundColor: 'rgba(0,0,0,0.85)' }}>
+            <div
+              style={{
+                background: 'var(--color-bg-elevated)',
+                border: '1px solid var(--color-border)',
+                padding: '2rem',
+                borderRadius: 'var(--radius-lg)',
+                maxWidth: 400,
+                textAlign: 'center',
+                boxShadow:
+                  '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.2)',
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+                <div
+                  style={{
+                    background: 'rgba(239, 68, 68, 0.1)',
+                    padding: '1rem',
+                    borderRadius: '50%',
+                  }}
+                >
+                  <XCircle size={32} color="#ef4444" />
+                </div>
+              </div>
+              <h3 style={{ color: 'var(--color-text-primary)', marginTop: 0 }}>
+                Replace Schedule?
+              </h3>
+              <p
+                style={{ color: 'var(--color-text-muted)', fontSize: '0.95rem', lineHeight: '1.5' }}
+              >
+                This will overwrite your currently active schedule with a brand new mathematically
+                optimized layout. Are you super sure you want to proceed?
+              </p>
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '1rem',
+                  justifyContent: 'center',
+                  marginTop: '2rem',
+                }}
+              >
+                <button className="sm-btn-ghost" onClick={() => setIsConfirmingGenerate(false)}>
+                  Cancel
+                </button>
+                <button
+                  className="sm-btn-generate"
+                  style={{ background: '#ef4444' }}
+                  onClick={() => {
+                    setIsConfirmingGenerate(false)
+                    executeGenerate()
+                  }}
+                >
+                  Yes, Replace It
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {isGenerating && (
           <div className="sm-overlay">
             <Sparkles
               size={48}
-              color="var(--primary)"
+              color="var(--color-accent)"
               className="lucide-spin"
               style={{ animationDuration: '3s' }}
             />
@@ -331,19 +511,23 @@ export function ScheduleManager() {
               style={{
                 padding: '1rem',
                 background: 'rgba(255,255,255,0.02)',
-                borderBottom: '1px solid var(--border)',
+                borderBottom: '1px solid var(--color-border)',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
               }}
             >
               <div>
-                <h3 style={{ color: 'var(--text-base)', margin: 0 }}>{activeSchedule.name}</h3>
+                <h3 style={{ color: 'var(--color-text-primary)', margin: 0 }}>
+                  {activeSchedule.name.startsWith('Auto Generated')
+                    ? 'Weekly Schedule'
+                    : activeSchedule.name}
+                </h3>
                 <p
                   style={{
                     margin: '0.25rem 0 0 0',
                     fontSize: '0.8rem',
-                    color: 'var(--text-muted)',
+                    color: 'var(--color-text-muted)',
                   }}
                 >
                   Generated {activeSchedule.assignments.length} assignments.
@@ -353,6 +537,58 @@ export function ScheduleManager() {
                     </span>
                   )}
                 </p>
+              </div>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <h4 style={{ margin: 0, color: 'var(--color-primary)', whiteSpace: 'nowrap' }}>
+                  Week {activeWeekNumber + 1}{' '}
+                  <span
+                    style={{
+                      opacity: 0.6,
+                      fontSize: '0.9em',
+                      marginLeft: '0.5rem',
+                      color: 'var(--color-text-muted)',
+                    }}
+                  >
+                    ({formatWeekRange(activeSchedule.startDate, activeWeekNumber)})
+                  </span>
+                </h4>
+
+                {totalWeeksInSchedule > 1 && (
+                  <div style={{ display: 'flex', gap: '0.25rem' }}>
+                    <button
+                      className="sm-btn-ghost"
+                      onClick={() => setActiveWeekNumber(Math.max(0, activeWeekNumber - 1))}
+                      disabled={activeWeekNumber <= 0}
+                      title="Previous Week"
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
+                    <span
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        fontSize: '0.85rem',
+                        color: 'var(--color-text-muted)',
+                        padding: '0 0.5rem',
+                      }}
+                    >
+                      {activeWeekNumber + 1} of {totalWeeksInSchedule}
+                    </span>
+                    <button
+                      className="sm-btn-ghost"
+                      onClick={() =>
+                        setActiveWeekNumber(
+                          Math.min(totalWeeksInSchedule - 1, activeWeekNumber + 1),
+                        )
+                      }
+                      disabled={activeWeekNumber >= totalWeeksInSchedule - 1}
+                      title="Next Week"
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -374,36 +610,18 @@ export function ScheduleManager() {
               </div>
             )}
 
-            {viewMode === 'matrix' ? (
-              <div
-                className="scroll-matrix-wrapper"
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '3rem',
-                  padding: '1rem',
-                  overflowY: 'auto',
-                }}
-              >
-                {Array.from({
-                  length:
-                    Math.ceil(
-                      (new Date(activeSchedule.endDate).getTime() -
-                        new Date(activeSchedule.startDate).getTime()) /
-                        (7 * 24 * 60 * 60 * 1000),
-                    ) || 1,
-                }).map((_, i) => (
-                  <div key={i} className="weekly-block">
-                    <h4 style={{ margin: '0 0 1rem 0', color: 'var(--text-muted)' }}>
-                      Week {i + 1}
-                    </h4>
-                    <WeeklyGrid weekNumber={i} />
-                  </div>
-                ))}
+            <div className="scroll-matrix-wrapper" style={{ overflowY: 'auto' }}>
+              <div className="weekly-block">
+                {viewMode === 'matrix' ? (
+                  <WeeklyGrid weekNumber={activeWeekNumber} startDate={activeSchedule.startDate} />
+                ) : (
+                  <TimelineGrid
+                    weekNumber={activeWeekNumber}
+                    startDate={activeSchedule.startDate}
+                  />
+                )}
               </div>
-            ) : (
-              <TimelineGrid />
-            )}
+            </div>
 
             <div
               className="schedule-analytics"
@@ -414,8 +632,8 @@ export function ScheduleManager() {
                 padding: '2rem',
               }}
             >
-              <CoverageHeatmap />
-              <FairnessChart />
+              <CoverageHeatmap activeWeekNumber={activeWeekNumber} />
+              <FairnessChart activeWeekNumber={activeWeekNumber} />
             </div>
           </div>
         ) : (
@@ -427,7 +645,7 @@ export function ScheduleManager() {
                 description="Trigger the solver engine to generate a mathematically optimized schedule based on your coverage requirements and employee constraints."
                 icon={<Sparkles size={32} opacity={0.5} />}
                 ctaLabel="Automagic Schedule"
-                onCtaClick={handleGenerate}
+                onCtaClick={handleGenerateClick}
               />
             </div>
           )

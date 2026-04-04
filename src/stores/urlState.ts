@@ -106,6 +106,66 @@ export function generateShareUrl(state: ShareableState): string {
 }
 
 /**
+ * Generate a highly-optimized shareable URL specifically for QR codes.
+ * Strips all unnecessary configuration data (availability, restrictions, etc.)
+ * leaving only the bare minimum needed to visually render the schedule.
+ * This guarantees the QR code stays within the physical 2.9KB limit.
+ */
+export function generateOptimizedQrUrl(state: ShareableState): string {
+  // Translate long hex UUIDs into sequential Base36 integers ('1', '2', ..., 'a', 'b')
+  // This allows gzip to massively compress the JSON compared to high-entropy UUIDs
+  let nextId = 1
+  const idMap = new Map<string, string>()
+  const getId = (uuid: string) => {
+    if (!uuid) return uuid
+    if (!idMap.has(uuid)) {
+      idMap.set(uuid, (nextId++).toString(36))
+    }
+    return idMap.get(uuid)!
+  }
+
+  const optimizedState: ShareableState = {
+    ...state,
+    // Drop all requirements
+    coverageRequirements: [],
+    // Strip employee metadata that is only needed for building a schedule, not viewing it
+    employees: state.employees.map((emp) => ({
+      ...emp,
+      id: getId(emp.id),
+      availability: [],
+      restrictions: [],
+      preferredTimes: [],
+      maxHoursPerWeek: 0,
+      minHoursPerWeek: 0,
+      preferredShiftsPerWeek: null,
+      createdAt: '',
+      updatedAt: '',
+    })),
+    // Map schedule and its deeply nested IDs
+    schedule: {
+      ...state.schedule,
+      id: getId(state.schedule.id),
+      unfilledShiftIds: [],
+      shifts: state.schedule.shifts.map((s) => ({
+        ...s,
+        id: getId(s.id),
+      })),
+      assignments: state.schedule.assignments.map((a) => ({
+        ...a,
+        id: getId(a.id),
+        shiftId: getId(a.shiftId),
+        employeeId: getId(a.employeeId),
+      })),
+    },
+  }
+
+  const hash = encodeStateToHash(optimizedState)
+  const origin =
+    typeof window !== 'undefined' ? window.location.origin + window.location.pathname : ''
+  return `${origin}#${hash}`
+}
+
+/**
  * Attempt to hydrate application state from the current URL hash fragment.
  *
  * Returns null if no hash is present or if the hash is invalid.

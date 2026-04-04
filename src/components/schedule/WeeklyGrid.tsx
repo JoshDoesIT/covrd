@@ -1,10 +1,13 @@
 import React, { useMemo } from 'react'
-import { DndContext, useDraggable, useDroppable, closestCenter } from '@dnd-kit/core'
+import { DndContext, useDraggable, useDroppable, pointerWithin } from '@dnd-kit/core'
 import type { DragEndEvent } from '@dnd-kit/core'
 import { useScheduleStore } from '../../stores/scheduleStore'
 import { useEmployeeStore } from '../../stores/employeeStore'
+import { useSettingsStore } from '../../stores/settingsStore'
 import { DAYS_OF_WEEK } from '../../types/index'
 import type { Shift, Employee } from '../../types/index'
+import { formatTime } from '../../utils/formatTime'
+import { formatDayHeader, formatWeekRange } from '../../utils/scheduleDates'
 import './WeeklyGrid.css'
 
 export const DraggableShift = React.memo(function DraggableShift({
@@ -18,6 +21,8 @@ export const DraggableShift = React.memo(function DraggableShift({
 }) {
   const assignmentId = isAssigned && employee ? `${shift.id}__${employee.id}` : shift.id
 
+  const { timeFormat } = useSettingsStore()
+
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: assignmentId,
     data: { shift, employee, isAssigned },
@@ -26,11 +31,14 @@ export const DraggableShift = React.memo(function DraggableShift({
   const style = transform
     ? {
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-        borderColor: employee ? employee.color : 'var(--primary)',
+        borderColor: employee ? employee.color : '#ef4444',
+        backgroundColor: employee ? `${employee.color}15` : 'rgba(239, 68, 68, 0.1)',
         boxShadow: employee ? `inset 4px 0 0 ${employee.color}` : 'inset 4px 0 0 #ef4444',
+        zIndex: 50,
       }
     : {
-        borderColor: employee ? employee.color : 'var(--border)',
+        borderColor: employee ? `${employee.color}50` : 'rgba(239, 68, 68, 0.3)',
+        backgroundColor: employee ? `${employee.color}15` : 'rgba(239, 68, 68, 0.1)',
         boxShadow: employee ? `inset 4px 0 0 ${employee.color}` : 'inset 4px 0 0 #ef4444',
       }
 
@@ -44,7 +52,7 @@ export const DraggableShift = React.memo(function DraggableShift({
       data-dragging={isDragging}
     >
       <div className="wg-shift-time">
-        {shift.startTime} - {shift.endTime}
+        {formatTime(shift.startTime, timeFormat)} - {formatTime(shift.endTime, timeFormat)}
       </div>
     </div>
   )
@@ -64,12 +72,18 @@ export const DroppableCell = React.memo(function DroppableCell({
   })
 
   return (
-    <div ref={setNodeRef} className="wg-cell" data-is-over={isOver}>
+    <td ref={setNodeRef} className="wg-cell" data-is-over={isOver}>
       {children}
-    </div>
+    </td>
   )
 })
-export function WeeklyGrid({ weekNumber = 0 }: { weekNumber?: number }) {
+export function WeeklyGrid({
+  weekNumber = 0,
+  startDate,
+}: {
+  weekNumber?: number
+  startDate?: string
+}) {
   const { activeSchedule, setActiveSchedule } = useScheduleStore()
   const { employees } = useEmployeeStore()
 
@@ -108,9 +122,11 @@ export function WeeklyGrid({ weekNumber = 0 }: { weekNumber?: number }) {
       isAssigned: boolean
     }
 
-    // over.id is the droppable cell e.g., "unassigned-monday" or "empId-tuesday"
+    // over.id is the droppable cell e.g., "unassigned-monday" or "demo-emp-1-tuesday"
+    // Employee IDs contain hyphens, so we split on the LAST hyphen to separate empId from day
     const overId = String(over.id)
-    const [targetType] = overId.split('-') // e.g. "unassigned" or employeeId
+    const lastDash = overId.lastIndexOf('-')
+    const targetEmployeeId = overId.substring(0, lastDash) // "unassigned" or full employee ID
 
     if (!draggedData) return
 
@@ -127,16 +143,16 @@ export function WeeklyGrid({ weekNumber = 0 }: { weekNumber?: number }) {
     }
 
     // If dropped onto an employee cell, add the new assignment
-    if (targetType !== 'unassigned') {
+    if (targetEmployeeId !== 'unassigned') {
       // Don't allow assigning the same employee to the same shift twice
       const alreadyAssigned = newAssignments.some(
-        (a) => a.shiftId === shiftId && a.employeeId === targetType,
+        (a) => a.shiftId === shiftId && a.employeeId === targetEmployeeId,
       )
       if (!alreadyAssigned) {
         newAssignments.push({
           id: crypto.randomUUID(),
           shiftId: shiftId,
-          employeeId: targetType,
+          employeeId: targetEmployeeId,
           isManual: true,
         })
       }
@@ -164,101 +180,135 @@ export function WeeklyGrid({ weekNumber = 0 }: { weekNumber?: number }) {
   if (!activeSchedule) return null
 
   return (
-    <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+    <DndContext collisionDetection={pointerWithin} onDragEnd={handleDragEnd}>
       <div className="wg-wrapper">
-        <div className="wg-grid">
-          {/* Top-Left Empty Corner */}
-          <div className="wg-header-cell wg-corner">Roster</div>
-
-          {/* Column Headers (Days) */}
-          {DAYS_OF_WEEK.map((day) => (
-            <div key={day} className="wg-header-cell">
-              {day}
-            </div>
-          ))}
-
-          {/* Unassigned Pool Row */}
-          <div className="wg-row-label wg-unassigned-pool">
-            <span className="wg-emp-name">Unassigned / Need Staff</span>
-            <span className="wg-emp-target">Pending fulfilling</span>
-          </div>
-
-          {DAYS_OF_WEEK.map((day) => {
-            const dayShifts = shiftsByDay.get(day) ?? []
-            // render shifts that still need staff
-            const neededShifts: Shift[] = []
-
-            dayShifts.forEach((shift) => {
-              const assignedCount = assignmentsByShift.get(shift.id)?.length ?? 0
-              if (assignedCount < shift.requiredStaff) {
-                // If it needs 3 staff but has 1, render 2 draggable tiles!
-                // Wait, if it has a unique shift ID from the expanded generator,
-                // each shift only has requiredStaff=1 inherently, so we just check if it has 0 assignments.
-                if (assignedCount === 0) {
-                  neededShifts.push(shift)
-                }
-              }
-            })
-
-            return (
-              <DroppableCell key={`unassigned-${day}`} id={`unassigned-${day}`} day={day}>
-                {neededShifts.map((s) => (
-                  <DraggableShift key={`pool-${s.id}`} shift={s} isAssigned={false} />
-                ))}
-              </DroppableCell>
-            )
-          })}
-
-          {/* Employee Rows */}
-          {employees.map((emp) => {
-            // Calculate assigned hours this week for display
-            const assignedShifts = activeSchedule.assignments
-              .filter((a) => a.employeeId === emp.id)
-              .map((a) => activeSchedule.shifts.find((s) => s.id === a.shiftId))
-              .filter(Boolean) as Shift[]
-
-            let totalHours = 0
-            assignedShifts.forEach((s) => {
-              const st = parseInt(s.startTime.split(':')[0], 10)
-              const et = parseInt(s.endTime.split(':')[0], 10)
-              totalHours += et > st ? et - st : 24 - st + et
-            })
-
-            return (
-              <React.Fragment key={emp.id}>
-                <div className="wg-row-label">
-                  <span className="wg-emp-name">{emp.name}</span>
-                  <span
-                    className="wg-emp-target"
-                    style={{ color: totalHours > emp.maxHoursPerWeek ? '#ef4444' : undefined }}
-                  >
-                    {totalHours}h / {emp.maxHoursPerWeek}h
+        <table className="wg-grid">
+          {/* Print Table Header Group */}
+          <thead className="wg-print-thead">
+            {/* Print-only Document Title */}
+            <tr className="wg-print-row-group wg-print-title-row" style={{ display: 'none' }}>
+              <th
+                className="wg-header-cell"
+                colSpan={8}
+                style={{
+                  gridColumn: '1 / -1',
+                  textAlign: 'left',
+                  padding: '12px 6px',
+                  fontSize: '11pt',
+                  borderBottom: 'none',
+                  borderRight: 'none',
+                }}
+              >
+                <strong>
+                  {activeSchedule?.name || 'Weekly Schedule'} - Week {weekNumber + 1}
+                </strong>
+                {startDate && (
+                  <span style={{ marginLeft: '12px', fontWeight: 'normal' }}>
+                    ({formatWeekRange(startDate, weekNumber)})
                   </span>
-                </div>
+                )}
+              </th>
+            </tr>
 
-                {DAYS_OF_WEEK.map((day) => {
-                  const empDayShifts = activeSchedule.assignments
-                    .filter((a) => a.employeeId === emp.id)
-                    .map((a) => activeSchedule.shifts.find((s) => s.id === a.shiftId))
-                    .filter((s) => s?.day === day) as Shift[]
+            {/* Header Row Wrapper */}
+            <tr className="wg-print-row-group">
+              {/* Top-Left Empty Corner */}
+              <th className="wg-header-cell wg-corner">Roster</th>
 
-                  return (
-                    <DroppableCell key={`${emp.id}-${day}`} id={`${emp.id}-${day}`} day={day}>
-                      {empDayShifts.map((s) => (
-                        <DraggableShift
-                          key={`assigned-${s.id}-${emp.id}`}
-                          shift={s}
-                          employee={emp}
-                          isAssigned={true}
-                        />
-                      ))}
-                    </DroppableCell>
-                  )
-                })}
-              </React.Fragment>
-            )
-          })}
-        </div>
+              {/* Column Headers (Days) */}
+              {DAYS_OF_WEEK.map((day) => (
+                <th key={day} className="wg-header-cell">
+                  {startDate ? formatDayHeader(startDate, weekNumber, day) : day}
+                </th>
+              ))}
+            </tr>
+          </thead>
+
+          {/* Print Table Body Group */}
+          <tbody className="wg-print-tbody">
+            {/* Unassigned Pool Wrapper */}
+            <tr className="wg-print-row-group">
+              <th className="wg-row-label wg-unassigned-pool">
+                <span className="wg-emp-name">Unassigned / Need Staff</span>
+                <span className="wg-emp-target">Pending fulfilling</span>
+              </th>
+
+              {DAYS_OF_WEEK.map((day) => {
+                const dayShifts = shiftsByDay.get(day) ?? []
+                // render shifts that still need staff
+                const neededShifts: Shift[] = []
+
+                dayShifts.forEach((shift) => {
+                  const assignedCount = assignmentsByShift.get(shift.id)?.length ?? 0
+                  if (assignedCount < shift.requiredStaff) {
+                    if (assignedCount === 0) {
+                      neededShifts.push(shift)
+                    }
+                  }
+                })
+
+                return (
+                  <DroppableCell key={`unassigned-${day}`} id={`unassigned-${day}`} day={day}>
+                    {neededShifts.map((s) => (
+                      <DraggableShift key={`pool-${s.id}`} shift={s} isAssigned={false} />
+                    ))}
+                  </DroppableCell>
+                )
+              })}
+            </tr>
+
+            {/* Employee Rows */}
+            {employees.map((emp) => {
+              // Calculate assigned hours EXACTLY for this week for display
+              const assignedShifts = activeSchedule.assignments
+                .filter((a) => a.employeeId === emp.id)
+                .map((a) => activeSchedule.shifts.find((s) => s.id === a.shiftId))
+                .filter((s) => s && (s.weekNumber || 0) === weekNumber) as Shift[]
+
+              let totalHours = 0
+              assignedShifts.forEach((s) => {
+                const st = parseInt(s.startTime.split(':')[0], 10)
+                const et = parseInt(s.endTime.split(':')[0], 10)
+                let duration = et > st ? et - st : 24 - st + et
+                if (s.unpaidBreakMinutes) {
+                  duration -= s.unpaidBreakMinutes / 60
+                }
+                totalHours += duration
+              })
+
+              return (
+                <tr className="wg-print-row-group" key={emp.id}>
+                  <th className="wg-row-label">
+                    <span className="wg-emp-name">{emp.name}</span>
+                    <span
+                      className="wg-emp-target"
+                      style={{ color: totalHours > emp.maxHoursPerWeek ? '#ef4444' : undefined }}
+                    >
+                      {totalHours}h / {emp.maxHoursPerWeek}h
+                    </span>
+                  </th>
+
+                  {DAYS_OF_WEEK.map((day) => {
+                    const empDayShifts = assignedShifts.filter((s) => s.day === day)
+
+                    return (
+                      <DroppableCell key={`${emp.id}-${day}`} id={`${emp.id}-${day}`} day={day}>
+                        {empDayShifts.map((s) => (
+                          <DraggableShift
+                            key={`assigned-${s.id}-${emp.id}`}
+                            shift={s}
+                            employee={emp}
+                            isAssigned={true}
+                          />
+                        ))}
+                      </DroppableCell>
+                    )
+                  })}
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       </div>
     </DndContext>
   )

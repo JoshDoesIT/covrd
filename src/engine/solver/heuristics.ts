@@ -14,8 +14,27 @@ export function sortShiftsByMRV(shifts: Shift[], candidateCounts: Map<string, nu
       return countA - countB // Ascending: smallest domains first
     }
 
-    // Tie-breaker: Longer shifts are generally harder to place than shorter ones
-    return b.durationHours - a.durationHours
+    // Tie-breaker 1: Chronological (Week -> Day -> Time)
+    // Building the schedule chronologically guarantees the "clumping" fairness heuristic
+    // operates correctly, as it evaluates "isolated gaps" based on past assignments.
+    if (a.weekNumber !== b.weekNumber) {
+      return a.weekNumber - b.weekNumber
+    }
+
+    // Normalize day to Monday=0, Sunday=6
+    const normDayA = a.dayOfWeek === 0 ? 6 : a.dayOfWeek - 1
+    const normDayB = b.dayOfWeek === 0 ? 6 : b.dayOfWeek - 1
+    if (normDayA !== normDayB) {
+      return normDayA - normDayB
+    }
+
+    if (a.start !== b.start) return a.start.localeCompare(b.start)
+
+    // Tie-breaker 2: Longer shifts are generally harder to place
+    if (a.durationHours !== b.durationHours) return b.durationHours - a.durationHours
+
+    // Deterministic final tie-breaker prevents fragile cross-browser search space deviations
+    return a.id.localeCompare(b.id)
   })
 }
 
@@ -25,18 +44,110 @@ export function sortShiftsByMRV(shifts: Shift[], candidateCounts: Map<string, nu
  * By assigning to them first, we balance the schedule and preserve
  * the hours of people who are close to hitting overtime.
  */
+function getAbsoluteDayIndex(weekNum: number, dayOfWeek: number): number {
+  // Our weeks start on Monday. DAY_MAP makes Sunday = 0, Monday = 1...
+  // Normalize so Monday = 0, Tuesday = 1, ..., Sunday = 6
+  const normalizedDay = dayOfWeek === 0 ? 6 : dayOfWeek - 1
+  return weekNum * 7 + normalizedDay
+}
+
+function getClumpingModifier(assignedDays: number[], targetDay: number): number {
+  if (assignedDays.length === 0) return 0
+
+  if (assignedDays.includes(targetDay)) return -2000
+
+  const proposedDays = [...new Set([...assignedDays, targetDay])].sort((a, b) => a - b)
+
+  let isolatedGaps = 0
+  let clusters = 1
+  for (let i = 1; i < proposedDays.length; i++) {
+    const diff = proposedDays[i] - proposedDays[i - 1]
+    if (diff > 1) clusters++
+    if (diff === 2) isolatedGaps++ // A diff of 2 means exactly 1 missing day (an isolated day off!)
+  }
+
+  const currentDays = [...new Set(assignedDays)].sort((a, b) => a - b)
+  let currentIsolatedGaps = 0
+  let currentClusters = 1
+  for (let i = 1; i < currentDays.length; i++) {
+    const diff = currentDays[i] - currentDays[i - 1]
+    if (diff > 1) currentClusters++
+    if (diff === 2) currentIsolatedGaps++
+  }
+
+  // If assigning this shift CREATES a new isolated gap, VETO it. This is the root cause of fragmented off-days.
+  if (isolatedGaps > currentIsolatedGaps) {
+    return -2000
+  }
+
+  // If assigning this shift CLOSES an isolated gap (e.g. they had [0, 2] and we assign 1), REWARD IT massively!
+  // This causes the solver to mathematically self-heal any fragmented schedules that were forced by limited staff availability
+  if (isolatedGaps < currentIsolatedGaps) {
+    return 2000
+  }
+
+  if (clusters < currentClusters) return 1000 // Bridging a larger gap into a single cluster
+  if (clusters === currentClusters) return 500 // Extending an existing contiguous block seamlessly
+  if (clusters > currentClusters) return -100 // Starting a new contiguous block (acceptable if gap > 1, but still worse than extending)
+
+  return 0
+}
+
+function getConsistencyModifier(assignedShifts: Shift[], targetShift: Shift): number {
+  if (assignedShifts.length === 0) return 0
+
+  // Check if they worked this exact day of the week in any OTHER week
+  const workedSameDayInOtherWeek = assignedShifts.some(
+    (s) => s.weekNumber !== targetShift.weekNumber && s.dayOfWeek === targetShift.dayOfWeek,
+  )
+
+  if (workedSameDayInOtherWeek) {
+    // Massive bonus to establish repeating schedules across multi-week horizons
+    return 600
+  }
+
+  return 0
+}
+
 export function sortCandidatesByFairness(
   candidates: Employee[],
-  currentHours: Map<string, number>,
+  hourTotals: Map<string, Map<number, number>>,
+  shiftToAssign: Shift,
+  assignments: Map<string, Shift[]>,
 ): Employee[] {
+  const targetDayIndex = getAbsoluteDayIndex(shiftToAssign.weekNumber, shiftToAssign.dayOfWeek)
+
   return [...candidates].sort((a, b) => {
-    const hoursA = currentHours.get(a.id) ?? 0
-    const deficitA = a.targetHours - hoursA
+    const empWeekMapA = hourTotals.get(a.id) ?? new Map<number, number>()
+    const hoursA = empWeekMapA.get(shiftToAssign.weekNumber) ?? 0
+    // Proportional deficit: normalize to 0-1 range so part-timers and full-timers
+    // compete fairly. A PT at 0/20hrs (100%) has equal priority to FT at 0/40hrs (100%).
+    const proportionalDeficitA = a.targetHours > 0 ? (a.targetHours - hoursA) / a.targetHours : 0
 
-    const hoursB = currentHours.get(b.id) ?? 0
-    const deficitB = b.targetHours - hoursB
+    const empWeekMapB = hourTotals.get(b.id) ?? new Map<number, number>()
+    const hoursB = empWeekMapB.get(shiftToAssign.weekNumber) ?? 0
+    const proportionalDeficitB = b.targetHours > 0 ? (b.targetHours - hoursB) / b.targetHours : 0
 
-    // Sort descending by deficit (largest deficit comes first)
-    return deficitB - deficitA
+    const assignedShiftsA = assignments.get(a.id) ?? []
+    const assignedDaysA = assignedShiftsA.map((s) => getAbsoluteDayIndex(s.weekNumber, s.dayOfWeek))
+    const clumpModifierA = getClumpingModifier(assignedDaysA, targetDayIndex)
+    const consistencyModifierA = getConsistencyModifier(assignedShiftsA, shiftToAssign)
+
+    const assignedShiftsB = assignments.get(b.id) ?? []
+    const assignedDaysB = assignedShiftsB.map((s) => getAbsoluteDayIndex(s.weekNumber, s.dayOfWeek))
+    const clumpModifierB = getClumpingModifier(assignedDaysB, targetDayIndex)
+    const consistencyModifierB = getConsistencyModifier(assignedShiftsB, shiftToAssign)
+
+    // Proportional deficit scaled to 1000 for integer-safe comparison with modifiers.
+    const scoreA = proportionalDeficitA * 1000 + clumpModifierA + consistencyModifierA
+    const scoreB = proportionalDeficitB * 1000 + clumpModifierB + consistencyModifierB
+
+    if (scoreA !== scoreB) {
+      // Higher score means they SHOULD be assigned first (descending)
+      return scoreB - scoreA
+    }
+
+    // Deterministic tie-breaker prevents fragile cross-browser search space deviations
+    return a.id.localeCompare(b.id)
   })
 }

@@ -2,7 +2,7 @@ import type { EngineEmployee as Employee, EngineShift as Shift } from '../types'
 import {
   isAvailableForShift,
   wouldExceedMaxHours,
-  hasOverlappingShift,
+  hasShiftOnSameDay,
   isEligibleForShift,
 } from './validators'
 
@@ -26,6 +26,7 @@ describe('Constraint Validators', () => {
 
   const mockShift: Shift = {
     id: 'shift-1',
+    weekNumber: 0,
     dayOfWeek: 1, // Monday
     start: '09:00',
     end: '17:00',
@@ -67,24 +68,42 @@ describe('Constraint Validators', () => {
     })
   })
 
-  describe('hasOverlappingShift', () => {
+  describe('hasShiftOnSameDay', () => {
     const existingShifts: Shift[] = [
-      { ...mockShift, id: 'shift-a', start: '08:00', end: '12:00', dayOfWeek: 1 },
+      { ...mockShift, id: 'shift-a', start: '08:00', end: '12:00', dayOfWeek: 1, weekNumber: 0 },
     ]
 
-    it('returns true if shift overlaps with existing assignments on same day', () => {
-      const newShift: Shift = { ...mockShift, start: '11:00', end: '15:00', dayOfWeek: 1 }
-      expect(hasOverlappingShift(newShift, existingShifts)).toBe(true)
+    it('returns true if another shift exists on the exact same day', () => {
+      const newShift: Shift = {
+        ...mockShift,
+        start: '16:00',
+        end: '18:00',
+        dayOfWeek: 1,
+        weekNumber: 0,
+      }
+      expect(hasShiftOnSameDay(newShift, existingShifts)).toBe(true)
     })
 
-    it('returns false if shift does not overlap on same day', () => {
-      const newShift: Shift = { ...mockShift, start: '13:00', end: '17:00', dayOfWeek: 1 }
-      expect(hasOverlappingShift(newShift, existingShifts)).toBe(false)
+    it('returns false if shift is on a different day', () => {
+      const newShift: Shift = {
+        ...mockShift,
+        start: '13:00',
+        end: '17:00',
+        dayOfWeek: 2,
+        weekNumber: 0,
+      }
+      expect(hasShiftOnSameDay(newShift, existingShifts)).toBe(false)
     })
 
-    it('returns false if shift overlaps in time but on a different day', () => {
-      const newShift: Shift = { ...mockShift, start: '11:00', end: '15:00', dayOfWeek: 2 }
-      expect(hasOverlappingShift(newShift, existingShifts)).toBe(false)
+    it('returns false if shift is on the same dayOfWeek but in a different week', () => {
+      const newShift: Shift = {
+        ...mockShift,
+        start: '11:00',
+        end: '15:00',
+        dayOfWeek: 1,
+        weekNumber: 1,
+      }
+      expect(hasShiftOnSameDay(newShift, existingShifts)).toBe(false)
     })
   })
 
@@ -93,7 +112,7 @@ describe('Constraint Validators', () => {
       expect(isEligibleForShift(mockEmployee, mockShift, [], 0)).toBe(true)
     })
 
-    it('resolves false if overlapping', () => {
+    it('resolves false if double-shifting on the same day', () => {
       const existing: Shift[] = [{ ...mockShift, start: '08:00', end: '12:00' }]
       expect(isEligibleForShift(mockEmployee, mockShift, existing, 0)).toBe(false)
     })
@@ -110,6 +129,11 @@ describe('Constraint Validators', () => {
     it('resolves false if role does not match', () => {
       const supportShift: Shift = { ...mockShift, role: 'CNA' }
       expect(isEligibleForShift(mockEmployee, supportShift, [], 0)).toBe(false)
+    })
+
+    it('resolves true if shift role is "any" wildcard regardless of employee role', () => {
+      const anyRoleShift: Shift = { ...mockShift, role: 'any' }
+      expect(isEligibleForShift(mockEmployee, anyRoleShift, [], 0)).toBe(true)
     })
   })
 })

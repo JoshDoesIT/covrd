@@ -5,7 +5,6 @@ import { hydrateFromHash } from './stores/urlState'
 import { useScheduleStore } from './stores/scheduleStore'
 import { useEmployeeStore } from './stores/employeeStore'
 import { useCoverageStore } from './stores/coverageStore'
-import { useTemplateStore } from './stores/templateStore'
 import { covrdDb } from './db/db'
 import { LandingPage } from './components/landing/LandingPage'
 import { PolicyModal } from './components/shared/PolicyModal'
@@ -22,7 +21,7 @@ const ONBOARDING_KEY = 'covrd-onboarding-complete'
  */
 export function App() {
   const [isAppLaunched, setIsAppLaunched] = useState(
-    () => window.location.search.includes('app') || localStorage.getItem(ONBOARDING_KEY) === 'true',
+    () => window.location.search.includes('app') || window.location.hash.includes('app'),
   )
   const [showOnboarding, setShowOnboarding] = useState(
     () => localStorage.getItem(ONBOARDING_KEY) !== 'true',
@@ -43,22 +42,26 @@ export function App() {
         window.history.replaceState(null, '', window.location.pathname)
       } else {
         // Otherwise, hydrate from local IndexedDB
-        const [employees, reqs, schedules, templates] = await Promise.all([
+        const [employees, reqs, schedules] = await Promise.all([
           covrdDb.employees.toArray(),
           covrdDb.coverageRequirements.toArray(),
           covrdDb.schedules.toArray(),
-          covrdDb.templates.toArray(),
         ])
 
         useEmployeeStore.getState().hydrate(employees)
         useCoverageStore.getState().hydrate(reqs)
         useScheduleStore.getState().hydrate(schedules)
-        useTemplateStore.getState().hydrate(templates)
       }
       setIsLoading(false)
     }
 
     initData()
+  }, [])
+
+  useEffect(() => {
+    const onLaunchTutorial = () => setShowOnboarding(true)
+    window.addEventListener('launch-tutorial', onLaunchTutorial)
+    return () => window.removeEventListener('launch-tutorial', onLaunchTutorial)
   }, [])
 
   const handleOnboardingComplete = () => {
@@ -73,8 +76,12 @@ export function App() {
     return (
       <>
         <LandingPage
-          onLaunch={() => setIsAppLaunched(true)}
+          onLaunch={() => {
+            window.location.hash = 'app'
+            setIsAppLaunched(true)
+          }}
           onShowPrivacy={() => setPolicyModal('privacy')}
+          onShowAccessibility={() => setPolicyModal('accessibility')}
         />
         <PolicyModal type={policyModal} onClose={() => setPolicyModal(null)} />
       </>

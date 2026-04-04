@@ -1,12 +1,16 @@
 import { useState, useRef } from 'react'
-import { Download, Upload, Printer, Link2, QrCode } from 'lucide-react'
+import { Download, Upload, Printer, Link2 } from 'lucide-react'
 import type { ShareableState } from '../../stores/urlState'
 import { generateShareUrl } from '../../stores/urlState'
+import { useScheduleStore } from '../../stores/scheduleStore'
+import { useEmployeeStore } from '../../stores/employeeStore'
+import { useSettingsStore } from '../../stores/settingsStore'
 import {
   serializeScheduleJSON,
   serializeScheduleCSV,
   downloadFile,
 } from '../../utils/exportSchedule'
+import { printSchedule } from '../../utils/printSchedule'
 import { Toast } from '../tooling/Toast'
 import './ShareToolbar.css'
 
@@ -27,9 +31,10 @@ interface ShareToolbarProps {
  */
 export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
   const [toastMessage, setToastMessage] = useState<string | null>(null)
-  const [showQr, setShowQr] = useState(false)
-  const [qrDataUrl, setQrDataUrl] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const { activeSchedule } = useScheduleStore()
+  const { employees } = useEmployeeStore()
+  const { timeFormat } = useSettingsStore()
 
   const handleExportJSON = () => {
     const json = serializeScheduleJSON(state)
@@ -57,7 +62,11 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
   }
 
   const handlePrint = () => {
-    window.print()
+    if (activeSchedule) {
+      printSchedule(activeSchedule, employees, timeFormat)
+    } else {
+      window.print()
+    }
   }
 
   const handleShareLink = async () => {
@@ -70,99 +79,71 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
     }
   }
 
-  const handleQrCode = async () => {
-    try {
-      const QRCode = await import('qrcode')
-      const url = generateShareUrl(state)
-      const dataUrl = await QRCode.toDataURL(url, { width: 256, margin: 2 })
-      setQrDataUrl(dataUrl)
-      setShowQr(true)
-    } catch {
-      setToastMessage('Failed to generate QR code')
-    }
-  }
-
   return (
     <div className="share-toolbar">
-      <button
-        className="sm-btn-ghost share-toolbar__btn"
-        onClick={handleExportJSON}
-        aria-label="Export JSON"
-        title="Export schedule as JSON"
-      >
-        <Download size={14} />
-        <span className="share-toolbar__label">Export JSON</span>
-      </button>
+      {/* Top Row */}
+      <div className="share-toolbar__row share-toolbar__row--top">
+        <button
+          className="sm-btn-ghost share-toolbar__btn"
+          onClick={handleImportClick}
+          aria-label="Import JSON"
+          title="Import schedule from JSON"
+        >
+          <Upload size={14} />
+          <span className="share-toolbar__label">Import JSON</span>
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".json"
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+          aria-hidden="true"
+        />
 
-      <button
-        className="sm-btn-ghost share-toolbar__btn"
-        onClick={handleExportCSV}
-        aria-label="Export CSV"
-        title="Export schedule as CSV"
-      >
-        <Download size={14} />
-        <span className="share-toolbar__label">Export CSV</span>
-      </button>
+        <button
+          className="sm-btn-ghost share-toolbar__btn"
+          onClick={handleExportJSON}
+          aria-label="Export JSON"
+          title="Export schedule as JSON"
+        >
+          <Download size={14} />
+          <span className="share-toolbar__label">Export JSON</span>
+        </button>
+      </div>
 
-      <button
-        className="sm-btn-ghost share-toolbar__btn"
-        onClick={handleImportClick}
-        aria-label="Import"
-        title="Import schedule from JSON"
-      >
-        <Upload size={14} />
-        <span className="share-toolbar__label">Import</span>
-      </button>
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".json"
-        onChange={handleFileChange}
-        style={{ display: 'none' }}
-        aria-hidden="true"
-      />
+      {/* Bottom Row */}
+      <div className="share-toolbar__row">
+        <button
+          className="sm-btn-ghost share-toolbar__btn"
+          onClick={handleExportCSV}
+          aria-label="Export CSV"
+          title="Export schedule as CSV"
+        >
+          <Download size={14} />
+          <span className="share-toolbar__label">Export CSV</span>
+        </button>
 
-      <button
-        className="sm-btn-ghost share-toolbar__btn"
-        onClick={handlePrint}
-        aria-label="Print"
-        title="Print schedule"
-      >
-        <Printer size={14} />
-        <span className="share-toolbar__label">Print</span>
-      </button>
+        <button
+          className="sm-btn-ghost share-toolbar__btn"
+          onClick={handlePrint}
+          aria-label="Print"
+          title="Print schedule"
+        >
+          <Printer size={14} />
+          <span className="share-toolbar__label">Print</span>
+        </button>
 
-      <button
-        className="sm-btn-ghost share-toolbar__btn"
-        onClick={handleShareLink}
-        aria-label="Share Link"
-        title="Copy share link to clipboard"
-      >
-        <Link2 size={14} />
-        <span className="share-toolbar__label">Share Link</span>
-      </button>
-
-      <button
-        className="sm-btn-ghost share-toolbar__btn"
-        onClick={handleQrCode}
-        aria-label="QR Code"
-        title="Generate QR code"
-      >
-        <QrCode size={14} />
-        <span className="share-toolbar__label">QR Code</span>
-      </button>
-
-      {showQr && qrDataUrl && (
-        <div className="share-toolbar__qr-overlay" onClick={() => setShowQr(false)}>
-          <div className="share-toolbar__qr-modal" onClick={(e) => e.stopPropagation()}>
-            <h3 className="share-toolbar__qr-title">Scan to open schedule</h3>
-            <img src={qrDataUrl} alt="QR code for schedule URL" className="share-toolbar__qr-img" />
-            <button className="sm-btn-ghost" onClick={() => setShowQr(false)}>
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+        <button
+          className="sm-btn-ghost share-toolbar__btn"
+          onClick={handleShareLink}
+          aria-label="Share Link"
+          title="Copy share link to clipboard"
+        >
+          <Link2 size={14} />
+          <span className="share-toolbar__label">Share Link</span>
+        </button>
+      </div>
 
       {toastMessage && <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} />}
     </div>

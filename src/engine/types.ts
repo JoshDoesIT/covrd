@@ -33,6 +33,7 @@ export interface EngineEmployee {
 export interface EngineShift {
   id: string
   dayOfWeek: number
+  weekNumber: number
   start: string
   end: string
   role: string

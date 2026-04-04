@@ -83,8 +83,8 @@ export function validateEmployee(employee: Employee): ValidationResult {
 export function validateCoverageRequirement(req: CoverageRequirement): ValidationResult {
   const errors: string[] = []
 
-  if (!req.name || req.name.trim().length === 0) {
-    errors.push('Name is required')
+  if (!req.date || !/^\d{4}-\d{2}-\d{2}$/.test(req.date)) {
+    errors.push('A valid ISO date (YYYY-MM-DD) is required')
   }
   if (req.requiredStaff < 1) {
     errors.push('Required staff must be at least 1')

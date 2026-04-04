@@ -12,10 +12,35 @@
   align-items: center;
 }
 
+.sm-template-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 1rem;
+  background: var(--color-accent-muted);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  color: var(--color-text-primary);
+  animation: banner-fade-in 0.3s ease;
+}
+
+@keyframes banner-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .sm-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--text-base);
+  color: var(--color-text-primary);
   margin: 0;
   display: flex;
   align-items: center;
@@ -24,7 +49,7 @@
 
 .sm-subtitle {
   font-size: 0.875rem;
-  color: var(--text-muted);
+  color: var(--color-text-muted);
   margin: 0.25rem 0 0 0;
 }
 
@@ -34,26 +59,94 @@
   gap: 1rem;
 }
 
+/* --- Automagic Schedule Button — Hero CTA --- */
 .sm-btn-generate {
+  --btn-glow: rgba(108, 92, 231, 0.5);
+  --btn-glow-strong: rgba(108, 92, 231, 0.8);
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  background: linear-gradient(135deg, var(--primary) 0%, rgba(168, 85, 247, 1) 100%);
-  color: var(--bg-card);
-  border: none;
-  border-radius: 8px;
-  padding: 0.625rem 1.25rem;
-  font-size: 0.875rem;
-  font-weight: 600;
+  gap: 0.6rem;
+  background: linear-gradient(
+    135deg,
+    var(--color-accent) 0%,
+    #a855f7 40%,
+    #6c5ce7 70%,
+    #8b5cf6 100%
+  );
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease infinite;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-xl);
+  padding: 0.7rem 1.5rem;
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.02em;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(168, 85, 247, 0.4);
-  transition: all 0.2s ease;
+  overflow: hidden;
+  box-shadow:
+    0 0 20px var(--btn-glow),
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transition:
+    transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.3s ease,
+    filter 0.2s ease;
+  z-index: 1;
+}
+
+/* Animated shimmer sweep across the button */
+.sm-btn-generate::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.15) 45%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0.15) 55%,
+    transparent 80%
+  );
+  transform: translateX(-100%);
+  animation: btn-shimmer 3s ease-in-out infinite;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Glow pulse halo behind the button */
+.sm-btn-generate::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  background: inherit;
+  border-radius: inherit;
+  filter: blur(14px);
+  opacity: 0.4;
+  z-index: -1;
+  animation: glow-pulse 3s ease-in-out infinite;
+  pointer-events: none;
 }
 
 .sm-btn-generate:hover:not(:disabled) {
-  opacity: 0.9;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(168, 85, 247, 0.6);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow:
+    0 0 30px var(--btn-glow-strong),
+    0 8px 24px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  filter: brightness(1.1);
+}
+
+.sm-btn-generate:active:not(:disabled) {
+  transform: translateY(0px) scale(0.98);
+  box-shadow:
+    0 0 12px var(--btn-glow),
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  filter: brightness(0.95);
+  transition-duration: 0.08s;
 }
 
 .sm-btn-generate:disabled {
@@ -61,8 +154,65 @@
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
-  background: var(--border);
-  color: var(--text-muted);
+  background: var(--color-border);
+  color: var(--color-text-muted);
+  border-color: transparent;
+  filter: none;
+  animation: none;
+}
+
+.sm-btn-generate:disabled::before,
+.sm-btn-generate:disabled::after {
+  display: none;
+}
+
+/* Sparkle icon idle bob */
+.sm-btn-generate .lucide-sparkles {
+  animation: sparkle-bob 2.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
+}
+
+@keyframes gradient-shift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes btn-shimmer {
+  0% {
+    transform: translateX(-120%);
+  }
+  60%,
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+@keyframes sparkle-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-1px) rotate(3deg);
+  }
+  75% {
+    transform: translateY(1px) rotate(-3deg);
+  }
 }
 
 .sm-btn-ghost {
@@ -70,8 +220,8 @@
   align-items: center;
   gap: 0.5rem;
   background: transparent;
-  color: var(--text-base);
-  border: 1px solid var(--border);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 0.625rem 1rem;
   font-size: 0.875rem;
@@ -84,12 +234,45 @@
   background: rgba(255, 255, 255, 0.05);
 }
 
+/* Premium Segmented Control */
+.sm-view-toggle {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 0.25rem;
+  margin-right: 1rem;
+}
+
+.sm-view-btn {
+  background: transparent;
+  color: var(--color-text-muted);
+  border: none;
+  padding: 0.35rem 1rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sm-view-btn:hover:not(.sm-view-btn--active) {
+  color: var(--color-text-primary);
+}
+
+.sm-view-btn--active {
+  background: var(--color-bg-surface);
+  color: var(--color-text-primary);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
 .sm-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   overflow: hidden;
   position: relative;
@@ -97,7 +280,7 @@
 
 /* Generation Overlay Overlay (Story 4.22) */
 .sm-overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(8px);
@@ -105,7 +288,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 50;
+  z-index: 9999;
   gap: 1.5rem;
 }
 
@@ -120,14 +303,14 @@
 
 .sm-progress-bar {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary), #d8b4fe);
+  background: linear-gradient(90deg, var(--color-accent), #d8b4fe);
   border-radius: 3px;
   transition: width 0.3s ease;
   width: 0%;
 }
 
 .sm-loading-text {
-  color: var(--text-base);
+  color: var(--color-text-primary);
   font-weight: 500;
   letter-spacing: 0.02em;
 }
@@ -139,7 +322,7 @@
   justify-content: center;
   flex: 1;
   gap: 1rem;
-  color: var(--text-muted);
+  color: var(--color-text-muted);
 }
 
 /* Base style for the grid that will be implemented next */
@@ -147,4 +330,35 @@
   flex: 1;
   overflow: auto;
   position: relative;
+  -webkit-overflow-scrolling: touch; /* Added for mobile UX */
+}
+
+/* --- Responsive --- */
+@media (max-width: 1024px) {
+  .sm-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .sm-actions {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    width: 100%;
+  }
+
+  .sm-view-toggle {
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .schedule-manager {
+    padding: 0.5rem;
+    gap: 1rem;
+  }
+
+  .schedule-analytics {
+    grid-template-columns: 1fr !important;
+  }
 }

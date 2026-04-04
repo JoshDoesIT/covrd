@@ -3,7 +3,6 @@ import { AlertTriangle } from 'lucide-react'
 import { useEmployeeStore } from '../../stores/employeeStore'
 import { useCoverageStore } from '../../stores/coverageStore'
 import { useScheduleStore } from '../../stores/scheduleStore'
-import { useTemplateStore } from '../../stores/templateStore'
 import { covrdDb } from '../../db/db'
 import './DataPurge.css'
 
@@ -31,7 +30,6 @@ export function DataPurge({ onClose }: DataPurgeProps) {
     useEmployeeStore.getState().reset()
     useCoverageStore.getState().reset()
     useScheduleStore.getState().reset()
-    useTemplateStore.getState().reset()
 
     // Clear Dexie IndexedDB
     await covrdDb.purgeAll()
@@ -56,7 +54,7 @@ export function DataPurge({ onClose }: DataPurgeProps) {
 
         <p className="data-purge__warning">
           This action <strong>cannot be undone</strong>. All employees, coverage requirements,
-          schedules, templates, and settings will be permanently deleted from this browser.
+          schedules, and settings will be permanently deleted from this browser.
         </p>
 
         <div className="data-purge__confirm-field">

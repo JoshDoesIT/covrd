@@ -1,6 +1,8 @@
-import { useState, lazy, Suspense } from 'react'
+import { useState, useEffect, lazy, Suspense } from 'react'
 import { CommandPalette } from './tooling/CommandPalette'
 import { PolicyModal } from './shared/PolicyModal'
+import { useSettingsStore } from '../stores/settingsStore'
+import { Users, ClipboardList, CalendarDays, BookOpen } from 'lucide-react'
 import './AppShell.css'
 
 /** Lazy-loaded views for bundle size optimization (Story 7.6). */
@@ -13,8 +15,8 @@ const EmployeeManager = lazy(() =>
 const CoverageManager = lazy(() =>
   import('./coverage/CoverageManager').then((m) => ({ default: m.CoverageManager })),
 )
-const TemplatesView = lazy(() =>
-  import('./templates/TemplatesView').then((m) => ({ default: m.TemplatesView })),
+const KnowledgeBase = lazy(() =>
+  import('./knowledge/KnowledgeBase').then((m) => ({ default: m.KnowledgeBase })),
 )
 
 /** Navigation items for the sidebar. */
@@ -22,22 +24,23 @@ const NAV_ITEMS = [
   {
     id: 'employees',
     label: 'Employees',
-    icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z',
+    icon: Users,
   },
   {
     id: 'coverage',
     label: 'Coverage',
-    icon: 'M4 5a1 1 0 011-1h14a1 1 0 010 2H5a1 1 0 01-1-1zm0 4a1 1 0 011-1h14a1 1 0 010 2H5a1 1 0 01-1-1zm0 4a1 1 0 011-1h14a1 1 0 010 2H5a1 1 0 01-1-1zm0 4a1 1 0 011-1h14a1 1 0 010 2H5a1 1 0 01-1-1z',
+    icon: ClipboardList,
   },
   {
     id: 'schedule',
     label: 'Schedule',
-    icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
+    icon: CalendarDays,
   },
+
   {
-    id: 'templates',
-    label: 'Templates',
-    icon: 'M4 5a1 1 0 011-1h14a1 1 0 010 2H5a1 1 0 01-1-1zm2 4a1 1 0 011-1h10a1 1 0 010 2H7a1 1 0 01-1-1zm4 4a1 1 0 011-1h2a1 1 0 010 2h-2a1 1 0 01-1-1z',
+    id: 'knowledge',
+    label: 'Knowledge',
+    icon: BookOpen,
   },
 ] as const
 
@@ -52,8 +55,38 @@ const isMac = typeof navigator !== 'undefined' && /Mac/i.test(navigator.userAgen
  */
 export function AppShell() {
   const [collapsed, setCollapsed] = useState(false)
-  const [activeNav, setActiveNav] = useState('schedule')
+  const [activeNav, setActiveNavState] = useState(() => {
+    // Only check browser location if window is defined (safe for SSR environments)
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.replace('#', '')
+      return NAV_ITEMS.some((item) => item.id === hash) ? hash : 'schedule'
+    }
+    return 'schedule'
+  })
+
+  const setActiveNav = (id: string) => {
+    setActiveNavState(id)
+  }
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.location.hash !== '#' + activeNav) {
+      window.history.replaceState(null, '', '#' + activeNav)
+    }
+  }, [activeNav])
+
+  useEffect(() => {
+    const onHashChange = () => {
+      const hash = window.location.hash.replace('#', '')
+      if (NAV_ITEMS.some((item) => item.id === hash)) {
+        setActiveNavState(hash)
+      }
+    }
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
   const [policyModal, setPolicyModal] = useState<'privacy' | 'accessibility' | null>(null)
+  const [cmdOpen, setCmdOpen] = useState(false)
+  const { timeFormat, update: updateSettings } = useSettingsStore()
 
   const renderContent = () => {
     switch (activeNav) {
@@ -63,8 +96,8 @@ export function AppShell() {
         return <EmployeeManager />
       case 'coverage':
         return <CoverageManager />
-      case 'templates':
-        return <TemplatesView onNavigate={setActiveNav} />
+      case 'knowledge':
+        return <KnowledgeBase />
       default:
         return (
           <div className="shell__placeholder">
@@ -84,10 +117,23 @@ export function AppShell() {
         aria-label="Sidebar"
       >
         <div className="shell__sidebar-header">
-          <div className="shell__brand" style={{ display: 'flex', alignItems: 'center' }}>
-            <img src="/favicon.png" alt="Covrd" style={{ height: '28px', width: '28px' }} />
-            {!collapsed && <span style={{ marginLeft: '12px' }}>Covrd</span>}
-          </div>
+          <a
+            href="/"
+            className="shell__brand"
+            style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}
+          >
+            <img
+              src="/logo-dark.png"
+              alt="Covrd"
+              style={{
+                height: '64px' /* Larger height to fill the new 72px header */,
+                width: 'auto',
+                objectFit: 'contain',
+                transform:
+                  'translateY(-2px)' /* Minor optical adjustment for built-in PNG whitespace */,
+              }}
+            />
+          </a>
           <button
             className="shell__sidebar-toggle"
             onClick={() => setCollapsed(!collapsed)}
@@ -121,25 +167,29 @@ export function AppShell() {
               aria-current={activeNav === item.id ? 'page' : undefined}
               title={collapsed ? item.label : undefined}
             >
-              <svg
-                className="shell__nav-icon"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d={item.icon} />
-              </svg>
+              <item.icon className="shell__nav-icon" size={20} strokeWidth={1.5} />
               <span className="shell__nav-label">{item.label}</span>
             </button>
           ))}
         </div>
 
         <div className="shell__sidebar-footer">
+          <div className="shell__time-toggle" aria-hidden={collapsed ? 'true' : 'false'}>
+            <button
+              className={`shell__time-btn ${timeFormat === '12h' ? 'active' : ''}`}
+              onClick={() => updateSettings({ timeFormat: '12h' })}
+              title="12-hour format"
+            >
+              12h
+            </button>
+            <button
+              className={`shell__time-btn ${timeFormat === '24h' ? 'active' : ''}`}
+              onClick={() => updateSettings({ timeFormat: '24h' })}
+              title="24-hour format"
+            >
+              24h
+            </button>
+          </div>
           <div className="shell__privacy-badge">
             <span className="shell__privacy-dot" aria-hidden="true" />
             <span className="shell__privacy-label">Client-side only</span>
@@ -161,6 +211,7 @@ export function AppShell() {
         {/* Header */}
         <header className="shell__header" role="banner">
           <div className="shell__header-left">
+            <img src="/logo-dark.png" alt="Covrd" className="shell__mobile-logo" />
             <h1 className="shell__page-title">
               {NAV_ITEMS.find((n) => n.id === activeNav)?.label ?? 'Covrd'}
             </h1>
@@ -169,9 +220,7 @@ export function AppShell() {
             <button
               className="shell__cmd-trigger"
               aria-label="Open command palette"
-              onClick={() => {
-                document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', metaKey: true }))
-              }}
+              onClick={() => setCmdOpen(true)}
             >
               <svg
                 width="16"
@@ -205,7 +254,7 @@ export function AppShell() {
         </main>
       </div>
 
-      <CommandPalette onNavigate={setActiveNav} />
+      <CommandPalette onNavigate={setActiveNav} open={cmdOpen} setOpen={setCmdOpen} />
       <PolicyModal type={policyModal} onClose={() => setPolicyModal(null)} />
     </div>
   )

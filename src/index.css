@@ -134,7 +134,7 @@
   /* Layout */
   --sidebar-width: 260px;
   --sidebar-collapsed-width: 64px;
-  --header-height: 56px;
+  --header-height: 72px; /* Increased from 56px for more breathing room */
   --content-max-width: 1400px;
 }
 
@@ -277,9 +277,13 @@ a:hover {
 /* --- Print Styles (Story 6.4) --- */
 @media print {
   * {
-    color-adjust: exact;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
+  }
+
+  @page {
+    size: landscape;
+    margin: 0.5in;
   }
 
   body {
@@ -288,17 +292,18 @@ a:hover {
     font-size: 11pt;
   }
 
-  /* Hide all chrome: sidebar, header, actions, form controls */
+  /* Hide absolutely all application chroming */
   .shell__sidebar,
   .shell__header,
-  .sm-header,
-  .sm-actions,
   .share-toolbar,
   .sandbox-banner,
   .schedule-analytics,
-  .shell__cmd-trigger,
-  .toast,
+  .sm-header,
+  .sm-actions,
+  .wg-controls,
   .share-toolbar__qr-overlay,
+  .toast,
+  .shell__cmd-trigger,
   .no-print {
     display: none !important;
   }
@@ -307,52 +312,119 @@ a:hover {
     display: block !important;
   }
 
-  /* Make main content fill the page */
-  .shell {
+  /* Flatten layout to allow native pagination */
+  .shell,
+  .shell__main-area,
+  .shell__content,
+  .schedule-manager,
+  .sm-content,
+  .wg-wrapper {
     display: block !important;
-  }
-
-  .shell__main-area {
+    height: auto !important;
+    overflow: visible !important;
     margin: 0 !important;
     padding: 0 !important;
-  }
-
-  .shell__content {
-    padding: 0 !important;
-  }
-
-  .sm-content {
+    background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    background: white !important;
   }
 
-  /* Schedule grid: visible borders, readable text */
-  .weekly-grid {
-    border: 1px solid #333 !important;
-    background: white !important;
+  /* Convert grid entirely to an HTML Table structure strictly for Print logic */
+  /* This enables the OS to natively repeat headers on new pages */
+  .wg-grid {
+    display: table !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    border-top: 1px solid #000 !important;
+    border-left: 1px solid #000 !important;
+    border-right: 1px solid #000 !important;
   }
 
-  .weekly-grid th,
-  .weekly-grid td {
-    border: 1px solid #999 !important;
-    color: black !important;
-    padding: 4px 6px !important;
-    font-size: 9pt !important;
+  .wg-print-thead {
+    display: table-header-group !important;
   }
 
-  .weekly-grid th {
-    background: #eee !important;
+  .wg-print-tbody {
+    display: table-row-group !important;
+  }
+
+  /* Renders above the thead naturally and repeats natively due to standard caption mechanics or by being inside thead */
+  .wg-print-title-row {
+    display: table-row !important;
+  }
+
+  .wg-print-row-group {
+    display: table-row !important;
+    width: 100% !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Flatten Sticky elements and apply sharp table borders */
+  .wg-header-cell,
+  .wg-row-label,
+  .wg-cell {
+    position: static !important;
+    display: table-cell !important;
+    background: #fff !important;
+    color: #000 !important;
+    border: none !important;
+    border-right: 1px solid #000 !important;
+    border-bottom: 1px solid #000 !important;
+    padding: 6px !important;
+    vertical-align: top !important;
+  }
+
+  /* Remove double border on last item */
+  .wg-header-cell:last-child,
+  .wg-cell:last-child {
+    border-right: none !important;
+  }
+
+  .wg-row-label,
+  .wg-header-cell.wg-corner {
+    width: 180px !important;
+  }
+
+  .wg-header-cell:not(.wg-corner),
+  .wg-cell {
+    width: auto !important;
+  }
+
+  .wg-header-cell {
+    background: #f0f0f0 !important;
+    font-size: 10pt !important;
     font-weight: bold !important;
   }
 
-  /* Ensure each week block starts on a new page if needed */
-  .weekly-block {
-    page-break-inside: avoid;
+  .wg-emp-name {
+    color: #000 !important;
+    font-size: 10pt !important;
   }
 
-  .weekly-block h4 {
-    color: black !important;
-    font-size: 12pt !important;
+  .wg-emp-hours {
+    color: #333 !important;
   }
+
+  /* Transform shifts to a stark border-only design for ink saving */
+  .wg-shift-block {
+    background: #fff !important;
+    border: 1px solid #000 !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    padding: 2px 4px !important;
+    margin: 2px !important;
+  }
+
+  .wg-shift-time {
+    color: #000 !important;
+    font-weight: bold !important;
+  }
+}
+
+/* Ensure React wrappers do not break native CSS Grid on web */
+.wg-print-row-group,
+.wg-print-thead,
+.wg-print-tbody {
+  display: contents;
 }

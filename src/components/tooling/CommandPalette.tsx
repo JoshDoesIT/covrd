@@ -5,22 +5,23 @@ import {
   Users,
   Briefcase,
   Activity,
-  Settings,
-  RefreshCcw,
   Zap,
   Trash2,
-  Shield,
+  RefreshCcw,
+  BookOpen,
+  HelpCircle,
 } from 'lucide-react'
 import { useScheduleStore } from '../../stores/scheduleStore'
 import { useEmployeeStore } from '../../stores/employeeStore'
 import { useCoverageStore } from '../../stores/coverageStore'
-import { loadDemoData } from '../../data/demoData'
-import { auditPrivacy } from '../../utils/privacyAudit'
+import { loadDemoDataAsync } from '../../data/demoData'
 import { DataPurge } from '../settings/DataPurge'
 import './CommandPalette.css'
 
 interface CommandPaletteProps {
   onNavigate: (view: string) => void
+  open: boolean
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 /**
@@ -28,9 +29,12 @@ interface CommandPaletteProps {
  *
  * Provides navigation, scheduling actions, demo data loading,
  * data purge, and privacy audit commands.
+ *
+ * Uses cmdk v1 which wraps Radix UI Dialog internally.
+ * - `overlayClassName` targets the backdrop overlay `[cmdk-overlay]`
+ * - `contentClassName` targets the dialog content `[cmdk-dialog]`
  */
-export function CommandPalette({ onNavigate }: CommandPaletteProps) {
-  const [open, setOpen] = useState(false)
+export function CommandPalette({ onNavigate, open, setOpen }: CommandPaletteProps) {
   const [showPurge, setShowPurge] = useState(false)
   const { enableSandbox, commitSandbox, discardSandbox, isSandboxMode } = useScheduleStore()
 
@@ -39,13 +43,13 @@ export function CommandPalette({ onNavigate }: CommandPaletteProps) {
     const down = (e: KeyboardEvent) => {
       if (e.key === 'k' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault()
-        setOpen((open) => !open)
+        setOpen((o) => !o)
       }
     }
 
     document.addEventListener('keydown', down)
     return () => document.removeEventListener('keydown', down)
-  }, [])
+  }, [setOpen])
 
   const handleAction = (action: string) => {
     setOpen(false)
@@ -57,15 +61,24 @@ export function CommandPalette({ onNavigate }: CommandPaletteProps) {
     } else if (action === 'action_commit_sandbox') {
       if (isSandboxMode) commitSandbox()
     } else if (action === 'action_load_demo') {
-      const { employees, coverageRequirements, schedule } = loadDemoData()
-      employees.forEach((e) => useEmployeeStore.getState().addEmployee(e))
-      coverageRequirements.forEach((r) => useCoverageStore.getState().addRequirement(r))
-      useScheduleStore.getState().setActiveSchedule(schedule)
+      import('../../db/db').then(({ covrdDb }) => {
+        // First strictly purge all existing application data and database records
+        useEmployeeStore.getState().reset()
+        useCoverageStore.getState().reset()
+        useScheduleStore.getState().reset()
+        covrdDb.purgeAll().then(() => {
+          // Then seamlessly load and inject the pristine demo environment
+          loadDemoDataAsync().then(({ employees, coverageRequirements, schedule }) => {
+            employees.forEach((e) => useEmployeeStore.getState().addEmployee(e))
+            coverageRequirements.forEach((r) => useCoverageStore.getState().addRequirement(r))
+            useScheduleStore.getState().setActiveSchedule(schedule)
+          })
+        })
+      })
     } else if (action === 'action_purge') {
       setShowPurge(true)
-    } else if (action === 'action_privacy_audit') {
-      const report = auditPrivacy()
-      console.log(report.formatted)
+    } else if (action === 'action_tutorial') {
+      window.dispatchEvent(new CustomEvent('launch-tutorial'))
     }
   }
 
@@ -75,7 +88,8 @@ export function CommandPalette({ onNavigate }: CommandPaletteProps) {
         open={open}
         onOpenChange={setOpen}
         label="Global Command Menu"
-        className="covrd-command-dialog"
+        overlayClassName="covrd-command-overlay"
+        contentClassName="covrd-command-dialog"
       >
         <Command.Input placeholder="Type a command or search..." className="covrd-command-input" />
         <Command.List className="covrd-command-list">
@@ -86,22 +100,30 @@ export function CommandPalette({ onNavigate }: CommandPaletteProps) {
               onSelect={() => handleAction('nav_employees')}
               className="covrd-command-item"
             >
-              <Users className="w-4 h-4 mr-2" />
+              <Users size={18} />
               Go to Employee Roster
             </Command.Item>
             <Command.Item
               onSelect={() => handleAction('nav_coverage')}
               className="covrd-command-item"
             >
-              <Briefcase className="w-4 h-4 mr-2" />
+              <Briefcase size={18} />
               Go to Coverage Rules
             </Command.Item>
             <Command.Item
               onSelect={() => handleAction('nav_schedule')}
               className="covrd-command-item"
             >
-              <Calendar className="w-4 h-4 mr-2" />
+              <Calendar size={18} />
               Go to Schedule Builder
+            </Command.Item>
+
+            <Command.Item
+              onSelect={() => handleAction('nav_knowledge')}
+              className="covrd-command-item"
+            >
+              <BookOpen size={18} />
+              Go to Knowledgebase
             </Command.Item>
           </Command.Group>
 
@@ -110,14 +132,14 @@ export function CommandPalette({ onNavigate }: CommandPaletteProps) {
               onSelect={() => handleAction('nav_schedule')}
               className="covrd-command-item"
             >
-              <Activity className="w-4 h-4 mr-2 text-primary" />
+              <Activity size={18} />
               Run Schedule Generator
             </Command.Item>
             <Command.Item
               onSelect={() => handleAction('action_sandbox')}
               className="covrd-command-item"
             >
-              <RefreshCcw className="w-4 h-4 mr-2 text-warning" />
+              <RefreshCcw size={18} />
               Toggle Sandbox Mode
             </Command.Item>
             {isSandboxMode && (
@@ -125,7 +147,7 @@ export function CommandPalette({ onNavigate }: CommandPaletteProps) {
                 onSelect={() => handleAction('action_commit_sandbox')}
                 className="covrd-command-item"
               >
-                <RefreshCcw className="w-4 h-4 mr-2 text-success" />
+                <RefreshCcw size={18} />
                 Commit Sandbox Changes
               </Command.Item>
             )}
@@ -133,32 +155,22 @@ export function CommandPalette({ onNavigate }: CommandPaletteProps) {
               onSelect={() => handleAction('action_load_demo')}
               className="covrd-command-item"
             >
-              <Zap className="w-4 h-4 mr-2" />
+              <Zap size={18} />
               Load Demo Data
             </Command.Item>
-          </Command.Group>
-
-          <Command.Group heading="Settings">
             <Command.Item
-              onSelect={() => handleAction('action_privacy_audit')}
+              onSelect={() => handleAction('action_tutorial')}
               className="covrd-command-item"
             >
-              <Shield className="w-4 h-4 mr-2" />
-              Run Privacy Audit
+              <HelpCircle size={18} />
+              Launch Tutorial
             </Command.Item>
             <Command.Item
               onSelect={() => handleAction('action_purge')}
               className="covrd-command-item"
             >
-              <Trash2 className="w-4 h-4 mr-2" color="var(--color-danger)" />
+              <Trash2 size={18} color="var(--color-danger)" />
               Purge All Data
-            </Command.Item>
-            <Command.Item
-              onSelect={() => handleAction('nav_settings')}
-              className="covrd-command-item"
-            >
-              <Settings className="w-4 h-4 mr-2" />
-              Preferences
             </Command.Item>
           </Command.Group>
         </Command.List>

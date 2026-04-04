@@ -5,8 +5,6 @@ import type {
   Schedule,
   Constraint,
   ConstraintType,
-  RecurringTemplate,
-  RecurrencePattern,
   DayOfWeek,
   EmploymentType,
   DayAvailability,
@@ -76,34 +74,48 @@ export function createEmployee(
 /**
  * Create a new CoverageRequirement.
  */
-export function createCoverageRequirement(
-  fields: Pick<CoverageRequirement, 'name' | 'day' | 'startTime' | 'endTime' | 'requiredStaff'> &
-    Partial<Pick<CoverageRequirement, 'id'>>,
-): CoverageRequirement {
+export function createCoverageRequirement(props: {
+  id?: string
+  date: string
+  startTime: string
+  endTime: string
+  requiredStaff: number
+  role?: string
+  unpaidBreakMinutes?: number
+}) {
   return {
-    id: fields.id ?? generateId(),
-    name: fields.name,
-    day: fields.day,
-    startTime: fields.startTime,
-    endTime: fields.endTime,
-    requiredStaff: fields.requiredStaff,
+    id: props.id ?? generateId(),
+    date: props.date,
+    startTime: props.startTime,
+    endTime: props.endTime,
+    requiredStaff: props.requiredStaff,
+    role: props.role,
+    unpaidBreakMinutes: props.unpaidBreakMinutes,
   }
 }
 
 /**
  * Create a new Shift.
  */
-export function createShift(
-  fields: Pick<Shift, 'day' | 'startTime' | 'endTime' | 'requiredStaff'> &
-    Partial<Pick<Shift, 'id' | 'weekNumber'>>,
-): Shift {
+export function createShift(props: {
+  id?: string
+  day: DayOfWeek
+  startTime: string
+  endTime: string
+  requiredStaff: number
+  role?: string
+  unpaidBreakMinutes?: number
+  weekNumber?: number
+}) {
   return {
-    id: fields.id ?? generateId(),
-    day: fields.day,
-    startTime: fields.startTime,
-    endTime: fields.endTime,
-    requiredStaff: fields.requiredStaff,
-    weekNumber: fields.weekNumber,
+    id: props.id ?? generateId(),
+    day: props.day,
+    startTime: props.startTime,
+    endTime: props.endTime,
+    requiredStaff: props.requiredStaff,
+    role: props.role,
+    unpaidBreakMinutes: props.unpaidBreakMinutes,
+    weekNumber: props.weekNumber,
   }
 }
 
@@ -144,35 +156,13 @@ export function createConstraint(
   }
 }
 
-/**
- * Create a new RecurringTemplate.
- */
-export function createRecurringTemplate(
-  fields: Pick<RecurringTemplate, 'name' | 'pattern'> & Partial<Omit<RecurringTemplate, 'name'>>,
-): RecurringTemplate {
-  const timestamp = now()
-
-  return {
-    id: fields.id ?? generateId(),
-    name: fields.name,
-    coverageRequirements: fields.coverageRequirements ?? [],
-    constraints: fields.constraints ?? [],
-    pattern: fields.pattern,
-    createdAt: fields.createdAt ?? timestamp,
-    updatedAt: fields.updatedAt ?? timestamp,
-  }
-}
-
 // Re-export types for convenience
 export type {
   Employee,
   CoverageRequirement,
   Shift,
   Schedule,
-  Constraint,
   ConstraintType,
-  RecurringTemplate,
-  RecurrencePattern,
   DayOfWeek,
   EmploymentType,
   DayAvailability,

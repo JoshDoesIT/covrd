@@ -17,8 +17,7 @@ describe('URL State Encoding', () => {
 
   const sampleCoverage = createCoverageRequirement({
     id: 'cov-1',
-    name: 'Morning',
-    day: 'monday',
+    date: '2026-04-06',
     startTime: '09:00',
     endTime: '13:00',
     requiredStaff: 3,
@@ -71,7 +70,7 @@ describe('URL State Encoding', () => {
       expect(decoded!.employees).toHaveLength(1)
       expect(decoded!.employees[0].name).toBe('Alice')
       expect(decoded!.coverageRequirements).toHaveLength(1)
-      expect(decoded!.coverageRequirements[0].name).toBe('Morning')
+      expect(decoded!.coverageRequirements[0].date).toBe('2026-04-06')
       expect(decoded!.schedule.name).toBe('Week 1')
     })
 
