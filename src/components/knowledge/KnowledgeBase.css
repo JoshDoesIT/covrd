@@ -213,3 +213,29 @@
   font-weight: 600;
   color: var(--color-text-primary);
 }
+
+@media (max-width: 768px) {
+  .kb-header {
+    align-items: stretch; /* Allow search bar to fill naturally */
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .kb-title {
+    justify-content: center;
+  }
+
+  .kb-search-container {
+    max-width: 100%;
+  }
+
+  .kb-search-input {
+    border-radius: 100px; /* Pill shape for better standalone look */
+    text-align: center;
+    padding-left: 1rem; /* Balance padding since text is centered */
+  }
+
+  .kb-search-icon {
+    display: none; /* Hide icon on mobile since text is centered */
+  }
+}

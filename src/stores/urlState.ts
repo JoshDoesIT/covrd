@@ -1,5 +1,5 @@
 import pako from 'pako'
-import type { Employee, CoverageRequirement, Schedule } from '../types/index'
+import type { Employee, CoverageRequirement, BaselineRequirement, Schedule } from '../types/index'
 
 /**
  * Shareable state payload — the data that gets encoded into URL hash fragments.
@@ -8,6 +8,7 @@ import type { Employee, CoverageRequirement, Schedule } from '../types/index'
 export interface ShareableState {
   employees: Employee[]
   coverageRequirements: CoverageRequirement[]
+  baselineRequirements?: BaselineRequirement[]
   schedule: Schedule
 }
 

@@ -133,6 +133,25 @@ export interface CoverageRequirement {
 }
 
 /**
+ * Baseline coverage requirements: recurring weekly templates.
+ */
+export interface BaselineRequirement {
+  id: EntityId
+  /** Day of the week (0=Monday, 6=Sunday). */
+  dayOfWeek: number
+  /** Shift start time (HH:mm format). */
+  startTime: string
+  /** Shift end time (HH:mm format). */
+  endTime: string
+  /** Number of staff needed for this exact timeframe. */
+  requiredStaff: number
+  /** Specific role required (optional - defaults to any). */
+  role?: string
+  /** Unpaid break minutes to deduct from total hours. */
+  unpaidBreakMinutes?: number
+}
+
+/**
  * A schedule assignment: one employee assigned to one shift.
  */
 export interface ShiftAssignment {

@@ -392,6 +392,28 @@
   }
 }
 
+@media (max-width: 768px) {
+  .employee-manager {
+    padding: 0.5rem;
+    gap: 1rem;
+  }
+  .em-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+  .em-header > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .em-add-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 @media (max-width: 600px) {
   .employee-card {
     padding: 1rem;
