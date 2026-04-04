@@ -32,6 +32,22 @@ export function solveSchedule(employees: Employee[], targetShifts: Shift[]): Sol
 
   const unassignedShifts = shifts.filter((s) => !s.isAssigned)
 
+  // Pre-filter shifts that are permanently impossible (0 candidates with empty schedule).
+  // If we don't, they trigger a depth-0 domain wipeout causing the solver to assign absolutely nothing.
+  const fillableShifts: Shift[] = []
+
+  for (const shift of unassignedShifts) {
+    const baseEligible = getEligibleCandidates(
+      employees,
+      shift,
+      existingAssignments,
+      currentHourTotals,
+    )
+    if (baseEligible.length > 0) {
+      fillableShifts.push(shift)
+    }
+  }
+
   const context: SearchContext = {
     startTime: Date.now(),
     timeoutMs: 10000,
@@ -40,9 +56,9 @@ export function solveSchedule(employees: Employee[], targetShifts: Shift[]): Sol
     timedOut: false,
   }
 
-  // Recursively solve
+  // Recursively solve using only the shifts that have at least one viable candidate initially
   const success = backtrack(
-    unassignedShifts,
+    fillableShifts,
     employees,
     existingAssignments,
     currentHourTotals,
