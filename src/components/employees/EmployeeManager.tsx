@@ -288,10 +288,15 @@ export function EmployeeManager() {
                     value={formData.maxHoursPerWeek ?? 40}
                     onChange={(e) => {
                       const raw = e.target.value.replace(/[^0-9]/g, '')
-                      setFormData({ ...formData, maxHoursPerWeek: raw === '' ? 40 : Number(raw) })
+                      setFormData({ ...formData, maxHoursPerWeek: raw === '' ? ('' as unknown as number) : Number(raw) })
                     }}
                     onFocus={(e) => {
-                      e.target.select()
+                      if (e.target.value === '40') e.target.value = ''
+                    }}
+                    onBlur={(e) => {
+                      if (e.target.value === '') {
+                        setFormData({ ...formData, maxHoursPerWeek: 40 })
+                      }
                     }}
                   />
                 </div>
