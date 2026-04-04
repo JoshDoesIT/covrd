@@ -61,10 +61,19 @@ export function CommandPalette({ onNavigate, open, setOpen }: CommandPaletteProp
     } else if (action === 'action_commit_sandbox') {
       if (isSandboxMode) commitSandbox()
     } else if (action === 'action_load_demo') {
-      loadDemoDataAsync().then(({ employees, coverageRequirements, schedule }) => {
-        employees.forEach((e) => useEmployeeStore.getState().addEmployee(e))
-        coverageRequirements.forEach((r) => useCoverageStore.getState().addRequirement(r))
-        useScheduleStore.getState().setActiveSchedule(schedule)
+      import('../../db/db').then(({ covrdDb }) => {
+        // First strictly purge all existing application data and database records
+        useEmployeeStore.getState().reset()
+        useCoverageStore.getState().reset()
+        useScheduleStore.getState().reset()
+        covrdDb.purgeAll().then(() => {
+          // Then seamlessly load and inject the pristine demo environment
+          loadDemoDataAsync().then(({ employees, coverageRequirements, schedule }) => {
+            employees.forEach((e) => useEmployeeStore.getState().addEmployee(e))
+            coverageRequirements.forEach((r) => useCoverageStore.getState().addRequirement(r))
+            useScheduleStore.getState().setActiveSchedule(schedule)
+          })
+        })
       })
     } else if (action === 'action_purge') {
       setShowPurge(true)
