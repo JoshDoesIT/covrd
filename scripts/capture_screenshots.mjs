@@ -2,7 +2,7 @@ import { chromium, devices } from 'playwright'
 import path from 'path'
 import fs from 'fs'
 
-const url = 'http://localhost:5174/?demo=1#schedule'
+const url = 'http://localhost:5174/?app'
 const outDir = path.resolve('docs/brand/screenshots')
 
 async function capture() {
