@@ -79,67 +79,76 @@ export function ShareToolbar({ state, onImport }: ShareToolbarProps) {
     }
   }
 
-
   return (
     <div className="share-toolbar">
-      <button
-        className="sm-btn-ghost share-toolbar__btn"
-        onClick={handleImportClick}
-        aria-label="Import JSON"
-        title="Import schedule from JSON"
-      >
-        <Upload size={14} />
-        <span className="share-toolbar__label">Import JSON</span>
-      </button>
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept=".json"
-        onChange={handleFileChange}
-        style={{ display: 'none' }}
-        aria-hidden="true"
-      />
+      {/* Top Row */}
+      <div className="share-toolbar__row share-toolbar__row--top">
+        <button
+          className="sm-btn-ghost share-toolbar__btn share-toolbar__btn--block"
+          onClick={handleShareLink}
+          aria-label="Share Link"
+          title="Copy share link to clipboard"
+        >
+          <Link2 size={14} />
+          <span className="share-toolbar__label" style={{ display: 'inline' }}>
+            Share Link
+          </span>
+        </button>
+      </div>
 
-      <button
-        className="sm-btn-ghost share-toolbar__btn"
-        onClick={handleExportJSON}
-        aria-label="Export JSON"
-        title="Export schedule as JSON"
-      >
-        <Download size={14} />
-        <span className="share-toolbar__label">Export JSON</span>
-      </button>
+      {/* Middle Row */}
+      <div className="share-toolbar__row">
+        <button
+          className="sm-btn-ghost share-toolbar__btn"
+          onClick={handleImportClick}
+          aria-label="Import JSON"
+          title="Import schedule from JSON"
+        >
+          <Upload size={14} />
+          <span className="share-toolbar__label">Import</span>
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".json"
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+          aria-hidden="true"
+        />
 
-      <button
-        className="sm-btn-ghost share-toolbar__btn"
-        onClick={handleExportCSV}
-        aria-label="Export CSV"
-        title="Export schedule as CSV"
-      >
-        <Download size={14} />
-        <span className="share-toolbar__label">Export CSV</span>
-      </button>
+        <button
+          className="sm-btn-ghost share-toolbar__btn"
+          onClick={handleExportJSON}
+          aria-label="Export JSON"
+          title="Export schedule as JSON"
+        >
+          <Download size={14} />
+          <span className="share-toolbar__label">Export JSON</span>
+        </button>
 
-      <button
-        className="sm-btn-ghost share-toolbar__btn"
-        onClick={handlePrint}
-        aria-label="Print"
-        title="Print schedule"
-      >
-        <Printer size={14} />
-        <span className="share-toolbar__label">Print</span>
-      </button>
+        <button
+          className="sm-btn-ghost share-toolbar__btn"
+          onClick={handleExportCSV}
+          aria-label="Export CSV"
+          title="Export schedule as CSV"
+        >
+          <Download size={14} />
+          <span className="share-toolbar__label">Export CSV</span>
+        </button>
+      </div>
 
-      <button
-        className="sm-btn-ghost share-toolbar__btn"
-        onClick={handleShareLink}
-        aria-label="Share Link"
-        title="Copy share link to clipboard"
-      >
-        <Link2 size={14} />
-        <span className="share-toolbar__label">Share Link</span>
-      </button>
-
+      {/* Bottom Row */}
+      <div className="share-toolbar__row">
+        <button
+          className="sm-btn-ghost share-toolbar__btn"
+          onClick={handlePrint}
+          aria-label="Print"
+          title="Print schedule"
+        >
+          <Printer size={14} />
+          <span className="share-toolbar__label">Print</span>
+        </button>
+      </div>
 
       {toastMessage && <Toast message={toastMessage} onDismiss={() => setToastMessage(null)} />}
     </div>

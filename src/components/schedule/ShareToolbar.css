@@ -1,8 +1,21 @@
 .share-toolbar {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 0.25rem;
-  flex-wrap: wrap;
+}
+
+.share-toolbar__row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.share-toolbar__row--top .share-toolbar__btn {
+  width: 100%;
+  justify-content: center;
 }
 
 .share-toolbar__btn {
