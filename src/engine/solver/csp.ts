@@ -126,11 +126,11 @@ function backtrack(
     if (eligible.length === 0) {
       // Domain wipeout! A shift cannot be filled given current assignments.
       // E.g. no employees have the required role or availability left.
-      // But instead of failing the WHOLE tree instantly (which abandons the partial branch),
-      // we could continue by ignoring this shift. However, true CSP backtracking says if X is required,
-      // and X is empty, this branch is invalid. Since we already recorded `bestAssignments`,
-      // we can safely return FALSE to backjump and look for better arrangements.
-      return false
+      // To provide a 'best effort' partial schedule instead of failing completely,
+      // we gracefully accept this shift as unfillable in the current branch
+      // and continue filling out the rest of the schedule.
+      const remaining = unassignedShifts.filter((s) => s.id !== shift.id)
+      return backtrack(remaining, employees, assignments, hourTotals, ctx)
     }
     domains.set(shift.id, eligible)
   }

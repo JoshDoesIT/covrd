@@ -74,7 +74,7 @@ export function ScheduleManager() {
 
   const handleGenerateClick = () => {
     if (employees.length === 0 || requirements.length === 0) {
-      alert('You must configure at least 1 employee and 1 coverage requirement first.')
+      setErrorStatus('You must configure at least 1 employee and 1 coverage requirement first.')
       return
     }
 
